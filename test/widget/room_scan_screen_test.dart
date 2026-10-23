@@ -133,7 +133,7 @@ void main() {
     }
     expect(find.text('4 esquinas'), findsOneWidget);
 
-    await tester.tap(find.text('Terminar'));
+    await tester.tap(find.text('Terminar sin cerrar'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).first, 'Sala medida');
     await tester.tap(find.text('Crear habitación'));
@@ -165,5 +165,58 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('0 esquinas'), findsOneWidget);
+  });
+
+  testWidgets('volver a la primera esquina cierra la habitación', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester);
+
+    for (final double turn in _cornerTurns) {
+      await aimAt(tester, distance: 2.5, turn: turn);
+      await tester.tap(find.text('Marcar esquina'));
+      await tester.pumpAndSettle();
+    }
+
+    // Se sigue girando a la derecha hasta volver a la esquina 1.
+    await aimAt(tester, distance: 2.5, turn: _cornerTurns.first + 2 * math.pi);
+
+    expect(
+      find.text('Estás en la esquina 1: cierra la habitación'),
+      findsOneWidget,
+    );
+    expect(find.text('Marcar esquina'), findsNothing);
+
+    await tester.tap(find.text('Cerrar habitación'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).first, 'Sala cerrada');
+    await tester.tap(find.text('Crear habitación'));
+    await tester.pumpAndSettle();
+
+    final List<Room> saved = await rooms.watchByProject(1).first;
+    // Cerrar no añade una quinta esquina: siguen siendo cuatro paredes.
+    expect(saved.single.walls.length, 4);
+    expect(saved.single.walls.map((wall) => wall.lengthMeters), [
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+    ]);
+  });
+
+  testWidgets('estando lejos de la esquina 1 se sigue marcando', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester);
+
+    for (final double turn in _cornerTurns) {
+      await aimAt(tester, distance: 2.5, turn: turn);
+      await tester.tap(find.text('Marcar esquina'));
+      await tester.pumpAndSettle();
+    }
+    await aimAt(tester, distance: 2.5, turn: 3.0);
+
+    expect(find.text('Cerrar habitación'), findsNothing);
+    expect(find.text('Marcar esquina'), findsOneWidget);
   });
 }
