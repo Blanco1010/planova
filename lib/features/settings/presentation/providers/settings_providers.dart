@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/app_database.dart';
+import '../../../budget/presentation/providers/budget_providers.dart';
+import '../../../projects/presentation/providers/project_providers.dart';
+import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../data/repositories/drift_settings_repository.dart';
+import '../../data/services/demo_data_service.dart';
 import '../../domain/entities/app_theme_mode.dart';
 import '../../domain/repositories/settings_repository.dart';
 
@@ -31,3 +35,12 @@ extension AppThemeModeView on AppThemeMode {
     AppThemeMode.dark => ThemeMode.dark,
   };
 }
+
+/// Quien siembra el proyecto de ejemplo para probar sin cámara.
+final Provider<DemoDataService> demoDataProvider = Provider<DemoDataService>(
+  (ref) => DemoDataService(
+    projects: ref.watch(projectRepositoryProvider),
+    rooms: ref.watch(roomRepositoryProvider),
+    budget: ref.watch(budgetRepositoryProvider),
+  ),
+);
