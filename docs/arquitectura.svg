@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 880" width="1040" height="880" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="flechaClara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <rect width="1040" height="880" fill="#F1F5F9"/>
+
+  <text x="40" y="52" font-size="26" font-weight="700" fill="#1E3A8A">Planova · arquitectura</text>
+  <text x="40" y="78" font-size="14" fill="#64748B">Clean Architecture por features: cada feature tiene su dominio, sus datos y sus pantallas.</text>
+
+  <!-- ============ 1. Cómo es un feature ============ -->
+  <text x="40" y="124" font-size="15" font-weight="600" fill="#0F172A">1 · Cómo es un feature por dentro</text>
+
+  <rect x="40" y="140" width="960" height="190" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+
+  <rect x="64" y="168" width="268" height="134" rx="10" fill="#EFF6FF" stroke="#60A5FA"/>
+  <text x="198" y="196" font-size="14" font-weight="700" fill="#1E3A8A" text-anchor="middle">presentation</text>
+  <text x="198" y="220" font-size="12" fill="#0F172A" text-anchor="middle">pantallas, widgets y hojas</text>
+  <text x="198" y="240" font-size="12" fill="#0F172A" text-anchor="middle">providers de Riverpod</text>
+  <text x="198" y="266" font-size="11" fill="#64748B" text-anchor="middle">No sabe que existe SQLite.</text>
+  <text x="198" y="284" font-size="11" fill="#64748B" text-anchor="middle">Habla con los contratos.</text>
+
+  <rect x="386" y="168" width="268" height="134" rx="10" fill="#1E3A8A"/>
+  <text x="520" y="196" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">domain</text>
+  <text x="520" y="220" font-size="12" fill="#E8EDF5" text-anchor="middle">entidades y borradores</text>
+  <text x="520" y="240" font-size="12" fill="#E8EDF5" text-anchor="middle">cálculos puros</text>
+  <text x="520" y="260" font-size="12" fill="#E8EDF5" text-anchor="middle">contratos (repositorios</text>
+  <text x="520" y="278" font-size="12" fill="#E8EDF5" text-anchor="middle">y servicios)</text>
+
+  <rect x="708" y="168" width="268" height="134" rx="10" fill="#EFF6FF" stroke="#60A5FA"/>
+  <text x="842" y="196" font-size="14" font-weight="700" fill="#1E3A8A" text-anchor="middle">data</text>
+  <text x="842" y="220" font-size="12" fill="#0F172A" text-anchor="middle">tablas y repositorios Drift</text>
+  <text x="842" y="240" font-size="12" fill="#0F172A" text-anchor="middle">servicios del aparato</text>
+  <text x="842" y="266" font-size="11" fill="#64748B" text-anchor="middle">Sensores, cámara, PDF:</text>
+  <text x="842" y="284" font-size="11" fill="#64748B" text-anchor="middle">cada uno tras su contrato.</text>
+
+  <line x1="338" y1="235" x2="380" y2="235" stroke="#1E3A8A" stroke-width="2" marker-end="url(#flecha)"/>
+  <line x1="702" y1="235" x2="660" y2="235" stroke="#1E3A8A" stroke-width="2" marker-end="url(#flecha)"/>
+  <text x="520" y="322" font-size="11" fill="#64748B" text-anchor="middle">Las flechas son dependencias: todo apunta al dominio, y el dominio no apunta a nadie.</text>
+
+  <!-- ============ 2. Los features ============ -->
+  <text x="40" y="376" font-size="15" font-weight="600" fill="#0F172A">2 · Los features</text>
+
+  <g font-size="13" font-weight="600" text-anchor="middle">
+    <rect x="40" y="392" width="148" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="114" y="416" fill="#1E3A8A">projects</text>
+    <text x="114" y="435" font-size="11" font-weight="400" fill="#64748B">la obra y sus datos</text>
+
+    <rect x="202" y="392" width="148" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="276" y="416" fill="#1E3A8A">rooms</text>
+    <text x="276" y="435" font-size="11" font-weight="400" fill="#64748B">paredes y plano</text>
+
+    <rect x="364" y="392" width="148" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="438" y="416" fill="#1E3A8A">room_scan</text>
+    <text x="438" y="435" font-size="11" font-weight="400" fill="#64748B">medir con la cámara</text>
+
+    <rect x="526" y="392" width="148" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="600" y="416" fill="#1E3A8A">materials</text>
+    <text x="600" y="435" font-size="11" font-weight="400" fill="#64748B">cantidades</text>
+
+    <rect x="688" y="392" width="148" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="762" y="416" fill="#1E3A8A">budget</text>
+    <text x="762" y="435" font-size="11" font-weight="400" fill="#64748B">precios y PDF</text>
+
+    <rect x="850" y="392" width="150" height="56" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="925" y="416" fill="#1E3A8A">settings</text>
+    <text x="925" y="435" font-size="11" font-weight="400" fill="#64748B">tema y altura</text>
+  </g>
+
+  <text x="40" y="474" font-size="11" fill="#64748B">Se apoyan en cadena hacia la izquierda: budget usa materials, que usa rooms, que cuelga de projects.</text>
+
+  <!-- ============ 3. core ============ -->
+  <text x="40" y="518" font-size="15" font-weight="600" fill="#0F172A">3 · core · lo que comparten todos</text>
+
+  <rect x="40" y="534" width="960" height="92" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <g font-size="12" text-anchor="middle">
+    <rect x="64" y="558" width="172" height="44" rx="8" fill="#F1F5F9"/>
+    <text x="150" y="578" font-weight="600" fill="#1E3A8A">database</text>
+    <text x="150" y="594" font-size="11" fill="#64748B">Drift · SQLite</text>
+
+    <rect x="252" y="558" width="172" height="44" rx="8" fill="#F1F5F9"/>
+    <text x="338" y="578" font-weight="600" fill="#1E3A8A">geometry</text>
+    <text x="338" y="594" font-size="11" fill="#64748B">trazado y áreas</text>
+
+    <rect x="440" y="558" width="172" height="44" rx="8" fill="#F1F5F9"/>
+    <text x="526" y="578" font-weight="600" fill="#1E3A8A">measuring</text>
+    <text x="526" y="594" font-size="11" fill="#64748B">trigonometría</text>
+
+    <rect x="628" y="558" width="172" height="44" rx="8" fill="#F1F5F9"/>
+    <text x="714" y="578" font-weight="600" fill="#1E3A8A">utils</text>
+    <text x="714" y="594" font-size="11" fill="#64748B">formatos y medidas</text>
+
+    <rect x="816" y="558" width="160" height="44" rx="8" fill="#F1F5F9"/>
+    <text x="896" y="578" font-weight="600" fill="#1E3A8A">widgets</text>
+    <text x="896" y="594" font-size="11" fill="#64748B">piezas comunes</text>
+  </g>
+
+  <!-- ============ 4. El dato ============ -->
+  <text x="40" y="670" font-size="15" font-weight="600" fill="#0F172A">4 · El dato, de la pared al presupuesto</text>
+  <text x="40" y="692" font-size="11" fill="#64748B">Solo se guardan las paredes y los precios. Todo lo demás se calcula, así que no puede quedar desfasado.</text>
+
+  <g font-size="12" text-anchor="middle">
+    <rect x="40" y="712" width="140" height="76" rx="10" fill="#1E3A8A"/>
+    <text x="110" y="742" font-size="13" font-weight="700" fill="#FFFFFF">Paredes</text>
+    <text x="110" y="762" font-size="11" fill="#E8EDF5">largo y giro</text>
+    <text x="110" y="778" font-size="10" fill="#60A5FA">guardado</text>
+
+    <rect x="204" y="712" width="140" height="76" rx="10" fill="#FFFFFF" stroke="#60A5FA"/>
+    <text x="274" y="742" font-size="13" font-weight="700" fill="#1E3A8A">RoomPlan</text>
+    <text x="274" y="762" font-size="11" fill="#0F172A">área, perímetro</text>
+    <text x="274" y="778" font-size="11" fill="#0F172A">muros netos</text>
+
+    <rect x="368" y="712" width="140" height="76" rx="10" fill="#FFFFFF" stroke="#60A5FA"/>
+    <text x="438" y="742" font-size="13" font-weight="700" fill="#1E3A8A">Superficies</text>
+    <text x="438" y="762" font-size="11" fill="#0F172A">de una pieza</text>
+    <text x="438" y="778" font-size="11" fill="#0F172A">o de la obra</text>
+
+    <rect x="532" y="712" width="140" height="76" rx="10" fill="#FFFFFF" stroke="#60A5FA"/>
+    <text x="602" y="742" font-size="13" font-weight="700" fill="#1E3A8A">Materiales</text>
+    <text x="602" y="762" font-size="11" fill="#0F172A">bloques, pintura</text>
+    <text x="602" y="778" font-size="11" fill="#0F172A">baldosa, mortero</text>
+
+    <rect x="696" y="712" width="140" height="76" rx="10" fill="#FFFFFF" stroke="#60A5FA"/>
+    <text x="766" y="742" font-size="13" font-weight="700" fill="#1E3A8A">Presupuesto</text>
+    <text x="766" y="762" font-size="11" fill="#0F172A">precios y partidas</text>
+    <text x="766" y="778" font-size="10" fill="#64748B">precios guardados</text>
+
+    <rect x="860" y="712" width="140" height="76" rx="10" fill="#2563EB"/>
+    <text x="930" y="742" font-size="13" font-weight="700" fill="#FFFFFF">PDF</text>
+    <text x="930" y="762" font-size="11" fill="#FFFFFF">con el plano</text>
+    <text x="930" y="778" font-size="11" fill="#FFFFFF">dibujado</text>
+  </g>
+
+  <g stroke="#2563EB" stroke-width="2" marker-end="url(#flechaClara)">
+    <line x1="186" y1="750" x2="198" y2="750"/>
+    <line x1="350" y1="750" x2="362" y2="750"/>
+    <line x1="514" y1="750" x2="526" y2="750"/>
+    <line x1="678" y1="750" x2="690" y2="750"/>
+    <line x1="842" y1="750" x2="854" y2="750"/>
+  </g>
+
+  <text x="40" y="828" font-size="11" fill="#64748B">La cámara entrega esquinas, que se convierten en paredes: entra por la izquierda del mismo camino.</text>
+  <text x="40" y="848" font-size="11" fill="#64748B">Sensores, cámara, compartir y el dibujo del plano están tras contratos, para poder probar las pantallas sin aparato.</text>
+</svg>
