@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/core/geometry/point2d.dart';
 import 'package:planova/features/room_scan/domain/entities/device_aim.dart';
 import 'package:planova/features/room_scan/presentation/providers/scan_providers.dart';
 import 'package:planova/features/room_scan/presentation/screens/room_scan_screen.dart';
@@ -24,6 +25,17 @@ double _pitchFor(double distance) => math.atan(1.5 / distance);
 /// Las cuatro esquinas de una habitación de 4 × 3 vistas desde el centro:
 /// todas a 2,50 m, girando siempre hacia la derecha.
 const List<double> _cornerTurns = <double>[0.6435, 2.4981, 3.7851, 5.6397];
+
+/// Lo que medirían los sensores apuntando desde [from] al pie de [target].
+DeviceAim _aimFrom(Point2D from, Point2D target) {
+  final double dx = target.x - from.x;
+  final double dy = target.y - from.y;
+  final double distance = math.sqrt(dx * dx + dy * dy);
+  return DeviceAim(
+    pitchRadians: math.atan(1.5 / distance),
+    turnRadians: math.atan2(dy, dx),
+  );
+}
 
 void main() {
   setUpAll(initializeDateFormatting);
@@ -218,5 +230,65 @@ void main() {
 
     expect(find.text('Cerrar habitación'), findsNothing);
     expect(find.text('Marcar esquina'), findsOneWidget);
+  });
+
+  testWidgets('se puede caminar: el plano no se mueve al reubicarse', (
+    WidgetTester tester,
+  ) async {
+    // Una habitación de 4 × 3 medida desde dos sitios distintos.
+    const Point2D c1 = Point2D(0, 0);
+    const Point2D c2 = Point2D(4, 0);
+    const Point2D c3 = Point2D(4, 3);
+    const Point2D c4 = Point2D(0, 3);
+    const Point2D desdeAqui = Point2D(0.5, 1.5);
+    const Point2D yDesdeAlla = Point2D(3.5, 1.5);
+
+    await pumpScan(tester);
+
+    for (final Point2D corner in <Point2D>[c1, c2]) {
+      tracker.emit(_aimFrom(desdeAqui, corner));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Marcar esquina'));
+      await tester.pumpAndSettle();
+    }
+
+    // Se camina al otro lado y se vuelve a situar apuntando a la esquina 2.
+    await tester.tap(find.text('Me moví'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, '2'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Apunta al pie de la esquina 2 y fija tu posición'),
+      findsOneWidget,
+    );
+
+    tracker.emit(_aimFrom(yDesdeAlla, c2));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Estoy aquí'));
+    await tester.pumpAndSettle();
+
+    // Y se siguen marcando las que faltan desde el sitio nuevo.
+    for (final Point2D corner in <Point2D>[c3, c4]) {
+      tracker.emit(_aimFrom(yDesdeAlla, corner));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Marcar esquina'));
+      await tester.pumpAndSettle();
+    }
+
+    tracker.emit(_aimFrom(yDesdeAlla, c1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cerrar habitación'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).first, 'Sala caminada');
+    await tester.tap(find.text('Crear habitación'));
+    await tester.pumpAndSettle();
+
+    final List<Room> saved = await rooms.watchByProject(1).first;
+    expect(saved.single.walls.map((wall) => wall.lengthMeters), [
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+    ]);
   });
 }

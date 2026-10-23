@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/point2d.dart';
-import '../../../../core/measuring/sighting_math.dart';
 import '../../../../core/measuring/view_projection.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/device_aim.dart';
-import '../../domain/entities/sighting.dart';
+import '../../domain/entities/scan_session.dart';
 
 /// Dibuja el plano encima de la imagen de la cámara.
 ///
-/// Las esquinas marcadas se quedan pegadas al sitio donde están en la
-/// habitación, y desde la última sale una línea viva que sigue a la mira
+/// Las esquinas van en coordenadas de la habitación, así que se quedan
+/// pegadas a su sitio aunque se camine: lo que cambia al moverse es desde
+/// dónde se miran. Desde la última sale una línea viva que sigue a la mira
 /// hasta que se marca la siguiente.
 class ScanOverlay extends StatelessWidget {
   const ScanOverlay({
-    required this.sightings,
+    required this.session,
     required this.aim,
     required this.phoneHeightMeters,
     required this.liveDistanceMeters,
@@ -25,14 +25,15 @@ class ScanOverlay extends StatelessWidget {
     super.key,
   });
 
-  final List<Sighting> sightings;
+  final ScanSession session;
   final DeviceAim? aim;
   final double phoneHeightMeters;
 
   /// Distancia al punto al que se apunta ahora, si la hay.
   final double? liveDistanceMeters;
 
-  /// Esquina a la que se ha enganchado la mira, si hay alguna.
+  /// Esquina resaltada: la enganchada o la que se está usando para
+  /// volver a situarse.
   final int? snappedCorner;
 
   @override
@@ -40,7 +41,7 @@ class ScanOverlay extends StatelessWidget {
     return CustomPaint(
       size: Size.infinite,
       painter: _ScanOverlayPainter(
-        sightings: sightings,
+        session: session,
         aim: aim,
         phoneHeightMeters: phoneHeightMeters,
         liveDistanceMeters: liveDistanceMeters,
@@ -52,14 +53,14 @@ class ScanOverlay extends StatelessWidget {
 
 class _ScanOverlayPainter extends CustomPainter {
   _ScanOverlayPainter({
-    required this.sightings,
+    required this.session,
     required this.aim,
     required this.phoneHeightMeters,
     required this.liveDistanceMeters,
     required this.snappedCorner,
   });
 
-  final List<Sighting> sightings;
+  final ScanSession session;
   final DeviceAim? aim;
   final double phoneHeightMeters;
   final double? liveDistanceMeters;
@@ -71,7 +72,7 @@ class _ScanOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final DeviceAim? aim = this.aim;
-    if (aim == null || sightings.isEmpty) return;
+    if (aim == null || session.isEmpty) return;
 
     final ViewProjection projection = ViewProjection(
       widthPx: size.width,
@@ -82,13 +83,8 @@ class _ScanOverlayPainter extends CustomPainter {
     );
 
     final List<Offset?> corners = <Offset?>[
-      for (final Sighting sighting in sightings)
-        _toOffset(
-          projection.project(
-            distanceMeters: sighting.distanceMeters,
-            turnRadians: sighting.turnRadians,
-          ),
-        ),
+      for (final Point2D corner in session.corners)
+        _project(projection, corner),
     ];
 
     for (int i = 0; i + 1 < corners.length; i++) {
@@ -96,37 +92,42 @@ class _ScanOverlayPainter extends CustomPainter {
         canvas,
         corners[i],
         corners[i + 1],
-        meters: sightings[i].point.distanceTo(sightings[i + 1].point),
+        meters: session.corners[i].distanceTo(session.corners[i + 1]),
         color: AppColors.lightBlue,
       );
     }
 
-    _paintLiveWall(canvas, size, corners);
+    _paintLiveWall(canvas, size, corners, aim);
     _paintCorners(canvas, corners);
   }
 
   /// La línea que va desde la última esquina hasta donde apunta la mira.
-  void _paintLiveWall(Canvas canvas, Size size, List<Offset?> corners) {
+  void _paintLiveWall(
+    Canvas canvas,
+    Size size,
+    List<Offset?> corners,
+    DeviceAim aim,
+  ) {
     final double? distance = liveDistanceMeters;
     final Offset? from = corners.last;
     if (distance == null || from == null) return;
 
-    final bool closing = snappedCorner == 0 && sightings.length >= 3;
+    final bool closing = snappedCorner == 0 && session.corners.length >= 3;
+    final Point2D endPoint = closing
+        ? session.corners.first
+        : session.aimPoint(
+            distanceMeters: distance,
+            turnRadians: aim.turnRadians,
+          );
     final Offset to = closing
         ? (corners.first ?? Offset(size.width / 2, size.height / 2))
         : Offset(size.width / 2, size.height / 2);
-
-    final Point2D aimPoint = SightingMath.floorPoint(
-      distanceMeters: distance,
-      turnRadians: aim!.turnRadians,
-    );
-    final Point2D endPoint = closing ? sightings.first.point : aimPoint;
 
     _wall(
       canvas,
       from,
       to,
-      meters: sightings.last.point.distanceTo(endPoint),
+      meters: session.corners.last.distanceTo(endPoint),
       color: closing ? Colors.white : AppColors.primaryBlue,
       dashed: !closing,
     );
@@ -160,6 +161,15 @@ class _ScanOverlayPainter extends CustomPainter {
         background: AppColors.deepBlue,
       );
     }
+  }
+
+  Offset? _project(ViewProjection projection, Point2D corner) {
+    final ({double distance, double turn}) view = session.viewOf(corner);
+    final Point2D? point = projection.project(
+      distanceMeters: view.distance,
+      turnRadians: view.turn,
+    );
+    return point == null ? null : Offset(point.x, point.y);
   }
 
   void _wall(
@@ -245,9 +255,6 @@ class _ScanOverlayPainter extends CustomPainter {
       Offset(center.dx - painter.width / 2, center.dy - painter.height / 2),
     );
   }
-
-  Offset? _toOffset(Point2D? point) =>
-      point == null ? null : Offset(point.x, point.y);
 
   @override
   bool shouldRepaint(_ScanOverlayPainter oldDelegate) => true;

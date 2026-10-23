@@ -66,6 +66,44 @@ abstract final class SightingMath {
     return -dot;
   }
 
+  /// Coordenada de la esquina a la que se apunta, sabiendo desde dónde se
+  /// mira. Así el punto queda anclado a la habitación y no a quien mide:
+  /// aunque después se camine, la esquina sigue donde está.
+  static Point2D cornerFrom(
+    Point2D observer, {
+    required double distanceMeters,
+    required double turnRadians,
+  }) {
+    return observer +
+        floorPoint(distanceMeters: distanceMeters, turnRadians: turnRadians);
+  }
+
+  /// El camino de vuelta: dónde está parado quien mide, sabiendo a qué
+  /// esquina conocida apunta y a qué distancia la ve.
+  ///
+  /// Es lo que permite moverse por la obra sin perder el plano: se apunta a
+  /// una esquina ya marcada y la app vuelve a saber dónde estás.
+  static Point2D positionFromCorner(
+    Point2D corner, {
+    required double distanceMeters,
+    required double turnRadians,
+  }) {
+    return corner -
+        floorPoint(distanceMeters: distanceMeters, turnRadians: turnRadians);
+  }
+
+  /// Cómo se ve un punto desde [observer]: a qué distancia y con qué giro.
+  static ({double distance, double turn}) viewFrom(
+    Point2D observer,
+    Point2D target,
+  ) {
+    final Point2D relative = target - observer;
+    return (
+      distance: math.sqrt(relative.x * relative.x + relative.y * relative.y),
+      turn: math.atan2(relative.y, relative.x),
+    );
+  }
+
   /// Punto del suelo en el plano, visto desde donde está parado el usuario.
   ///
   /// El giro se mide desde la primera esquina marcada y crece hacia la
