@@ -27,8 +27,6 @@ class BudgetSummary {
     required this.otherTotal,
     required this.finishesTotal,
     required this.floorAreaM2,
-    required this.pricedMaterials,
-    required this.totalMaterials,
   });
 
   final double materialsTotal;
@@ -39,16 +37,9 @@ class BudgetSummary {
   final double finishesTotal;
   final double floorAreaM2;
 
-  /// Cuántos materiales calculados ya tienen precio, y cuántos hay.
-  /// Sirve para avisar de que el total todavía está incompleto.
-  final int pricedMaterials;
-  final int totalMaterials;
-
   double get total => materialsTotal + laborTotal + otherTotal + finishesTotal;
 
   /// Costo por metro cuadrado de piso; `null` si no hay área medida.
   double? get costPerSquareMeter =>
       floorAreaM2 > 0 ? total / floorAreaM2 : null;
-
-  bool get isComplete => pricedMaterials == totalMaterials;
 }

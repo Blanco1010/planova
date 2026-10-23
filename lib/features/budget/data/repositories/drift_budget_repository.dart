@@ -41,6 +41,14 @@ class DriftBudgetRepository implements BudgetRepository {
   }
 
   @override
+  Future<void> removePrice(int projectId, MaterialKind kind) async {
+    await (_db.delete(_db.materialPrices)..where(
+          (t) => t.projectId.equals(projectId) & t.kind.equalsValue(kind),
+        ))
+        .go();
+  }
+
+  @override
   Stream<List<BudgetItem>> watchItems(int projectId) {
     final query = _db.select(_db.budgetItems)
       ..where((t) => t.projectId.equals(projectId))

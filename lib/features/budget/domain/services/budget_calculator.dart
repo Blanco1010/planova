@@ -17,22 +17,38 @@ abstract final class BudgetCalculator {
     };
   }
 
-  /// Las líneas de material que tienen cantidad; las de cero no se enseñan.
+  /// Las líneas de material que el usuario metió en el presupuesto.
+  ///
+  /// Un material entra cuando se le pone precio: la app no decide por él
+  /// qué compra ni le reclama precios que no quiere poner.
   static List<MaterialLine> materialLines({
     required MaterialEstimates estimates,
     required Map<MaterialKind, double> prices,
   }) {
     final List<MaterialLine> lines = <MaterialLine>[];
     for (final MaterialKind kind in MaterialKind.values) {
+      final double? price = prices[kind];
+      if (price == null) continue;
+
       final double quantity = quantityOf(kind, estimates);
       if (quantity <= 0) continue;
-      lines.add(
-        MaterialLine(
-          kind: kind,
-          quantity: quantity,
-          unitPrice: prices[kind] ?? 0,
-        ),
-      );
+      lines.add(MaterialLine(kind: kind, quantity: quantity, unitPrice: price));
+    }
+    return lines;
+  }
+
+  /// Los que todavía se pueden añadir, con lo que haría falta de cada uno.
+  static List<MaterialLine> availableMaterials({
+    required MaterialEstimates estimates,
+    required Map<MaterialKind, double> prices,
+  }) {
+    final List<MaterialLine> lines = <MaterialLine>[];
+    for (final MaterialKind kind in MaterialKind.values) {
+      if (prices.containsKey(kind)) continue;
+
+      final double quantity = quantityOf(kind, estimates);
+      if (quantity <= 0) continue;
+      lines.add(MaterialLine(kind: kind, quantity: quantity, unitPrice: 0));
     }
     return lines;
   }
@@ -44,10 +60,8 @@ abstract final class BudgetCalculator {
     double finishesTotal = 0,
   }) {
     double materials = 0;
-    int priced = 0;
     for (final MaterialLine line in materialLines) {
       materials += line.subtotal;
-      if (line.hasPrice) priced++;
     }
 
     double labor = 0;
@@ -69,8 +83,6 @@ abstract final class BudgetCalculator {
       otherTotal: other,
       finishesTotal: finishesTotal,
       floorAreaM2: floorAreaM2,
-      pricedMaterials: priced,
-      totalMaterials: materialLines.length,
     );
   }
 }

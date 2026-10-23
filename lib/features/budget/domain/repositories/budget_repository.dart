@@ -7,7 +7,11 @@ abstract interface class BudgetRepository {
   /// Precio de cada material calculado; los que no estén, van sin precio.
   Stream<Map<MaterialKind, double>> watchPrices(int projectId);
 
+  /// Ponerle precio a un material es lo que lo mete en el presupuesto.
   Future<void> savePrice(int projectId, MaterialKind kind, double unitPrice);
+
+  /// Lo saca del presupuesto. La cantidad sigue estando en materiales.
+  Future<void> removePrice(int projectId, MaterialKind kind);
 
   /// Partidas del proyecto, de la más vieja a la más nueva.
   Stream<List<BudgetItem>> watchItems(int projectId);

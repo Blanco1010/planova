@@ -437,14 +437,6 @@ abstract final class BudgetPdfBuilder {
             ],
           ),
         ),
-        if (!summary.isComplete) ...<pw.Widget>[
-          pw.SizedBox(height: 10),
-          pw.Text(
-            'Faltan ${summary.totalMaterials - summary.pricedMaterials} '
-            'precios por poner: el total todavía se queda corto.',
-            style: const pw.TextStyle(fontSize: 9, color: _muted),
-          ),
-        ],
         pw.SizedBox(height: 14),
         pw.Text(
           'Las cantidades de material se calculan a partir de las medidas del '

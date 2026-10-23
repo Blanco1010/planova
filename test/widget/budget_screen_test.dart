@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
 import 'package:planova/features/budget/domain/entities/budget_item.dart';
+import 'package:planova/features/budget/domain/entities/material_kind.dart';
 import 'package:planova/features/budget/presentation/providers/budget_providers.dart';
 import 'package:planova/features/budget/presentation/screens/budget_screen.dart';
 import 'package:planova/features/materials/presentation/providers/material_providers.dart';
@@ -84,26 +85,36 @@ void main() {
   ) async {
     await pumpBudget(tester);
 
-    expect(find.text('Todavía no hay habitaciones medidas.'), findsOneWidget);
+    expect(
+      find.textContaining('Añade los materiales que quieras presupuestar'),
+      findsOneWidget,
+    );
     expect(find.text(r'$ 0'), findsWidgets);
   });
 
-  testWidgets('enseña las cantidades del plano esperando precio', (
+  testWidgets('ningún material entra hasta que uno lo mete', (
     WidgetTester tester,
   ) async {
     await addRoom();
     await pumpBudget(tester);
 
-    expect(find.text('Bloques'), findsOneWidget);
-    expect(find.text('425 unid · toca para ponerle precio'), findsOneWidget);
-    expect(find.textContaining('Faltan 6 precios'), findsOneWidget);
+    expect(find.text('Bloques'), findsNothing);
+    expect(
+      find.textContaining('Añade los materiales que quieras presupuestar'),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('ponerle precio a los bloques calcula su subtotal', (
+  testWidgets('meter los bloques y ponerles precio calcula su subtotal', (
     WidgetTester tester,
   ) async {
     await addRoom();
     await pumpBudget(tester);
+
+    // El primer «Añadir» es el de materiales.
+    await tester.tap(find.widgetWithText(TextButton, 'Añadir').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Harían falta 425 unid'), findsOneWidget);
 
     await tester.tap(find.text('Bloques'));
     await tester.pumpAndSettle();
@@ -114,7 +125,22 @@ void main() {
     // 425 × 1.800.
     expect(find.text(r'$ 765.000'), findsWidgets);
     expect(find.text('425 unid × \$ 1.800'), findsOneWidget);
-    expect(find.textContaining('Faltan 5 precios'), findsOneWidget);
+  });
+
+  testWidgets('un material metido se puede quitar', (
+    WidgetTester tester,
+  ) async {
+    await addRoom();
+    await budget.savePrice(1, MaterialKind.block, 1800);
+    await pumpBudget(tester);
+    expect(find.text('Bloques'), findsOneWidget);
+
+    await tester.tap(find.text('Bloques'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Quitar del presupuesto'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bloques'), findsNothing);
   });
 
   testWidgets('una partida de mano de obra entra en su capítulo', (
@@ -123,8 +149,9 @@ void main() {
     await addRoom();
     await pumpBudget(tester);
 
-    // El primero es el de las partidas; el segundo, el de acabados.
-    await tester.tap(find.widgetWithText(TextButton, 'Añadir').first);
+    // Materiales, partidas y acabados tienen su «Añadir»: este es el de
+    // las partidas.
+    await tester.tap(find.widgetWithText(TextButton, 'Añadir').at(1));
     await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(

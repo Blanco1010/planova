@@ -31,15 +31,40 @@ BudgetItem _item({
 
 void main() {
   group('materialLines', () {
-    test('una línea por material con cantidad', () {
+    test('sin precio puesto, el material no entra', () {
       final List<MaterialLine> lines = BudgetCalculator.materialLines(
         estimates: _estimates,
         prices: const <MaterialKind, double>{},
       );
 
-      expect(lines.length, MaterialKind.values.length);
-      expect(lines.every((MaterialLine line) => line.quantity > 0), isTrue);
-      expect(lines.every((MaterialLine line) => line.hasPrice), isFalse);
+      expect(lines, isEmpty);
+    });
+
+    test('entra solo lo que se metió, con su precio', () {
+      final List<MaterialLine> lines = BudgetCalculator.materialLines(
+        estimates: _estimates,
+        prices: const <MaterialKind, double>{
+          MaterialKind.block: 1800,
+          MaterialKind.cement: 32000,
+        },
+      );
+
+      expect(lines.length, 2);
+      expect(lines.every((MaterialLine line) => line.hasPrice), isTrue);
+    });
+
+    test('los que faltan quedan disponibles, con su cantidad', () {
+      final List<MaterialLine> available = BudgetCalculator.availableMaterials(
+        estimates: _estimates,
+        prices: const <MaterialKind, double>{MaterialKind.block: 1800},
+      );
+
+      expect(available.length, MaterialKind.values.length - 1);
+      expect(
+        available.any((MaterialLine line) => line.kind == MaterialKind.block),
+        isFalse,
+      );
+      expect(available.every((MaterialLine line) => line.quantity > 0), isTrue);
     });
 
     test('sin obra medida no hay líneas', () {
@@ -97,22 +122,6 @@ void main() {
       expect(summary.costPerSquareMeter, closeTo(1858000 / 12, 1e-6));
     });
 
-    test('avisa mientras falten precios', () {
-      final List<MaterialLine> lines = BudgetCalculator.materialLines(
-        estimates: _estimates,
-        prices: const <MaterialKind, double>{MaterialKind.block: 1800},
-      );
-      final BudgetSummary summary = BudgetCalculator.summarize(
-        materialLines: lines,
-        items: const <BudgetItem>[],
-        floorAreaM2: 12,
-      );
-
-      expect(summary.pricedMaterials, 1);
-      expect(summary.totalMaterials, 6);
-      expect(summary.isComplete, isFalse);
-    });
-
     test('una partida de material suma con los calculados', () {
       final BudgetSummary summary = BudgetCalculator.summarize(
         materialLines: const <MaterialLine>[],
@@ -128,7 +137,6 @@ void main() {
 
       expect(summary.materialsTotal, closeTo(45000, 1e-6));
       expect(summary.costPerSquareMeter, isNull);
-      expect(summary.isComplete, isTrue);
     });
   });
 }

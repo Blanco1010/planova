@@ -75,6 +75,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       estimates: estimates,
       prices: prices,
     );
+    final List<MaterialLine> available = BudgetCalculator.availableMaterials(
+      estimates: estimates,
+      prices: prices,
+    );
     final BudgetSummary summary = BudgetCalculator.summarize(
       materialLines: lines,
       items: items,
@@ -118,7 +122,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ],
           _MaterialsCard(
             lines: lines,
-            onTapLine: (MaterialLine line) => _editPrice(line),
+            onTapLine: _materialOptions,
+            onAdd: available.isEmpty ? null : () => _addMaterial(available),
           ),
           const SizedBox(height: 12),
           _ItemsCard(
@@ -194,6 +199,48 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     }
   }
 
+  /// Elige cuál de los materiales que faltan se mete en el presupuesto.
+  Future<void> _addMaterial(List<MaterialLine> available) async {
+    final MaterialLine? chosen = await showModalBottomSheet<MaterialLine>(
+      context: context,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '¿Qué material entra?',
+                  style: Theme.of(sheetContext).textTheme.titleLarge,
+                ),
+              ),
+            ),
+            for (final MaterialLine line in available)
+              ListTile(
+                title: Text(line.kind.label),
+                subtitle: Text(
+                  'Harían falta '
+                  '${Formatters.quantity(line.quantity)} ${line.kind.unit}',
+                ),
+                onTap: () => Navigator.of(sheetContext).pop(line),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    if (chosen == null || !mounted) return;
+    await _editPrice(chosen);
+  }
+
+  Future<void> _removeMaterial(MaterialLine line) async {
+    await ref
+        .read(budgetRepositoryProvider)
+        .removePrice(widget.projectId, line.kind);
+  }
+
   Future<void> _editPrice(MaterialLine line) async {
     final double? price = await NumberPromptDialog.show(
       context,
@@ -209,6 +256,45 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     await ref
         .read(budgetRepositoryProvider)
         .savePrice(widget.projectId, line.kind, price);
+  }
+
+  /// Lo que se ofrece al tocar un material ya metido.
+  Future<void> _materialOptions(MaterialLine line) async {
+    if (!line.hasPrice) {
+      await _editPrice(line);
+      return;
+    }
+
+    final bool? remove = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.edit_outlined),
+              title: const Text('Cambiar el precio'),
+              onTap: () => Navigator.of(sheetContext).pop(false),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.remove_circle_outline,
+                color: Theme.of(sheetContext).colorScheme.error,
+              ),
+              title: const Text('Quitar del presupuesto'),
+              onTap: () => Navigator.of(sheetContext).pop(true),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (remove == null || !mounted) return;
+    if (remove) {
+      await _removeMaterial(line);
+    } else {
+      await _editPrice(line);
+    }
   }
 }
 
@@ -249,10 +335,15 @@ class _RoomPicker extends StatelessWidget {
 }
 
 class _MaterialsCard extends StatelessWidget {
-  const _MaterialsCard({required this.lines, required this.onTapLine});
+  const _MaterialsCard({
+    required this.lines,
+    required this.onTapLine,
+    required this.onAdd,
+  });
 
   final List<MaterialLine> lines;
   final ValueChanged<MaterialLine> onTapLine;
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -264,20 +355,25 @@ class _MaterialsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Materiales calculados', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 4),
-            Text(
-              'Las cantidades vienen del plano; tú pones el precio.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Materiales', style: theme.textTheme.titleMedium),
+                ),
+                TextButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Añadir'),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
             if (lines.isEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Todavía no hay habitaciones medidas.',
+                  'Añade los materiales que quieras presupuestar. Las '
+                  'cantidades salen del plano; tú pones el precio y decides '
+                  'cuáles entran.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -288,19 +384,12 @@ class _MaterialsCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(line.kind.label),
                 subtitle: Text(
-                  line.hasPrice
-                      ? '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
-                            ' × ${Formatters.money(line.unitPrice)}'
-                      : '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
-                            ' · toca para ponerle precio',
+                  '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
+                  ' × ${Formatters.money(line.unitPrice)}',
                 ),
                 trailing: Text(
-                  line.hasPrice ? Formatters.money(line.subtotal) : '—',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: line.hasPrice
-                        ? theme.colorScheme.onSurface
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
+                  Formatters.money(line.subtotal),
+                  style: theme.textTheme.titleSmall,
                 ),
                 onTap: () => onTapLine(line),
               ),
@@ -516,29 +605,6 @@ class _SummaryCard extends StatelessWidget {
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-              ),
-            ],
-            if (!summary.isComplete) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 18,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Faltan '
-                      '${summary.totalMaterials - summary.pricedMaterials}'
-                      ' precios: el total todavía se queda corto.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ],
           ],

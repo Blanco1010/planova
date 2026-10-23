@@ -32,6 +32,12 @@ class FakeBudgetRepository implements BudgetRepository {
   }
 
   @override
+  Future<void> removePrice(int projectId, MaterialKind kind) async {
+    _prices.remove(kind);
+    _emit();
+  }
+
+  @override
   Stream<List<BudgetItem>> watchItems(int projectId) async* {
     yield List<BudgetItem>.of(_items);
     yield* _changes.stream.map((_) => List<BudgetItem>.of(_items));

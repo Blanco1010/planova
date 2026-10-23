@@ -12,9 +12,10 @@ cliente en PDF.
 - **Medir con la cámara**: apuntas al pie de cada esquina y sale el polígono.
 - **Materiales**: bloques, mortero (cemento y arena), pintura y baldosa, con
   los rendimientos de tu obra.
-- **Presupuesto**: precio unitario a lo calculado, partidas a mano (acero,
-  teja, mano de obra), **acabados** por superficie —marcas qué paredes y qué
-  pisos llevan pintura o enchape y a cuánto el m²—, total y costo por m².
+- **Presupuesto**: tú eliges qué materiales entran y les pones precio; las
+  cantidades salen del plano. Más partidas a mano (acero, teja, mano de obra)
+  y **acabados** por superficie —marcas qué paredes y qué pisos llevan pintura
+  o enchape y a cuánto el m²—, con total y costo por m².
 - **PDF**: el presupuesto con el plano de cada habitación dibujado dentro.
 
 ## Arquitectura
@@ -74,7 +75,7 @@ va por la **versión 4**; cada tabla nueva se añade con su migración en
 [`app_database.dart`](lib/core/database/app_database.dart).
 
 ```bash
-flutter test            # 112 pruebas
+flutter test            # 117 pruebas
 flutter analyze
 flutter build apk --debug
 ```
