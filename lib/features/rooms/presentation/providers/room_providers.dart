@@ -4,6 +4,8 @@ import '../../../../core/database/app_database.dart';
 import '../../data/repositories/drift_room_repository.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/repositories/room_repository.dart';
+import '../../domain/services/floor_plan_renderer.dart';
+import '../services/canvas_floor_plan_renderer.dart';
 
 final Provider<RoomRepository> roomRepositoryProvider =
     Provider<RoomRepository>(
@@ -20,3 +22,7 @@ final projectRoomsProvider = StreamProvider.family<List<Room>, int>(
 final roomProvider = StreamProvider.family<Room?, int>(
   (ref, int roomId) => ref.watch(roomRepositoryProvider).watchById(roomId),
 );
+
+/// Quien pinta el plano para el PDF.
+final Provider<FloorPlanRenderer> floorPlanRendererProvider =
+    Provider<FloorPlanRenderer>((ref) => const CanvasFloorPlanRenderer());

@@ -79,6 +79,7 @@ Future<Uint8List> _buildSample() {
     project: _project,
     scopeLabel: 'Todo el proyecto',
     rooms: rooms,
+    roomPlans: const <int, Uint8List>{},
     materialLines: lines,
     items: items,
     summary: BudgetCalculator.summarize(
@@ -138,6 +139,7 @@ void main() {
       project: _project,
       scopeLabel: 'Todo el proyecto',
       rooms: const <Room>[],
+      roomPlans: const <int, Uint8List>{},
       materialLines: const <MaterialLine>[],
       items: const <BudgetItem>[],
       summary: BudgetCalculator.summarize(

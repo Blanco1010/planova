@@ -13,6 +13,7 @@ import '../../../materials/presentation/providers/material_providers.dart';
 import '../../../projects/domain/entities/project.dart';
 import '../../../projects/presentation/providers/project_providers.dart';
 import '../../../rooms/domain/entities/room.dart';
+import '../../../rooms/domain/entities/room_plan.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/budget_item.dart';
 import '../../domain/entities/budget_summary.dart';
@@ -145,10 +146,19 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         : rooms.firstOrNull?.name ?? 'Una habitación';
 
     try {
+      final Map<int, Uint8List> plans = <int, Uint8List>{};
+      for (final Room room in rooms) {
+        final Uint8List? png = await ref
+            .read(floorPlanRendererProvider)
+            .toPng(room: room, plan: RoomPlan.of(room));
+        if (png != null) plans[room.id] = png;
+      }
+
       final Uint8List bytes = await BudgetPdfBuilder.build(
         project: project,
         scopeLabel: scopeLabel,
         rooms: rooms,
+        roomPlans: plans,
         materialLines: lines,
         items: items,
         summary: summary,

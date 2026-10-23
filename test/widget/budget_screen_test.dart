@@ -13,6 +13,7 @@ import 'package:planova/features/rooms/domain/entities/room_drafts.dart';
 import 'package:planova/features/rooms/presentation/providers/room_providers.dart';
 
 import '../fakes/fake_budget_exporter.dart';
+import '../fakes/fake_floor_plan_renderer.dart';
 import '../fakes/fake_budget_repository.dart';
 import '../fakes/fake_project_repository.dart';
 import '../fakes/fake_material_settings_repository.dart';
@@ -26,12 +27,14 @@ void main() {
   late FakeBudgetRepository budget;
   late FakeProjectRepository projects;
   late FakeBudgetExporter exporter;
+  late FakeFloorPlanRenderer planRenderer;
 
   setUp(() async {
     rooms = FakeRoomRepository();
     settings = FakeMaterialSettingsRepository();
     budget = FakeBudgetRepository();
     exporter = FakeBudgetExporter();
+    planRenderer = FakeFloorPlanRenderer();
     projects = FakeProjectRepository();
     await projects.create(const ProjectDraft(name: 'Casa López'));
   });
@@ -56,6 +59,7 @@ void main() {
           budgetRepositoryProvider.overrideWithValue(budget),
           projectRepositoryProvider.overrideWithValue(projects),
           budgetExporterProvider.overrideWithValue(exporter),
+          floorPlanRendererProvider.overrideWithValue(planRenderer),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -169,5 +173,7 @@ void main() {
     expect(exporter.lastFileName, 'presupuesto-casa-l-pez.pdf');
     expect(exporter.lastBytes, isNotNull);
     expect(exporter.lastBytes!.length, greaterThan(2000));
+    // Y el plano de la habitación fue al documento.
+    expect(planRenderer.calls, 1);
   });
 }

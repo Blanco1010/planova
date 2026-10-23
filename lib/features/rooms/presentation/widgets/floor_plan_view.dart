@@ -1,4 +1,6 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -10,6 +12,112 @@ import '../../domain/entities/opening.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_plan.dart';
 import '../../domain/entities/room_wall.dart';
+
+
+/// Colores con los que se dibuja el plano.
+///
+/// Está aparte porque el mismo dibujo se pinta en pantalla, donde los colores
+/// salen del tema, y en el PDF, donde el fondo siempre es papel blanco.
+class FloorPlanPalette {
+  const FloorPlanPalette({
+    required this.wall,
+    required this.selected,
+    required this.fill,
+    required this.guide,
+    required this.label,
+    required this.gap,
+  });
+
+  /// La del tema actual de la app.
+  factory FloorPlanPalette.of(ThemeData theme) {
+    return FloorPlanPalette(
+      wall: theme.brightness == Brightness.light
+          ? AppColors.deepBlue
+          : AppColors.onDark,
+      selected: AppColors.primaryBlue,
+      fill: AppColors.primaryBlue.withValues(alpha: 0.08),
+      guide: AppColors.lightBlue,
+      label: theme.colorScheme.onSurface,
+      gap: theme.colorScheme.surface,
+    );
+  }
+
+  /// La del papel: tinta oscura sobre blanco.
+  factory FloorPlanPalette.onPaper() {
+    return FloorPlanPalette(
+      wall: AppColors.deepBlue,
+      selected: AppColors.primaryBlue,
+      fill: AppColors.primaryBlue.withValues(alpha: 0.08),
+      guide: AppColors.lightBlue,
+      label: AppColors.darkNavy,
+      gap: Colors.white,
+    );
+  }
+
+  final Color wall;
+  final Color selected;
+  final Color fill;
+  final Color guide;
+  final Color label;
+
+  /// El color del fondo: con él se abre el hueco de los vanos en la pared.
+  final Color gap;
+
+  @override
+  bool operator ==(Object other) =>
+      other is FloorPlanPalette &&
+      other.wall == wall &&
+      other.selected == selected &&
+      other.fill == fill &&
+      other.guide == guide &&
+      other.label == label &&
+      other.gap == gap;
+
+  @override
+  int get hashCode => Object.hash(wall, selected, fill, guide, label, gap);
+}
+
+/// Pinta el plano en una imagen PNG, con fondo blanco, para el PDF.
+///
+/// Usa el mismo pintor que la pantalla: lo que se envía al cliente es el
+/// mismo dibujo que se ve en la app, no una segunda versión que se desfase.
+Future<Uint8List?> renderFloorPlanPng({
+  required Room room,
+  required RoomPlan plan,
+  Size size = const Size(420, 300),
+  double pixelRatio = 3,
+}) async {
+  if (plan.vertices.length < 2) return null;
+
+  final ui.PictureRecorder recorder = ui.PictureRecorder();
+  final Canvas canvas = Canvas(recorder);
+  canvas.scale(pixelRatio);
+  canvas.drawRect(Offset.zero & size, Paint()..color = Colors.white);
+
+  _FloorPlanPainter(
+    room: room,
+    plan: plan,
+    transform: _PlanTransform.fit(
+      size: size,
+      bounds: PlanGeometry.boundsOf(plan.vertices),
+      padding: _dimensionPadding,
+    ),
+    selectedWallId: null,
+    showDimensions: true,
+    palette: FloorPlanPalette.onPaper(),
+    labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+  ).paint(canvas, size);
+
+  final ui.Image image = await recorder.endRecording().toImage(
+    (size.width * pixelRatio).round(),
+    (size.height * pixelRatio).round(),
+  );
+  final ByteData? data = await image.toByteData(
+    format: ui.ImageByteFormat.png,
+  );
+  image.dispose();
+  return data?.buffer.asUint8List();
+}
 
 /// Dibujo del plano de una habitación: paredes, medidas y vanos.
 ///
@@ -55,6 +163,8 @@ class FloorPlanView extends StatelessWidget {
         final _PlanTransform transform = _PlanTransform.fit(
           size: size,
           bounds: PlanGeometry.boundsOf(plan.vertices),
+          // Las cotas se dibujan por fuera de las paredes: necesitan sitio.
+          padding: showDimensions ? _dimensionPadding : 16,
         );
 
         return GestureDetector(
@@ -69,14 +179,7 @@ class FloorPlanView extends StatelessWidget {
               transform: transform,
               selectedWallId: selectedWallId,
               showDimensions: showDimensions,
-              wallColor: theme.brightness == Brightness.light
-                  ? AppColors.deepBlue
-                  : AppColors.onDark,
-              selectedColor: AppColors.primaryBlue,
-              fillColor: AppColors.primaryBlue.withValues(alpha: 0.08),
-              guideColor: AppColors.lightBlue,
-              labelColor: theme.colorScheme.onSurface,
-              gapColor: theme.colorScheme.surface,
+              palette: FloorPlanPalette.of(theme),
               labelStyle:
                   theme.textTheme.labelSmall ?? const TextStyle(fontSize: 11),
             ),
@@ -112,6 +215,9 @@ class FloorPlanView extends StatelessWidget {
   }
 }
 
+/// Sitio que hay que dejar alrededor del plano para que quepan las cotas.
+const double _dimensionPadding = 58;
+
 /// Lleva metros del plano a píxeles del lienzo, y al revés.
 class _PlanTransform {
   const _PlanTransform._(this._scale, this._offset, this._bounds);
@@ -119,7 +225,7 @@ class _PlanTransform {
   factory _PlanTransform.fit({
     required Size size,
     required PlanBounds bounds,
-    double padding = 32,
+    double padding = _dimensionPadding,
   }) {
     final double availableWidth = math.max(size.width - padding * 2, 1);
     final double availableHeight = math.max(size.height - padding * 2, 1);
@@ -164,12 +270,7 @@ class _FloorPlanPainter extends CustomPainter {
     required this.transform,
     required this.selectedWallId,
     required this.showDimensions,
-    required this.wallColor,
-    required this.selectedColor,
-    required this.fillColor,
-    required this.guideColor,
-    required this.labelColor,
-    required this.gapColor,
+    required this.palette,
     required this.labelStyle,
   });
 
@@ -178,12 +279,7 @@ class _FloorPlanPainter extends CustomPainter {
   final _PlanTransform transform;
   final int? selectedWallId;
   final bool showDimensions;
-  final Color wallColor;
-  final Color selectedColor;
-  final Color fillColor;
-  final Color guideColor;
-  final Color labelColor;
-  final Color gapColor;
+  final FloorPlanPalette palette;
   final TextStyle labelStyle;
 
   @override
@@ -219,7 +315,7 @@ class _FloorPlanPainter extends CustomPainter {
       path.lineTo(point.dx, point.dy);
     }
     path.close();
-    canvas.drawPath(path, Paint()..color = fillColor);
+    canvas.drawPath(path, Paint()..color = palette.fill);
   }
 
   void _paintWall(Canvas canvas, Offset start, Offset end, bool selected) {
@@ -227,7 +323,7 @@ class _FloorPlanPainter extends CustomPainter {
       start,
       end,
       Paint()
-        ..color = selected ? selectedColor : wallColor
+        ..color = selected ? palette.selected : palette.wall
         ..strokeWidth = selected ? 6 : 4
         ..strokeCap = StrokeCap.round,
     );
@@ -267,12 +363,12 @@ class _FloorPlanPainter extends CustomPainter {
         openingStart,
         openingEnd,
         Paint()
-          ..color = gapColor
+          ..color = palette.gap
           ..strokeWidth = 8,
       );
 
       final Paint markPaint = Paint()
-        ..color = opening.kind == OpeningKind.door ? wallColor : guideColor
+        ..color = opening.kind == OpeningKind.door ? palette.wall : palette.guide
         ..strokeWidth = 2
         ..style = PaintingStyle.stroke;
 
@@ -312,7 +408,7 @@ class _FloorPlanPainter extends CustomPainter {
       start + outward * 10,
       end + outward * 10,
       Paint()
-        ..color = guideColor
+        ..color = palette.guide
         ..strokeWidth = selected ? 2 : 1,
     );
 
@@ -320,7 +416,7 @@ class _FloorPlanPainter extends CustomPainter {
       text: TextSpan(
         text: Formatters.meters(wall.lengthMeters),
         style: labelStyle.copyWith(
-          color: selected ? selectedColor : labelColor,
+          color: selected ? palette.selected : palette.label,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
         ),
       ),
@@ -338,7 +434,7 @@ class _FloorPlanPainter extends CustomPainter {
   }
 
   void _paintVertices(Canvas canvas, List<Offset> points) {
-    final Paint paint = Paint()..color = wallColor;
+    final Paint paint = Paint()..color = palette.wall;
     for (final Offset point in points) {
       canvas.drawCircle(point, 3.5, paint);
     }
@@ -370,6 +466,6 @@ class _FloorPlanPainter extends CustomPainter {
         oldDelegate.plan != plan ||
         oldDelegate.showDimensions != showDimensions ||
         oldDelegate.selectedWallId != selectedWallId ||
-        oldDelegate.wallColor != wallColor;
+        oldDelegate.palette != palette;
   }
 }

@@ -19,11 +19,15 @@ abstract final class BudgetPdfBuilder {
   static const PdfColor _deepBlue = PdfColor.fromInt(0xFF1E3A8A);
   static const PdfColor _softGrey = PdfColor.fromInt(0xFFF1F5F9);
   static const PdfColor _muted = PdfColor.fromInt(0xFF64748B);
+  static const PdfColor _white = PdfColor.fromInt(0xFFFFFFFF);
 
   static Future<Uint8List> build({
     required Project project,
     required String scopeLabel,
     required List<Room> rooms,
+    /// Dibujo del plano de cada habitación, por `id`. Las que no estén salen
+    /// solo con sus medidas.
+    required Map<int, Uint8List> roomPlans,
     required List<MaterialLine> materialLines,
     required List<BudgetItem> items,
     required BudgetSummary summary,
@@ -48,8 +52,9 @@ abstract final class BudgetPdfBuilder {
         build: (pw.Context context) => <pw.Widget>[
           if (rooms.isNotEmpty) ...<pw.Widget>[
             _title('Habitaciones'),
-            _roomsTable(rooms),
-            pw.SizedBox(height: 18),
+            for (final Room room in rooms)
+              _roomBlock(room, roomPlans[room.id]),
+            pw.SizedBox(height: 8),
           ],
           _title('Materiales calculados'),
           if (materialLines.isEmpty)
@@ -177,18 +182,80 @@ abstract final class BudgetPdfBuilder {
   static pw.Widget _note(String text) =>
       pw.Text(text, style: const pw.TextStyle(fontSize: 10, color: _muted));
 
-  static pw.Widget _roomsTable(List<Room> rooms) {
-    return _table(
-      headers: <String>['Habitación', 'Área de piso', 'Muros sin vanos'],
-      rows: <List<String>>[
-        for (final Room room in rooms)
-          <String>[
-            room.name,
-            Formatters.squareMeters(RoomPlan.of(room).floorAreaM2),
-            Formatters.squareMeters(RoomPlan.of(room).netWallAreaM2),
+  /// Una habitación: su plano a la izquierda y sus medidas a la derecha.
+  static pw.Widget _roomBlock(Room room, Uint8List? planPng) {
+    final RoomPlan plan = RoomPlan.of(room);
+
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(bottom: 10),
+      padding: const pw.EdgeInsets.all(8),
+      decoration: pw.BoxDecoration(
+        color: _softGrey,
+        borderRadius: pw.BorderRadius.circular(6),
+      ),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: <pw.Widget>[
+          if (planPng != null) ...<pw.Widget>[
+            pw.Container(
+              width: 190,
+              height: 135,
+              decoration: pw.BoxDecoration(
+                color: _white,
+                borderRadius: pw.BorderRadius.circular(4),
+              ),
+              child: pw.Image(pw.MemoryImage(planPng), fit: pw.BoxFit.contain),
+            ),
+            pw.SizedBox(width: 12),
           ],
-      ],
-      numericFrom: 1,
+          pw.Expanded(
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: <pw.Widget>[
+                pw.Text(
+                  room.name,
+                  style: pw.TextStyle(
+                    fontSize: 11,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 5),
+                _fact('Área de piso', Formatters.squareMeters(plan.floorAreaM2)),
+                _fact('Perímetro', Formatters.meters(plan.perimeterMeters)),
+                _fact('Altura', Formatters.meters(room.wallHeightMeters)),
+                _fact(
+                  'Muros sin vanos',
+                  Formatters.squareMeters(plan.netWallAreaM2),
+                ),
+                _fact('Paredes', '${room.walls.length}'),
+                if (!plan.isClosed) ...<pw.Widget>[
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    'El plano no cierra por '
+                    '${Formatters.centimeters(plan.closureGapMeters)}.',
+                    style: const pw.TextStyle(fontSize: 8, color: _muted),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static pw.Widget _fact(String label, String value) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(bottom: 2),
+      child: pw.Row(
+        children: <pw.Widget>[
+          pw.Text(
+            '$label: ',
+            style: const pw.TextStyle(fontSize: 9, color: _muted),
+          ),
+          pw.Text(value, style: const pw.TextStyle(fontSize: 9)),
+        ],
+      ),
     );
   }
 
