@@ -68,6 +68,29 @@ abstract final class FinishCalculator {
     );
   }
 
+  /// Los mismos acabados vistos desde unas habitaciones.
+  ///
+  /// A cada uno le quedan solo las superficies que están ahí, y el que no
+  /// toca ninguna se cae de la lista. Es lo que hace falta para mirar el
+  /// presupuesto de una sola habitación: una pintura repartida entre varias
+  /// cuenta solo por la parte de esta.
+  static List<Finish> within(
+    Iterable<Finish> finishes,
+    Iterable<Room> rooms,
+  ) {
+    final Set<int> ids = <int>{for (final Room room in rooms) room.id};
+    final List<Finish> scoped = <Finish>[];
+
+    for (final Finish finish in finishes) {
+      final List<FinishSurface> surfaces = finish.surfaces
+          .where((FinishSurface surface) => ids.contains(surface.roomId))
+          .toList(growable: false);
+      if (surfaces.isNotEmpty) scoped.add(finish.withSurfaces(surfaces));
+    }
+
+    return scoped;
+  }
+
   static double totalOf(Iterable<Finish> finishes, Iterable<Room> rooms) {
     double total = 0;
     for (final Finish finish in finishes) {

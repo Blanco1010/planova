@@ -21,9 +21,12 @@ abstract final class Formatters {
   static String squareMeters(double value) =>
       '${_twoDecimals.format(value)} m²';
 
-  /// Medida corta en centímetros, para desfases pequeños: `12 cm`.
+  /// Medida corta en centímetros, para desfases pequeños: `12 cm`, `1,5 cm`.
+  ///
+  /// Lleva decimales solo si hacen falta: una junta de pega de 1,5 cm no
+  /// puede salir redondeada a 2 cm, que es otra cantidad de bloques.
   static String centimeters(double valueInMeters) =>
-      '${(valueInMeters * 100).round()} cm';
+      '${_upToTwoDecimals.format(valueInMeters * 100)} cm';
 
   /// Cantidad de piezas: `1.250`.
   static String units(int value) => _whole.format(value);

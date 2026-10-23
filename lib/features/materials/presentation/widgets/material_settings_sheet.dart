@@ -131,7 +131,7 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
                   'masonryWaste',
                   'Desperdicio (%)',
                   'cementBags',
-                  'Bultos de cemento por m³',
+                  'Cemento (bultos/m³)',
                 ),
                 _spaced(_field('sand', 'Arena por m³ de mortero (m³)')),
                 const SizedBox(height: 20),
@@ -150,9 +150,9 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
                 _Section(title: 'Piso'),
                 _pair(
                   'tileLength',
-                  'Largo de la baldosa (cm)',
+                  'Largo baldosa (cm)',
                   'tileWidth',
-                  'Ancho de la baldosa (cm)',
+                  'Ancho baldosa (cm)',
                 ),
                 _pair(
                   'floorWaste',

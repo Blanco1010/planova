@@ -43,6 +43,18 @@ class Finish {
   final double unitPrice;
 
   final List<FinishSurface> surfaces;
+
+  /// El mismo acabado con otras superficies.
+  ///
+  /// Sirve para mirarlo por partes, por ejemplo la pintura de una sola
+  /// habitación cuando se reparte entre varias.
+  Finish withSurfaces(List<FinishSurface> surfaces) => Finish(
+    id: id,
+    projectId: projectId,
+    description: description,
+    unitPrice: unitPrice,
+    surfaces: surfaces,
+  );
 }
 
 /// Datos de un acabado que escribe el usuario.

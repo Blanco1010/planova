@@ -121,4 +121,30 @@ void main() {
 
     expect(total, closeTo(7.2 * 12000 + 12 * 30000, 1e-6));
   });
+
+  test('mirado por habitación, un acabado cuenta solo por la parte de esa', () {
+    final Room sala = _room();
+    final Room cocina = _room(id: 2, width: 3, length: 2);
+    final Finish repartido = _finish(<FinishSurface>[
+      FinishSurface(roomId: sala.id, wallId: sala.walls[1].id),
+      FinishSurface(roomId: cocina.id, wallId: cocina.walls[1].id),
+    ]);
+    final Finish soloCocina = _finish(const <FinishSurface>[
+      FinishSurface(roomId: 2),
+    ]);
+
+    final List<Finish> enLaSala = FinishCalculator.within(<Finish>[
+      repartido,
+      soloCocina,
+    ], <Room>[sala]);
+
+    // El de la cocina se cae; al repartido le queda su pared de la sala.
+    expect(enLaSala.length, 1);
+    expect(enLaSala.single.surfaces.single.roomId, sala.id);
+    expect(enLaSala.single.description, repartido.description);
+    expect(
+      FinishCalculator.totalOf(enLaSala, <Room>[sala]),
+      closeTo(7.2 * 12000, 1e-6),
+    );
+  });
 }

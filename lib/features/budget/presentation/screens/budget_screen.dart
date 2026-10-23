@@ -54,7 +54,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         const <MaterialKind, double>{};
     final List<BudgetItem> allItems =
         ref.watch(budgetItemsProvider(projectId)).value ?? const <BudgetItem>[];
-    final List<Finish> finishes =
+    final List<Finish> allFinishes =
         ref.watch(finishesProvider(projectId)).value ?? const <Finish>[];
 
     final Iterable<Room> scopedRooms = _roomId == null
@@ -65,6 +65,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         : allItems
               .where((BudgetItem item) => item.roomId == _roomId)
               .toList(growable: false);
+    final List<Finish> finishes = _roomId == null
+        ? allFinishes
+        : FinishCalculator.within(allFinishes, scopedRooms);
 
     final SurfaceTotals surfaces = SurfaceTotals.ofRooms(scopedRooms);
     final MaterialEstimates estimates = MaterialCalculator.estimate(
@@ -83,7 +86,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       materialLines: lines,
       items: items,
       floorAreaM2: surfaces.floorAreaM2,
-      finishesTotal: FinishCalculator.totalOf(finishes, rooms),
+      finishesTotal: FinishCalculator.totalOf(finishes, scopedRooms),
     );
 
     return Scaffold(
@@ -100,7 +103,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     items: items,
                     finishes: <FinishEstimate>[
                       for (final Finish finish in finishes)
-                        FinishCalculator.estimate(finish, rooms),
+                        FinishCalculator.estimate(finish, scopedRooms),
                     ],
                     summary: summary,
                   ),
@@ -143,10 +146,17 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           const SizedBox(height: 12),
           _FinishesCard(
             finishes: finishes,
-            rooms: rooms,
+            rooms: scopedRooms.toList(growable: false),
             onAdd: () => FinishSheet.show(context, projectId: projectId),
-            onTapFinish: (Finish finish) =>
-                FinishSheet.show(context, projectId: projectId, finish: finish),
+            // Se edita el acabado entero, no el recorte que se esté mirando:
+            // si no, guardarlo le borraría las paredes de las demás piezas.
+            onTapFinish: (Finish finish) => FinishSheet.show(
+              context,
+              projectId: projectId,
+              finish: allFinishes.firstWhere(
+                (Finish whole) => whole.id == finish.id,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _SummaryCard(summary: summary),

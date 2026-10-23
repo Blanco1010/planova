@@ -144,6 +144,8 @@ class _PlanSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      // Sin este aire, «Muros sin vanos» y «Altura» quedan pegados.
+      spacing: 12,
       children: [
         Expanded(
           child: _Stat(
