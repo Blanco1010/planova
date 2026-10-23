@@ -14,10 +14,12 @@ class NativeOrientationTracker implements OrientationTracker {
 
   /// Hacia dónde crece el rumbo que entrega el aparato.
   ///
-  /// El convenio de la app es que el giro crece al mirar hacia la derecha.
-  /// Probado en el teléfono, el rumbo del sistema viene al revés: sin esto,
-  /// las esquinas marcadas se van hacia el mismo lado al que se gira.
-  static const double _turnSense = -1;
+  /// El convenio de la app es que el giro crece al mirar hacia la derecha, y
+  /// eso es lo que da el rumbo del sistema (se mide desde el norte, hacia el
+  /// este). Se probó a invertirlo creyendo que las esquinas se iban de sitio
+  /// por aquí, y no era eso: era el desplazamiento del teléfono, que no se
+  /// sigue. Queda nombrado por si alguna vez hiciera falta.
+  static const double _turnSense = 1;
 
   @override
   Stream<DeviceAim> watch() {

@@ -150,6 +150,11 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
               closing: closing,
               relocatingTo: relocating,
               calibration: _calibration,
+              // Con esquinas puestas, lo que estropea el plano es caminar.
+              warnAboutWalking:
+                  _session.corners.isNotEmpty &&
+                  relocating == null &&
+                  !calibrating,
             ),
           ),
           Align(
@@ -250,8 +255,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     final double? floorPitch = _floorPitch;
     if (floorPitch == null) return;
 
-    final ({double phoneHeight, double distance})? result = SightingMath
-        .calibrateWithCeiling(
+    final ({double phoneHeight, double distance})? result =
+        SightingMath.calibrateWithCeiling(
           ceilingHeightMeters: _ceilingHeight,
           floorAimPitchRadians: floorPitch,
           ceilingAimPitchRadians: aim.pitchRadians,
@@ -389,6 +394,7 @@ class _Readout extends StatelessWidget {
     required this.closing,
     required this.relocatingTo,
     required this.calibration,
+    required this.warnAboutWalking,
   });
 
   final double? distance;
@@ -396,6 +402,9 @@ class _Readout extends StatelessWidget {
   final bool closing;
   final int? relocatingTo;
   final _Calibration calibration;
+
+  /// Recuerda que hay que girar sobre uno mismo, no caminar.
+  final bool warnAboutWalking;
 
   @override
   Widget build(BuildContext context) {
@@ -426,28 +435,54 @@ class _Readout extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 64, 24, 0),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: highlighted
-                ? AppColors.primaryBlue
-                : Colors.black.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style:
-                  (big
-                          ? theme.textTheme.headlineSmall
-                          : theme.textTheme.bodyMedium)
-                      ?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: highlighted
+                    ? AppColors.primaryBlue
+                    : Colors.black.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style:
+                      (big
+                              ? theme.textTheme.headlineSmall
+                              : theme.textTheme.bodyMedium)
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                ),
+              ),
             ),
-          ),
+            if (warnAboutWalking) ...[
+              const SizedBox(height: 8),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  child: Text(
+                    'Gira sobre ti mismo, sin caminar. Si te mueves, usa '
+                    '«Me moví».',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
