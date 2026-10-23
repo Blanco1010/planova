@@ -72,3 +72,17 @@ final cameraFieldOfViewProvider = FutureProvider<CameraFieldOfView>((
     return CameraFieldOfView.estimated;
   }
 });
+
+/// Si este teléfono puede saber hacia dónde se gira.
+///
+/// Sin giroscopio no hay plano: se puede medir una distancia, pero no
+/// levantar la habitación girando. Si el sistema no contesta se da por
+/// bueno, que es lo que pasa en las pruebas.
+final turnSensorProvider = FutureProvider<bool>((ref) async {
+  const MethodChannel channel = MethodChannel('planova/sensors');
+  try {
+    return await channel.invokeMethod<bool>('hasTurnSensor') ?? true;
+  } catch (_) {
+    return true;
+  }
+});

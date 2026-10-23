@@ -1,6 +1,8 @@
 package com.blancotech.planova
 
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.util.SizeF
@@ -22,6 +24,14 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "fieldOfView" -> result.success(backCameraFieldOfView())
+                    else -> result.notImplemented()
+                }
+            }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SENSORS_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "hasTurnSensor" -> result.success(hasTurnSensor())
                     else -> result.notImplemented()
                 }
             }
@@ -62,8 +72,26 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    /**
+     * Si el aparato puede saber hacia dónde se gira.
+     *
+     * Sin giroscopio ni brújula no hay manera: los teléfonos de gama de
+     * entrada suelen traer solo acelerómetro, y entonces levantar un plano
+     * girando sobre uno mismo es imposible. Más vale decirlo que dibujar
+     * cualquier cosa.
+     */
+    private fun hasTurnSensor(): Boolean {
+        val manager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            ?: return false
+
+        return manager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR) != null ||
+            manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null ||
+            manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null
+    }
+
     companion object {
         private const val ORIENTATION_CHANNEL = "planova/orientation"
         private const val CAMERA_CHANNEL = "planova/camera"
+        private const val SENSORS_CHANNEL = "planova/sensors"
     }
 }

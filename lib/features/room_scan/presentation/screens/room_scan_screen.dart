@@ -58,6 +58,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Sin sensor de giro no hay plano que levantar: se dice y punto.
+    final bool canTurn = ref.watch(turnSensorProvider).value ?? true;
     final DeviceAim? aim = ref.watch(deviceAimProvider).value;
     final CameraController? camera = ref.watch(cameraControllerProvider).value;
     // De pie, la imagen es más alta que ancha: 3 de ancho por 4 de alto si
@@ -107,95 +109,118 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
           ),
         ],
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // El dibujo va dentro del mismo encuadre que la imagen: así el
-          // ángulo de la cámara vale para colocar cada esquina.
-          Center(
-            child: AspectRatio(
-              aspectRatio: previewAspect,
-              // Lo que se dibuje fuera de la imagen no se enseña: ahí ya no
-              // hay nada que mirar.
-              child: ClipRect(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    const CameraViewfinder(),
-                    ScanOverlay(
-                      session: _session,
-                      aim: aim,
-                      phoneHeightMeters: _phoneHeight,
-                      // Mientras se calibra o se vuelve a situar, la línea
-                      // viva estorba.
-                      liveDistanceMeters: relocating == null && !calibrating
-                          ? distance
-                          : null,
-                      snappedCorner: relocating ?? snapped,
-                      horizontalFovRadians: fieldOfView.horizontalFor(
-                        previewAspect,
-                      ),
+      body: canTurn
+          ? _buildScanner(
+              context,
+              aim: aim,
+              previewAspect: previewAspect,
+              fieldOfView: fieldOfView,
+              distance: distance,
+              calibrating: calibrating,
+              relocating: relocating,
+              snapped: snapped,
+              closing: closing,
+            )
+          : const _NoTurnSensor(),
+    );
+  }
+
+  Widget _buildScanner(
+    BuildContext context, {
+    required DeviceAim? aim,
+    required double previewAspect,
+    required CameraFieldOfView fieldOfView,
+    required double? distance,
+    required bool calibrating,
+    required int? relocating,
+    required int? snapped,
+    required bool closing,
+  }) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // El dibujo va dentro del mismo encuadre que la imagen: así el
+        // ángulo de la cámara vale para colocar cada esquina.
+        Center(
+          child: AspectRatio(
+            aspectRatio: previewAspect,
+            // Lo que se dibuje fuera de la imagen no se enseña: ahí ya no
+            // hay nada que mirar.
+            child: ClipRect(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const CameraViewfinder(),
+                  ScanOverlay(
+                    session: _session,
+                    aim: aim,
+                    phoneHeightMeters: _phoneHeight,
+                    // Mientras se calibra o se vuelve a situar, la línea
+                    // viva estorba.
+                    liveDistanceMeters: relocating == null && !calibrating
+                        ? distance
+                        : null,
+                    snappedCorner: relocating ?? snapped,
+                    horizontalFovRadians: fieldOfView.horizontalFor(
+                      previewAspect,
                     ),
-                    const ScanReticle(),
-                  ],
-                ),
+                  ),
+                  const ScanReticle(),
+                ],
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: _Readout(
-              distance: distance,
-              hasSensors: aim != null,
-              closing: closing,
-              relocatingTo: relocating,
-              calibration: _calibration,
-              // Con esquinas puestas, lo que estropea el plano es caminar.
-              warnAboutWalking:
-                  _session.corners.isNotEmpty &&
-                  relocating == null &&
-                  !calibrating,
-            ),
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: _Readout(
+            distance: distance,
+            hasSensors: aim != null,
+            closing: closing,
+            relocatingTo: relocating,
+            calibration: _calibration,
+            // Con esquinas puestas, lo que estropea el plano es caminar.
+            warnAboutWalking:
+                _session.corners.isNotEmpty &&
+                relocating == null &&
+                !calibrating,
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: _ScanBar(
-              corners: _session.corners.length,
-              calibrated: _calibrated,
-              phoneHeight: _phoneHeight,
-              calibration: _calibration,
-              closing: closing,
-              relocatingTo: relocating,
-              onCapture:
-                  distance == null ||
-                      closing ||
-                      relocating != null ||
-                      calibrating
-                  ? null
-                  : () => _mark(aim!, distance),
-              onClose: closing ? _finish : null,
-              onRelocate: distance == null || relocating == null
-                  ? null
-                  : () => _relocate(aim!, distance, relocating),
-              onCancelRelocate: () => setState(() => _relocatingTo = null),
-              onStartRelocate:
-                  _session.isEmpty || relocating != null || calibrating
-                  ? null
-                  : _askWhereIAm,
-              onStartCalibration: calibrating ? null : _startCalibration,
-              onCalibrationStep: aim == null ? null : () => _calibrateStep(aim),
-              onCancelCalibration: () =>
-                  setState(() => _calibration = _Calibration.idle),
-              onUndo: _session.isEmpty || relocating != null || calibrating
-                  ? null
-                  : _undo,
-              onFinish: _session.corners.length < 3 || closing || calibrating
-                  ? null
-                  : _finish,
-            ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: _ScanBar(
+            corners: _session.corners.length,
+            calibrated: _calibrated,
+            phoneHeight: _phoneHeight,
+            calibration: _calibration,
+            closing: closing,
+            relocatingTo: relocating,
+            onCapture:
+                distance == null || closing || relocating != null || calibrating
+                ? null
+                : () => _mark(aim!, distance),
+            onClose: closing ? _finish : null,
+            onRelocate: distance == null || relocating == null
+                ? null
+                : () => _relocate(aim!, distance, relocating),
+            onCancelRelocate: () => setState(() => _relocatingTo = null),
+            onStartRelocate:
+                _session.isEmpty || relocating != null || calibrating
+                ? null
+                : _askWhereIAm,
+            onStartCalibration: calibrating ? null : _startCalibration,
+            onCalibrationStep: aim == null ? null : () => _calibrateStep(aim),
+            onCancelCalibration: () =>
+                setState(() => _calibration = _Calibration.idle),
+            onUndo: _session.isEmpty || relocating != null || calibrating
+                ? null
+                : _undo,
+            onFinish: _session.corners.length < 3 || closing || calibrating
+                ? null
+                : _finish,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -671,5 +696,54 @@ class _ScanBar extends StatelessWidget {
         label: const Text('Marcar esquina'),
       ),
     };
+  }
+}
+
+/// Lo que se ve cuando el teléfono no tiene con qué medir el giro.
+class _NoTurnSensor extends StatelessWidget {
+  const _NoTurnSensor();
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.screen_rotation_alt_outlined,
+              size: 56,
+              color: AppColors.lightBlue,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Este teléfono no puede medir el giro',
+              style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Le falta el giroscopio, así que no hay forma de saber hacia '
+              'dónde apuntas al girar sobre ti mismo y el plano saldría '
+              'inventado.\n\n'
+              'Puedes crear la habitación escribiendo el ancho y el largo, '
+              'y ajustar cada pared en el plano.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.mutedDark,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              child: const Text('Volver'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -53,7 +53,7 @@ void main() {
     rooms.dispose();
   });
 
-  Future<void> pumpScan(WidgetTester tester) async {
+  Future<void> pumpScan(WidgetTester tester, {bool canTurn = true}) async {
     tester.view.physicalSize = const Size(1000, 2400);
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
@@ -80,6 +80,7 @@ void main() {
           orientationTrackerProvider.overrideWithValue(tracker),
           roomRepositoryProvider.overrideWithValue(rooms),
           cameraControllerProvider.overrideWith((ref) async => null),
+          turnSensorProvider.overrideWith((ref) async => canTurn),
         ],
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
@@ -342,5 +343,15 @@ void main() {
     expect(find.textContaining('No cuadra'), findsOneWidget);
     expect(find.text('Fijar el suelo'), findsOneWidget);
     expect(find.text('Sin calibrar'), findsOneWidget);
+  });
+
+  testWidgets('sin giroscopio lo dice y no finge medir', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester, canTurn: false);
+
+    expect(find.text('Este teléfono no puede medir el giro'), findsOneWidget);
+    expect(find.text('Marcar esquina'), findsNothing);
+    expect(find.text('Sin calibrar'), findsNothing);
   });
 }
