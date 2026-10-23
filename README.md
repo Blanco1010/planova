@@ -73,7 +73,7 @@ va por la **versión 4**; cada tabla nueva se añade con su migración en
 [`app_database.dart`](lib/core/database/app_database.dart).
 
 ```bash
-flutter test            # 69 pruebas
+flutter test            # 92 pruebas
 flutter analyze
 flutter build apk --debug
 ```
