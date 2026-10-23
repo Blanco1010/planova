@@ -41,6 +41,7 @@ abstract final class BudgetCalculator {
     required List<MaterialLine> materialLines,
     required List<BudgetItem> items,
     required double floorAreaM2,
+    double finishesTotal = 0,
   }) {
     double materials = 0;
     int priced = 0;
@@ -66,6 +67,7 @@ abstract final class BudgetCalculator {
       materialsTotal: materials,
       laborTotal: labor,
       otherTotal: other,
+      finishesTotal: finishesTotal,
       floorAreaM2: floorAreaM2,
       pricedMaterials: priced,
       totalMaterials: materialLines.length,

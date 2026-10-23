@@ -1,4 +1,5 @@
 import '../entities/budget_item.dart';
+import '../entities/finish.dart';
 import '../entities/material_kind.dart';
 
 /// Precios unitarios y partidas escritas a mano, por proyecto.
@@ -16,4 +17,13 @@ abstract interface class BudgetRepository {
   Future<void> updateItem(int itemId, BudgetItemDraft draft);
 
   Future<void> deleteItem(int itemId);
+
+  /// Acabados del proyecto, con las superficies que llevan.
+  Stream<List<Finish>> watchFinishes(int projectId);
+
+  Future<int> addFinish(int projectId, FinishDraft draft);
+
+  Future<void> updateFinish(int finishId, FinishDraft draft);
+
+  Future<void> deleteFinish(int finishId);
 }

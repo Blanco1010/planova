@@ -16,12 +16,15 @@ import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/budget_item.dart';
+import '../../domain/entities/finish.dart';
 import '../../domain/entities/budget_summary.dart';
 import '../../domain/entities/material_kind.dart';
 import '../../data/services/budget_pdf_builder.dart';
 import '../../domain/services/budget_calculator.dart';
+import '../../domain/services/finish_calculator.dart';
 import '../providers/budget_providers.dart';
 import '../widgets/budget_item_sheet.dart';
+import '../widgets/finish_sheet.dart';
 
 /// Presupuesto de la obra: precio a lo calculado, más lo que se escribe.
 class BudgetScreen extends ConsumerStatefulWidget {
@@ -51,6 +54,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         const <MaterialKind, double>{};
     final List<BudgetItem> allItems =
         ref.watch(budgetItemsProvider(projectId)).value ?? const <BudgetItem>[];
+    final List<Finish> finishes =
+        ref.watch(finishesProvider(projectId)).value ?? const <Finish>[];
 
     final Iterable<Room> scopedRooms = _roomId == null
         ? rooms
@@ -74,6 +79,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       materialLines: lines,
       items: items,
       floorAreaM2: surfaces.floorAreaM2,
+      finishesTotal: FinishCalculator.totalOf(finishes, rooms),
     );
 
     return Scaffold(
@@ -88,6 +94,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     rooms: scopedRooms.toList(growable: false),
                     lines: lines,
                     items: items,
+                    finishes: <FinishEstimate>[
+                      for (final Finish finish in finishes)
+                        FinishCalculator.estimate(finish, rooms),
+                    ],
                     summary: summary,
                   ),
             tooltip: 'Exportar en PDF',
@@ -126,6 +136,14 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
             ),
           ),
           const SizedBox(height: 12),
+          _FinishesCard(
+            finishes: finishes,
+            rooms: rooms,
+            onAdd: () => FinishSheet.show(context, projectId: projectId),
+            onTapFinish: (Finish finish) =>
+                FinishSheet.show(context, projectId: projectId, finish: finish),
+          ),
+          const SizedBox(height: 12),
           _SummaryCard(summary: summary),
         ],
       ),
@@ -138,6 +156,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     required List<Room> rooms,
     required List<MaterialLine> lines,
     required List<BudgetItem> items,
+    required List<FinishEstimate> finishes,
     required BudgetSummary summary,
   }) async {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
@@ -161,6 +180,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         roomPlans: plans,
         materialLines: lines,
         items: items,
+        finishes: finishes,
         summary: summary,
         generatedAt: DateTime.now(),
       );
@@ -360,6 +380,90 @@ class _ItemsCard extends StatelessWidget {
   }
 }
 
+/// Los acabados: qué se le hace a qué paredes y pisos.
+class _FinishesCard extends StatelessWidget {
+  const _FinishesCard({
+    required this.finishes,
+    required this.rooms,
+    required this.onAdd,
+    required this.onTapFinish,
+  });
+
+  final List<Finish> finishes;
+  final List<Room> rooms;
+  final VoidCallback onAdd;
+  final ValueChanged<Finish> onTapFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Acabados', style: theme.textTheme.titleMedium),
+                ),
+                TextButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Añadir'),
+                ),
+              ],
+            ),
+            if (finishes.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Marca las paredes y los pisos que llevan pintura, estuco '
+                  'o enchape y ponles precio por m². Los metros salen del '
+                  'plano.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            for (final Finish finish in finishes)
+              _finishTile(context, FinishCalculator.estimate(finish, rooms)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _finishTile(BuildContext context, FinishEstimate estimate) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(estimate.finish.description),
+      subtitle: Text(
+        '${_where(estimate)} · ${Formatters.squareMeters(estimate.areaM2)}'
+        ' × ${Formatters.money(estimate.finish.unitPrice)}',
+      ),
+      trailing: Text(
+        Formatters.money(estimate.total),
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      onTap: () => onTapFinish(estimate.finish),
+    );
+  }
+
+  String _where(FinishEstimate estimate) {
+    final List<String> parts = <String>[];
+    if (estimate.walls > 0) {
+      parts.add(estimate.walls == 1 ? '1 pared' : '${estimate.walls} paredes');
+    }
+    if (estimate.floors > 0) {
+      parts.add(estimate.floors == 1 ? '1 piso' : '${estimate.floors} pisos');
+    }
+    return parts.isEmpty ? 'Sin superficies' : parts.join(' y ');
+  }
+}
+
 class _SummaryCard extends StatelessWidget {
   const _SummaryCard({required this.summary});
 
@@ -379,6 +483,7 @@ class _SummaryCard extends StatelessWidget {
             Text('Resumen', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
             _Line(label: 'Materiales', value: summary.materialsTotal),
+            _Line(label: 'Acabados', value: summary.finishesTotal),
             _Line(label: 'Mano de obra', value: summary.laborTotal),
             _Line(label: 'Otros', value: summary.otherTotal),
             const Padding(

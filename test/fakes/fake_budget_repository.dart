@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:planova/features/budget/domain/entities/budget_item.dart';
+import 'package:planova/features/budget/domain/entities/finish.dart';
 import 'package:planova/features/budget/domain/entities/material_kind.dart';
 import 'package:planova/features/budget/domain/repositories/budget_repository.dart';
 
@@ -8,6 +9,7 @@ import 'package:planova/features/budget/domain/repositories/budget_repository.da
 class FakeBudgetRepository implements BudgetRepository {
   final Map<MaterialKind, double> _prices = <MaterialKind, double>{};
   final List<BudgetItem> _items = <BudgetItem>[];
+  final List<Finish> _finishes = <Finish>[];
   final StreamController<void> _changes = StreamController<void>.broadcast();
   int _nextId = 1;
 
@@ -54,6 +56,48 @@ class FakeBudgetRepository implements BudgetRepository {
   @override
   Future<void> deleteItem(int itemId) async {
     _items.removeWhere((BudgetItem item) => item.id == itemId);
+    _emit();
+  }
+
+  @override
+  Stream<List<Finish>> watchFinishes(int projectId) async* {
+    yield List<Finish>.of(_finishes);
+    yield* _changes.stream.map((_) => List<Finish>.of(_finishes));
+  }
+
+  @override
+  Future<int> addFinish(int projectId, FinishDraft draft) async {
+    final int id = _nextId++;
+    _finishes.add(
+      Finish(
+        id: id,
+        projectId: projectId,
+        description: draft.description,
+        unitPrice: draft.unitPrice,
+        surfaces: draft.surfaces,
+      ),
+    );
+    _emit();
+    return id;
+  }
+
+  @override
+  Future<void> updateFinish(int finishId, FinishDraft draft) async {
+    final int index = _finishes.indexWhere((Finish f) => f.id == finishId);
+    if (index == -1) return;
+    _finishes[index] = Finish(
+      id: finishId,
+      projectId: _finishes[index].projectId,
+      description: draft.description,
+      unitPrice: draft.unitPrice,
+      surfaces: draft.surfaces,
+    );
+    _emit();
+  }
+
+  @override
+  Future<void> deleteFinish(int finishId) async {
+    _finishes.removeWhere((Finish f) => f.id == finishId);
     _emit();
   }
 

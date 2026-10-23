@@ -8,6 +8,7 @@ import 'package:planova/features/budget/domain/entities/budget_item.dart';
 import 'package:planova/features/budget/domain/entities/budget_summary.dart';
 import 'package:planova/features/budget/domain/entities/material_kind.dart';
 import 'package:planova/features/budget/domain/services/budget_calculator.dart';
+import 'package:planova/features/budget/domain/services/finish_calculator.dart';
 import 'package:planova/features/materials/domain/entities/material_estimates.dart';
 import 'package:planova/features/materials/domain/entities/material_settings.dart';
 import 'package:planova/features/materials/domain/services/material_calculator.dart';
@@ -82,6 +83,7 @@ Future<Uint8List> _buildSample() {
     roomPlans: const <int, Uint8List>{},
     materialLines: lines,
     items: items,
+    finishes: const <FinishEstimate>[],
     summary: BudgetCalculator.summarize(
       materialLines: lines,
       items: items,
@@ -142,6 +144,7 @@ void main() {
       roomPlans: const <int, Uint8List>{},
       materialLines: const <MaterialLine>[],
       items: const <BudgetItem>[],
+      finishes: const <FinishEstimate>[],
       summary: BudgetCalculator.summarize(
         materialLines: const <MaterialLine>[],
         items: const <BudgetItem>[],

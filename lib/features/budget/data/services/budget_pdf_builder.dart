@@ -9,6 +9,7 @@ import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
 import '../../domain/entities/budget_item.dart';
 import '../../domain/entities/budget_summary.dart';
+import '../../domain/services/finish_calculator.dart';
 import '../../domain/entities/material_kind.dart';
 
 /// Arma el PDF del presupuesto para enviárselo al cliente.
@@ -31,6 +32,7 @@ abstract final class BudgetPdfBuilder {
     required Map<int, Uint8List> roomPlans,
     required List<MaterialLine> materialLines,
     required List<BudgetItem> items,
+    required List<FinishEstimate> finishes,
     required BudgetSummary summary,
     required DateTime generatedAt,
 
@@ -62,6 +64,11 @@ abstract final class BudgetPdfBuilder {
           else
             _materialsTable(materialLines),
           pw.SizedBox(height: 18),
+          if (finishes.isNotEmpty) ...<pw.Widget>[
+            _title('Acabados'),
+            _finishesTable(finishes),
+            pw.SizedBox(height: 18),
+          ],
           if (items.isNotEmpty) ...<pw.Widget>[
             _title('Otras partidas'),
             _itemsTable(items),
@@ -286,6 +293,41 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
+  /// Qué se le hace a cada grupo de superficies, y lo que cuesta.
+  static pw.Widget _finishesTable(List<FinishEstimate> finishes) {
+    return _table(
+      headers: <String>[
+        'Acabado',
+        'Dónde',
+        'Superficie',
+        'Precio por m²',
+        'Subtotal',
+      ],
+      rows: <List<String>>[
+        for (final FinishEstimate estimate in finishes)
+          <String>[
+            estimate.finish.description,
+            _whereOf(estimate),
+            Formatters.squareMeters(estimate.areaM2),
+            Formatters.money(estimate.finish.unitPrice),
+            Formatters.money(estimate.total),
+          ],
+      ],
+      numericFrom: 2,
+    );
+  }
+
+  static String _whereOf(FinishEstimate estimate) {
+    final List<String> parts = <String>[];
+    if (estimate.walls > 0) {
+      parts.add(estimate.walls == 1 ? '1 pared' : '${estimate.walls} paredes');
+    }
+    if (estimate.floors > 0) {
+      parts.add(estimate.floors == 1 ? '1 piso' : '${estimate.floors} pisos');
+    }
+    return parts.isEmpty ? '-' : parts.join(' y ');
+  }
+
   static pw.Widget _itemsTable(List<BudgetItem> items) {
     return _table(
       headers: <String>[
@@ -358,6 +400,7 @@ abstract final class BudgetPdfBuilder {
           child: pw.Column(
             children: <pw.Widget>[
               _summaryLine('Materiales', summary.materialsTotal),
+              _summaryLine('Acabados', summary.finishesTotal),
               _summaryLine('Mano de obra', summary.laborTotal),
               _summaryLine('Otros', summary.otherTotal),
               pw.Divider(color: _muted, height: 14),

@@ -123,7 +123,8 @@ void main() {
     await addRoom();
     await pumpBudget(tester);
 
-    await tester.tap(find.text('Añadir'));
+    // El primero es el de las partidas; el segundo, el de acabados.
+    await tester.tap(find.widgetWithText(TextButton, 'Añadir').first);
     await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(
@@ -175,5 +176,42 @@ void main() {
     expect(exporter.lastBytes!.length, greaterThan(2000));
     // Y el plano de la habitación fue al documento.
     expect(planRenderer.calls, 1);
+  });
+
+  testWidgets('un acabado toma las paredes marcadas y suma al total', (
+    WidgetTester tester,
+  ) async {
+    await addRoom();
+    await pumpBudget(tester);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Añadir').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.ancestor(
+        of: find.text('Qué se hace'),
+        matching: find.byType(TextFormField),
+      ),
+      'Pintura vinilo',
+    );
+    await tester.enterText(
+      find.ancestor(
+        of: find.text('Precio por m²'),
+        matching: find.byType(TextFormField),
+      ),
+      '12.000',
+    );
+
+    // La sala es de 4 × 3 y 2,40 de alto: la pared 2 son 7,20 m².
+    await tester.tap(find.text('Pared 2 · 7,20 m²'));
+    await tester.pumpAndSettle();
+    expect(find.text('Marcado: 7,20 m²'), findsOneWidget);
+
+    await tester.tap(find.text('Añadir acabado'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pintura vinilo'), findsOneWidget);
+    expect(find.text('1 pared · 7,20 m² × \$ 12.000'), findsOneWidget);
+    // 7,20 × 12.000 = 86.400, y entra en el total.
+    expect(find.text(r'$ 86.400'), findsWidgets);
   });
 }

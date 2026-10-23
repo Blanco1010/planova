@@ -25,6 +25,7 @@ class BudgetSummary {
     required this.materialsTotal,
     required this.laborTotal,
     required this.otherTotal,
+    required this.finishesTotal,
     required this.floorAreaM2,
     required this.pricedMaterials,
     required this.totalMaterials,
@@ -33,6 +34,9 @@ class BudgetSummary {
   final double materialsTotal;
   final double laborTotal;
   final double otherTotal;
+
+  /// Lo que suman los acabados por metro cuadrado.
+  final double finishesTotal;
   final double floorAreaM2;
 
   /// Cuántos materiales calculados ya tienen precio, y cuántos hay.
@@ -40,7 +44,7 @@ class BudgetSummary {
   final int pricedMaterials;
   final int totalMaterials;
 
-  double get total => materialsTotal + laborTotal + otherTotal;
+  double get total => materialsTotal + laborTotal + otherTotal + finishesTotal;
 
   /// Costo por metro cuadrado de piso; `null` si no hay área medida.
   double? get costPerSquareMeter =>

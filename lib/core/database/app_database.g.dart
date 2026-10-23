@@ -3719,6 +3719,680 @@ class BudgetItemsCompanion extends UpdateCompanion<BudgetItemRow> {
   }
 }
 
+class $FinishesTable extends Finishes
+    with TableInfo<$FinishesTable, FinishRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FinishesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 160,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitPriceMeta = const VerificationMeta(
+    'unitPrice',
+  );
+  @override
+  late final GeneratedColumn<double> unitPrice = GeneratedColumn<double>(
+    'unit_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    projectId,
+    description,
+    unitPrice,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'finishes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FinishRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('unit_price')) {
+      context.handle(
+        _unitPriceMeta,
+        unitPrice.isAcceptableOrUnknown(data['unit_price']!, _unitPriceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitPriceMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FinishRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FinishRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}project_id'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      unitPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}unit_price'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FinishesTable createAlias(String alias) {
+    return $FinishesTable(attachedDatabase, alias);
+  }
+}
+
+class FinishRow extends DataClass implements Insertable<FinishRow> {
+  final int id;
+  final int projectId;
+  final String description;
+
+  /// Precio por metro cuadrado.
+  final double unitPrice;
+  final DateTime createdAt;
+  const FinishRow({
+    required this.id,
+    required this.projectId,
+    required this.description,
+    required this.unitPrice,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['project_id'] = Variable<int>(projectId);
+    map['description'] = Variable<String>(description);
+    map['unit_price'] = Variable<double>(unitPrice);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FinishesCompanion toCompanion(bool nullToAbsent) {
+    return FinishesCompanion(
+      id: Value(id),
+      projectId: Value(projectId),
+      description: Value(description),
+      unitPrice: Value(unitPrice),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FinishRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FinishRow(
+      id: serializer.fromJson<int>(json['id']),
+      projectId: serializer.fromJson<int>(json['projectId']),
+      description: serializer.fromJson<String>(json['description']),
+      unitPrice: serializer.fromJson<double>(json['unitPrice']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'projectId': serializer.toJson<int>(projectId),
+      'description': serializer.toJson<String>(description),
+      'unitPrice': serializer.toJson<double>(unitPrice),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FinishRow copyWith({
+    int? id,
+    int? projectId,
+    String? description,
+    double? unitPrice,
+    DateTime? createdAt,
+  }) => FinishRow(
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    description: description ?? this.description,
+    unitPrice: unitPrice ?? this.unitPrice,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FinishRow copyWithCompanion(FinishesCompanion data) {
+    return FinishRow(
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      unitPrice: data.unitPrice.present ? data.unitPrice.value : this.unitPrice,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishRow(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('description: $description, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, projectId, description, unitPrice, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FinishRow &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.description == this.description &&
+          other.unitPrice == this.unitPrice &&
+          other.createdAt == this.createdAt);
+}
+
+class FinishesCompanion extends UpdateCompanion<FinishRow> {
+  final Value<int> id;
+  final Value<int> projectId;
+  final Value<String> description;
+  final Value<double> unitPrice;
+  final Value<DateTime> createdAt;
+  const FinishesCompanion({
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.description = const Value.absent(),
+    this.unitPrice = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  FinishesCompanion.insert({
+    this.id = const Value.absent(),
+    required int projectId,
+    required String description,
+    required double unitPrice,
+    this.createdAt = const Value.absent(),
+  }) : projectId = Value(projectId),
+       description = Value(description),
+       unitPrice = Value(unitPrice);
+  static Insertable<FinishRow> custom({
+    Expression<int>? id,
+    Expression<int>? projectId,
+    Expression<String>? description,
+    Expression<double>? unitPrice,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (description != null) 'description': description,
+      if (unitPrice != null) 'unit_price': unitPrice,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  FinishesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? projectId,
+    Value<String>? description,
+    Value<double>? unitPrice,
+    Value<DateTime>? createdAt,
+  }) {
+    return FinishesCompanion(
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      description: description ?? this.description,
+      unitPrice: unitPrice ?? this.unitPrice,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<int>(projectId.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (unitPrice.present) {
+      map['unit_price'] = Variable<double>(unitPrice.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishesCompanion(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('description: $description, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FinishSurfacesTable extends FinishSurfaces
+    with TableInfo<$FinishSurfacesTable, FinishSurfaceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FinishSurfacesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _finishIdMeta = const VerificationMeta(
+    'finishId',
+  );
+  @override
+  late final GeneratedColumn<int> finishId = GeneratedColumn<int>(
+    'finish_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES finishes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _roomIdMeta = const VerificationMeta('roomId');
+  @override
+  late final GeneratedColumn<int> roomId = GeneratedColumn<int>(
+    'room_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES rooms (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _wallIdMeta = const VerificationMeta('wallId');
+  @override
+  late final GeneratedColumn<int> wallId = GeneratedColumn<int>(
+    'wall_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES room_walls (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, finishId, roomId, wallId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'finish_surfaces';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FinishSurfaceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('finish_id')) {
+      context.handle(
+        _finishIdMeta,
+        finishId.isAcceptableOrUnknown(data['finish_id']!, _finishIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_finishIdMeta);
+    }
+    if (data.containsKey('room_id')) {
+      context.handle(
+        _roomIdMeta,
+        roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_roomIdMeta);
+    }
+    if (data.containsKey('wall_id')) {
+      context.handle(
+        _wallIdMeta,
+        wallId.isAcceptableOrUnknown(data['wall_id']!, _wallIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FinishSurfaceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FinishSurfaceRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      finishId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}finish_id'],
+      )!,
+      roomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}room_id'],
+      )!,
+      wallId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wall_id'],
+      ),
+    );
+  }
+
+  @override
+  $FinishSurfacesTable createAlias(String alias) {
+    return $FinishSurfacesTable(attachedDatabase, alias);
+  }
+}
+
+class FinishSurfaceRow extends DataClass
+    implements Insertable<FinishSurfaceRow> {
+  final int id;
+  final int finishId;
+  final int roomId;
+
+  /// `null` cuando la superficie es el piso de esa habitación.
+  final int? wallId;
+  const FinishSurfaceRow({
+    required this.id,
+    required this.finishId,
+    required this.roomId,
+    this.wallId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['finish_id'] = Variable<int>(finishId);
+    map['room_id'] = Variable<int>(roomId);
+    if (!nullToAbsent || wallId != null) {
+      map['wall_id'] = Variable<int>(wallId);
+    }
+    return map;
+  }
+
+  FinishSurfacesCompanion toCompanion(bool nullToAbsent) {
+    return FinishSurfacesCompanion(
+      id: Value(id),
+      finishId: Value(finishId),
+      roomId: Value(roomId),
+      wallId: wallId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wallId),
+    );
+  }
+
+  factory FinishSurfaceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FinishSurfaceRow(
+      id: serializer.fromJson<int>(json['id']),
+      finishId: serializer.fromJson<int>(json['finishId']),
+      roomId: serializer.fromJson<int>(json['roomId']),
+      wallId: serializer.fromJson<int?>(json['wallId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'finishId': serializer.toJson<int>(finishId),
+      'roomId': serializer.toJson<int>(roomId),
+      'wallId': serializer.toJson<int?>(wallId),
+    };
+  }
+
+  FinishSurfaceRow copyWith({
+    int? id,
+    int? finishId,
+    int? roomId,
+    Value<int?> wallId = const Value.absent(),
+  }) => FinishSurfaceRow(
+    id: id ?? this.id,
+    finishId: finishId ?? this.finishId,
+    roomId: roomId ?? this.roomId,
+    wallId: wallId.present ? wallId.value : this.wallId,
+  );
+  FinishSurfaceRow copyWithCompanion(FinishSurfacesCompanion data) {
+    return FinishSurfaceRow(
+      id: data.id.present ? data.id.value : this.id,
+      finishId: data.finishId.present ? data.finishId.value : this.finishId,
+      roomId: data.roomId.present ? data.roomId.value : this.roomId,
+      wallId: data.wallId.present ? data.wallId.value : this.wallId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishSurfaceRow(')
+          ..write('id: $id, ')
+          ..write('finishId: $finishId, ')
+          ..write('roomId: $roomId, ')
+          ..write('wallId: $wallId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, finishId, roomId, wallId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FinishSurfaceRow &&
+          other.id == this.id &&
+          other.finishId == this.finishId &&
+          other.roomId == this.roomId &&
+          other.wallId == this.wallId);
+}
+
+class FinishSurfacesCompanion extends UpdateCompanion<FinishSurfaceRow> {
+  final Value<int> id;
+  final Value<int> finishId;
+  final Value<int> roomId;
+  final Value<int?> wallId;
+  const FinishSurfacesCompanion({
+    this.id = const Value.absent(),
+    this.finishId = const Value.absent(),
+    this.roomId = const Value.absent(),
+    this.wallId = const Value.absent(),
+  });
+  FinishSurfacesCompanion.insert({
+    this.id = const Value.absent(),
+    required int finishId,
+    required int roomId,
+    this.wallId = const Value.absent(),
+  }) : finishId = Value(finishId),
+       roomId = Value(roomId);
+  static Insertable<FinishSurfaceRow> custom({
+    Expression<int>? id,
+    Expression<int>? finishId,
+    Expression<int>? roomId,
+    Expression<int>? wallId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (finishId != null) 'finish_id': finishId,
+      if (roomId != null) 'room_id': roomId,
+      if (wallId != null) 'wall_id': wallId,
+    });
+  }
+
+  FinishSurfacesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? finishId,
+    Value<int>? roomId,
+    Value<int?>? wallId,
+  }) {
+    return FinishSurfacesCompanion(
+      id: id ?? this.id,
+      finishId: finishId ?? this.finishId,
+      roomId: roomId ?? this.roomId,
+      wallId: wallId ?? this.wallId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (finishId.present) {
+      map['finish_id'] = Variable<int>(finishId.value);
+    }
+    if (roomId.present) {
+      map['room_id'] = Variable<int>(roomId.value);
+    }
+    if (wallId.present) {
+      map['wall_id'] = Variable<int>(wallId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FinishSurfacesCompanion(')
+          ..write('id: $id, ')
+          ..write('finishId: $finishId, ')
+          ..write('roomId: $roomId, ')
+          ..write('wallId: $wallId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3731,6 +4405,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $ProjectMaterialSettingsTable(this);
   late final $MaterialPricesTable materialPrices = $MaterialPricesTable(this);
   late final $BudgetItemsTable budgetItems = $BudgetItemsTable(this);
+  late final $FinishesTable finishes = $FinishesTable(this);
+  late final $FinishSurfacesTable finishSurfaces = $FinishSurfacesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3744,6 +4420,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     projectMaterialSettings,
     materialPrices,
     budgetItems,
+    finishes,
+    finishSurfaces,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3797,6 +4475,34 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('budget_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('finishes', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'finishes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('finish_surfaces', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'rooms',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('finish_surfaces', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'room_walls',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('finish_surfaces', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -3899,6 +4605,24 @@ final class $$ProjectsTableReferences
     ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_budgetItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FinishesTable, List<FinishRow>>
+  _finishesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.finishes,
+    aliasName: 'projects__id__finishes__project_id',
+  );
+
+  $$FinishesTableProcessedTableManager get finishesRefs {
+    final manager = $$FinishesTableTableManager(
+      $_db,
+      $_db.finishes,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_finishesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4041,6 +4765,31 @@ class $$ProjectsTableFilterComposer
           }) => $$BudgetItemsTableFilterComposer(
             $db: $db,
             $table: $db.budgetItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> finishesRefs(
+    Expression<bool> Function($$FinishesTableFilterComposer f) f,
+  ) {
+    final $$FinishesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishes,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishesTableFilterComposer(
+            $db: $db,
+            $table: $db.finishes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4227,6 +4976,31 @@ class $$ProjectsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> finishesRefs<T extends Object>(
+    Expression<T> Function($$FinishesTableAnnotationComposer a) f,
+  ) {
+    final $$FinishesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishes,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.finishes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -4247,6 +5021,7 @@ class $$ProjectsTableTableManager
             bool projectMaterialSettingsRefs,
             bool materialPricesRefs,
             bool budgetItemsRefs,
+            bool finishesRefs,
           })
         > {
   $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
@@ -4310,6 +5085,7 @@ class $$ProjectsTableTableManager
                 projectMaterialSettingsRefs = false,
                 materialPricesRefs = false,
                 budgetItemsRefs = false,
+                finishesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4318,6 +5094,7 @@ class $$ProjectsTableTableManager
                     if (projectMaterialSettingsRefs) db.projectMaterialSettings,
                     if (materialPricesRefs) db.materialPrices,
                     if (budgetItemsRefs) db.budgetItems,
+                    if (finishesRefs) db.finishes,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -4406,6 +5183,27 @@ class $$ProjectsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (finishesRefs)
+                        await $_getPrefetchedData<
+                          ProjectRow,
+                          $ProjectsTable,
+                          FinishRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._finishesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).finishesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4431,6 +5229,7 @@ typedef $$ProjectsTableProcessedTableManager =
         bool projectMaterialSettingsRefs,
         bool materialPricesRefs,
         bool budgetItemsRefs,
+        bool finishesRefs,
       })
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
@@ -4653,6 +5452,24 @@ final class $$RoomsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$FinishSurfacesTable, List<FinishSurfaceRow>>
+  _finishSurfacesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.finishSurfaces,
+    aliasName: 'rooms__id__finish_surfaces__room_id',
+  );
+
+  $$FinishSurfacesTableProcessedTableManager get finishSurfacesRefs {
+    final manager = $$FinishSurfacesTableTableManager(
+      $_db,
+      $_db.finishSurfaces,
+    ).filter((f) => f.roomId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_finishSurfacesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
@@ -4752,6 +5569,31 @@ class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
           }) => $$BudgetItemsTableFilterComposer(
             $db: $db,
             $table: $db.budgetItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> finishSurfacesRefs(
+    Expression<bool> Function($$FinishSurfacesTableFilterComposer f) f,
+  ) {
+    final $$FinishSurfacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableFilterComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4918,6 +5760,31 @@ class $$RoomsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> finishSurfacesRefs<T extends Object>(
+    Expression<T> Function($$FinishSurfacesTableAnnotationComposer a) f,
+  ) {
+    final $$FinishSurfacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RoomsTableTableManager
@@ -4937,6 +5804,7 @@ class $$RoomsTableTableManager
             bool projectId,
             bool roomWallsRefs,
             bool budgetItemsRefs,
+            bool finishSurfacesRefs,
           })
         > {
   $$RoomsTableTableManager(_$AppDatabase db, $RoomsTable table)
@@ -4995,12 +5863,14 @@ class $$RoomsTableTableManager
                 projectId = false,
                 roomWallsRefs = false,
                 budgetItemsRefs = false,
+                finishSurfacesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (roomWallsRefs) db.roomWalls,
                     if (budgetItemsRefs) db.budgetItems,
+                    if (finishSurfacesRefs) db.finishSurfaces,
                   ],
                   addJoins:
                       <
@@ -5076,6 +5946,27 @@ class $$RoomsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (finishSurfacesRefs)
+                        await $_getPrefetchedData<
+                          RoomRow,
+                          $RoomsTable,
+                          FinishSurfaceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomsTableReferences
+                              ._finishSurfacesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).finishSurfacesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.roomId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5100,6 +5991,7 @@ typedef $$RoomsTableProcessedTableManager =
         bool projectId,
         bool roomWallsRefs,
         bool budgetItemsRefs,
+        bool finishSurfacesRefs,
       })
     >;
 typedef $$RoomWallsTableCreateCompanionBuilder = RoomWallsCompanion Function({
@@ -5151,6 +6043,24 @@ final class $$RoomWallsTableReferences
     ).filter((f) => f.wallId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_roomOpeningsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FinishSurfacesTable, List<FinishSurfaceRow>>
+  _finishSurfacesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.finishSurfaces,
+    aliasName: 'room_walls__id__finish_surfaces__wall_id',
+  );
+
+  $$FinishSurfacesTableProcessedTableManager get finishSurfacesRefs {
+    final manager = $$FinishSurfacesTableTableManager(
+      $_db,
+      $_db.finishSurfaces,
+    ).filter((f) => f.wallId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_finishSurfacesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5225,6 +6135,31 @@ class $$RoomWallsTableFilterComposer
           }) => $$RoomOpeningsTableFilterComposer(
             $db: $db,
             $table: $db.roomOpenings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> finishSurfacesRefs(
+    Expression<bool> Function($$FinishSurfacesTableFilterComposer f) f,
+  ) {
+    final $$FinishSurfacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.wallId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableFilterComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5360,6 +6295,31 @@ class $$RoomWallsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> finishSurfacesRefs<T extends Object>(
+    Expression<T> Function($$FinishSurfacesTableAnnotationComposer a) f,
+  ) {
+    final $$FinishSurfacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.wallId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RoomWallsTableTableManager
@@ -5375,7 +6335,11 @@ class $$RoomWallsTableTableManager
           $$RoomWallsTableUpdateCompanionBuilder,
           (RoomWallRow, $$RoomWallsTableReferences),
           RoomWallRow,
-          PrefetchHooks Function({bool roomId, bool roomOpeningsRefs})
+          PrefetchHooks Function({
+            bool roomId,
+            bool roomOpeningsRefs,
+            bool finishSurfacesRefs,
+          })
         > {
   $$RoomWallsTableTableManager(_$AppDatabase db, $RoomWallsTable table)
     : super(
@@ -5424,65 +6388,96 @@ class $$RoomWallsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({roomId = false, roomOpeningsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (roomOpeningsRefs) db.roomOpenings],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (roomId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.roomId,
-                        referencedTable: $$RoomWallsTableReferences
-                            ._roomIdTable(db),
-                        referencedColumn: $$RoomWallsTableReferences
-                            ._roomIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                roomId = false,
+                roomOpeningsRefs = false,
+                finishSurfacesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (roomOpeningsRefs) db.roomOpenings,
+                    if (finishSurfacesRefs) db.finishSurfaces,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (roomId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.roomId,
+                            referencedTable: $$RoomWallsTableReferences
+                                ._roomIdTable(db),
+                            referencedColumn: $$RoomWallsTableReferences
+                                ._roomIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (roomOpeningsRefs)
+                        await $_getPrefetchedData<
+                          RoomWallRow,
+                          $RoomWallsTable,
+                          RoomOpeningRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomWallsTableReferences
+                              ._roomOpeningsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomWallsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).roomOpeningsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.wallId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (finishSurfacesRefs)
+                        await $_getPrefetchedData<
+                          RoomWallRow,
+                          $RoomWallsTable,
+                          FinishSurfaceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomWallsTableReferences
+                              ._finishSurfacesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomWallsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).finishSurfacesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.wallId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (roomOpeningsRefs)
-                    await $_getPrefetchedData<
-                      RoomWallRow,
-                      $RoomWallsTable,
-                      RoomOpeningRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$RoomWallsTableReferences
-                          ._roomOpeningsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$RoomWallsTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).roomOpeningsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.wallId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -5499,7 +6494,11 @@ typedef $$RoomWallsTableProcessedTableManager =
       $$RoomWallsTableUpdateCompanionBuilder,
       (RoomWallRow, $$RoomWallsTableReferences),
       RoomWallRow,
-      PrefetchHooks Function({bool roomId, bool roomOpeningsRefs})
+      PrefetchHooks Function({
+        bool roomId,
+        bool roomOpeningsRefs,
+        bool finishSurfacesRefs,
+      })
     >;
 typedef $$RoomOpeningsTableCreateCompanionBuilder =
     RoomOpeningsCompanion Function({
@@ -7177,6 +8176,874 @@ typedef $$BudgetItemsTableProcessedTableManager =
       BudgetItemRow,
       PrefetchHooks Function({bool projectId, bool roomId})
     >;
+typedef $$FinishesTableCreateCompanionBuilder = FinishesCompanion Function({
+  Value<int> id,
+  required int projectId,
+  required String description,
+  required double unitPrice,
+  Value<DateTime> createdAt,
+});
+typedef $$FinishesTableUpdateCompanionBuilder = FinishesCompanion Function({
+  Value<int> id,
+  Value<int> projectId,
+  Value<String> description,
+  Value<double> unitPrice,
+  Value<DateTime> createdAt,
+});
+
+final class $$FinishesTableReferences
+    extends BaseReferences<_$AppDatabase, $FinishesTable, FinishRow> {
+  $$FinishesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('finishes__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$FinishSurfacesTable, List<FinishSurfaceRow>>
+  _finishSurfacesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.finishSurfaces,
+    aliasName: 'finishes__id__finish_surfaces__finish_id',
+  );
+
+  $$FinishSurfacesTableProcessedTableManager get finishSurfacesRefs {
+    final manager = $$FinishSurfacesTableTableManager(
+      $_db,
+      $_db.finishSurfaces,
+    ).filter((f) => f.finishId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_finishSurfacesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$FinishesTableFilterComposer
+    extends Composer<_$AppDatabase, $FinishesTable> {
+  $$FinishesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> finishSurfacesRefs(
+    Expression<bool> Function($$FinishSurfacesTableFilterComposer f) f,
+  ) {
+    final $$FinishSurfacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.finishId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableFilterComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FinishesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FinishesTable> {
+  $$FinishesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinishesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FinishesTable> {
+  $$FinishesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get unitPrice =>
+      $composableBuilder(column: $table.unitPrice, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> finishSurfacesRefs<T extends Object>(
+    Expression<T> Function($$FinishSurfacesTableAnnotationComposer a) f,
+  ) {
+    final $$FinishSurfacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.finishSurfaces,
+      getReferencedColumn: (t) => t.finishId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishSurfacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.finishSurfaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$FinishesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FinishesTable,
+          FinishRow,
+          $$FinishesTableFilterComposer,
+          $$FinishesTableOrderingComposer,
+          $$FinishesTableAnnotationComposer,
+          $$FinishesTableCreateCompanionBuilder,
+          $$FinishesTableUpdateCompanionBuilder,
+          (FinishRow, $$FinishesTableReferences),
+          FinishRow,
+          PrefetchHooks Function({bool projectId, bool finishSurfacesRefs})
+        > {
+  $$FinishesTableTableManager(_$AppDatabase db, $FinishesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FinishesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FinishesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FinishesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> projectId = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<double> unitPrice = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FinishesCompanion(
+                id: id,
+                projectId: projectId,
+                description: description,
+                unitPrice: unitPrice,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int projectId,
+                required String description,
+                required double unitPrice,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FinishesCompanion.insert(
+                id: id,
+                projectId: projectId,
+                description: description,
+                unitPrice: unitPrice,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FinishesTable, FinishRow>(table),
+                  $$FinishesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({projectId = false, finishSurfacesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (finishSurfacesRefs) db.finishSurfaces,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (projectId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$FinishesTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn: $$FinishesTableReferences
+                                ._projectIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (finishSurfacesRefs)
+                        await $_getPrefetchedData<
+                          FinishRow,
+                          $FinishesTable,
+                          FinishSurfaceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$FinishesTableReferences
+                              ._finishSurfacesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$FinishesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).finishSurfacesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.finishId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FinishesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FinishesTable,
+      FinishRow,
+      $$FinishesTableFilterComposer,
+      $$FinishesTableOrderingComposer,
+      $$FinishesTableAnnotationComposer,
+      $$FinishesTableCreateCompanionBuilder,
+      $$FinishesTableUpdateCompanionBuilder,
+      (FinishRow, $$FinishesTableReferences),
+      FinishRow,
+      PrefetchHooks Function({bool projectId, bool finishSurfacesRefs})
+    >;
+typedef $$FinishSurfacesTableCreateCompanionBuilder =
+    FinishSurfacesCompanion Function({
+      Value<int> id,
+      required int finishId,
+      required int roomId,
+      Value<int?> wallId,
+    });
+typedef $$FinishSurfacesTableUpdateCompanionBuilder =
+    FinishSurfacesCompanion Function({
+      Value<int> id,
+      Value<int> finishId,
+      Value<int> roomId,
+      Value<int?> wallId,
+    });
+
+final class $$FinishSurfacesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $FinishSurfacesTable, FinishSurfaceRow> {
+  $$FinishSurfacesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $FinishesTable _finishIdTable(_$AppDatabase db) =>
+      db.finishes.createAlias('finish_surfaces__finish_id__finishes__id');
+
+  $$FinishesTableProcessedTableManager get finishId {
+    final $_column = $_itemColumn<int>('finish_id')!;
+
+    final manager = $$FinishesTableTableManager(
+      $_db,
+      $_db.finishes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_finishIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $RoomsTable _roomIdTable(_$AppDatabase db) =>
+      db.rooms.createAlias('finish_surfaces__room_id__rooms__id');
+
+  $$RoomsTableProcessedTableManager get roomId {
+    final $_column = $_itemColumn<int>('room_id')!;
+
+    final manager = $$RoomsTableTableManager(
+      $_db,
+      $_db.rooms,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_roomIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $RoomWallsTable _wallIdTable(_$AppDatabase db) =>
+      db.roomWalls.createAlias('finish_surfaces__wall_id__room_walls__id');
+
+  $$RoomWallsTableProcessedTableManager? get wallId {
+    final $_column = $_itemColumn<int>('wall_id');
+    if ($_column == null) return null;
+    final manager = $$RoomWallsTableTableManager(
+      $_db,
+      $_db.roomWalls,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_wallIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FinishSurfacesTableFilterComposer
+    extends Composer<_$AppDatabase, $FinishSurfacesTable> {
+  $$FinishSurfacesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$FinishesTableFilterComposer get finishId {
+    final $$FinishesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.finishId,
+      referencedTable: $db.finishes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishesTableFilterComposer(
+            $db: $db,
+            $table: $db.finishes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableFilterComposer get roomId {
+    final $$RoomsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableFilterComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomWallsTableFilterComposer get wallId {
+    final $$RoomWallsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.wallId,
+      referencedTable: $db.roomWalls,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomWallsTableFilterComposer(
+            $db: $db,
+            $table: $db.roomWalls,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinishSurfacesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FinishSurfacesTable> {
+  $$FinishSurfacesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$FinishesTableOrderingComposer get finishId {
+    final $$FinishesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.finishId,
+      referencedTable: $db.finishes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishesTableOrderingComposer(
+            $db: $db,
+            $table: $db.finishes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableOrderingComposer get roomId {
+    final $$RoomsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableOrderingComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomWallsTableOrderingComposer get wallId {
+    final $$RoomWallsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.wallId,
+      referencedTable: $db.roomWalls,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomWallsTableOrderingComposer(
+            $db: $db,
+            $table: $db.roomWalls,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinishSurfacesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FinishSurfacesTable> {
+  $$FinishSurfacesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$FinishesTableAnnotationComposer get finishId {
+    final $$FinishesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.finishId,
+      referencedTable: $db.finishes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FinishesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.finishes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableAnnotationComposer get roomId {
+    final $$RoomsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomWallsTableAnnotationComposer get wallId {
+    final $$RoomWallsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.wallId,
+      referencedTable: $db.roomWalls,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomWallsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.roomWalls,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FinishSurfacesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FinishSurfacesTable,
+          FinishSurfaceRow,
+          $$FinishSurfacesTableFilterComposer,
+          $$FinishSurfacesTableOrderingComposer,
+          $$FinishSurfacesTableAnnotationComposer,
+          $$FinishSurfacesTableCreateCompanionBuilder,
+          $$FinishSurfacesTableUpdateCompanionBuilder,
+          (FinishSurfaceRow, $$FinishSurfacesTableReferences),
+          FinishSurfaceRow,
+          PrefetchHooks Function({bool finishId, bool roomId, bool wallId})
+        > {
+  $$FinishSurfacesTableTableManager(
+    _$AppDatabase db,
+    $FinishSurfacesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FinishSurfacesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FinishSurfacesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FinishSurfacesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> finishId = const Value.absent(),
+                Value<int> roomId = const Value.absent(),
+                Value<int?> wallId = const Value.absent(),
+              }) => FinishSurfacesCompanion(
+                id: id,
+                finishId: finishId,
+                roomId: roomId,
+                wallId: wallId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int finishId,
+                required int roomId,
+                Value<int?> wallId = const Value.absent(),
+              }) => FinishSurfacesCompanion.insert(
+                id: id,
+                finishId: finishId,
+                roomId: roomId,
+                wallId: wallId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FinishSurfacesTable, FinishSurfaceRow>(table),
+                  $$FinishSurfacesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({finishId = false, roomId = false, wallId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (finishId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.finishId,
+                            referencedTable: $$FinishSurfacesTableReferences
+                                ._finishIdTable(db),
+                            referencedColumn: $$FinishSurfacesTableReferences
+                                ._finishIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (roomId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.roomId,
+                            referencedTable: $$FinishSurfacesTableReferences
+                                ._roomIdTable(db),
+                            referencedColumn: $$FinishSurfacesTableReferences
+                                ._roomIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (wallId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.wallId,
+                            referencedTable: $$FinishSurfacesTableReferences
+                                ._wallIdTable(db),
+                            referencedColumn: $$FinishSurfacesTableReferences
+                                ._wallIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$FinishSurfacesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FinishSurfacesTable,
+      FinishSurfaceRow,
+      $$FinishSurfacesTableFilterComposer,
+      $$FinishSurfacesTableOrderingComposer,
+      $$FinishSurfacesTableAnnotationComposer,
+      $$FinishSurfacesTableCreateCompanionBuilder,
+      $$FinishSurfacesTableUpdateCompanionBuilder,
+      (FinishSurfaceRow, $$FinishSurfacesTableReferences),
+      FinishSurfaceRow,
+      PrefetchHooks Function({bool finishId, bool roomId, bool wallId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7200,4 +9067,8 @@ class $AppDatabaseManager {
       $$MaterialPricesTableTableManager(_db, _db.materialPrices);
   $$BudgetItemsTableTableManager get budgetItems =>
       $$BudgetItemsTableTableManager(_db, _db.budgetItems);
+  $$FinishesTableTableManager get finishes =>
+      $$FinishesTableTableManager(_db, _db.finishes);
+  $$FinishSurfacesTableTableManager get finishSurfaces =>
+      $$FinishSurfacesTableTableManager(_db, _db.finishSurfaces);
 }

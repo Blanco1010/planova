@@ -51,10 +51,7 @@ class _SurfaceChooser extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
-          Text(
-            '¿Qué vas a medir?',
-            style: theme.textTheme.titleMedium,
-          ),
+          Text('¿Qué vas a medir?', style: theme.textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
             'La cámara busca mejor cuando sabe qué mirar.',

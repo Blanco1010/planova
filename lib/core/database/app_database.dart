@@ -26,6 +26,8 @@ part 'app_database.g.dart';
     ProjectMaterialSettings,
     MaterialPrices,
     BudgetItems,
+    Finishes,
+    FinishSurfaces,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -37,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _fileName = 'planova';
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -53,6 +55,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await m.createTable(materialPrices);
         await m.createTable(budgetItems);
+      }
+      if (from < 5) {
+        await m.createTable(finishes);
+        await m.createTable(finishSurfaces);
       }
     },
     beforeOpen: (OpeningDetails details) async {
