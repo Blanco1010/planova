@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/app_colors.dart';
+
 /// Pregunta antes de borrar algo que no se puede recuperar.
 ///
 /// El botón que borra va en rojo: es lo que avisa de que ese toque no tiene
@@ -11,8 +13,6 @@ abstract final class ConfirmDeleteDialog {
     required String message,
     String confirmLabel = 'Eliminar',
   }) async {
-    final ThemeData theme = Theme.of(context);
-
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
@@ -26,8 +26,8 @@ abstract final class ConfirmDeleteDialog {
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
+              backgroundColor: AppColors.dangerRed,
+              foregroundColor: Colors.white,
             ),
             child: Text(confirmLabel),
           ),

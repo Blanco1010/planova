@@ -145,7 +145,14 @@ class ProjectDetailScreen extends ConsumerWidget {
               subtitle: const Text('Ancho y largo, y luego ajustas el plano'),
               onTap: () {
                 Navigator.of(sheetContext).pop();
-                RoomFormSheet.show(context, projectId: projectId);
+                RoomFormSheet.show(
+                  context,
+                  projectId: projectId,
+                  // Igual que al medir con la cámara: la habitación recién
+                  // hecha se abre en su plano, que es donde se ajusta.
+                  onCreated: (int roomId) =>
+                      context.push(AppRoutes.roomEditorPath(projectId, roomId)),
+                );
               },
             ),
           ],

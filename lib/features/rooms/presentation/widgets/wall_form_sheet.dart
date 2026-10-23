@@ -190,6 +190,9 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _saving ? null : () => _deleteWall(wall),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
                 child: const Text('Eliminar esta pared'),
               ),
             ],

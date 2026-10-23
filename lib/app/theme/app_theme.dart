@@ -29,6 +29,8 @@ abstract final class AppTheme {
         surfaceContainer: AppColors.lightBackground,
         onSurfaceVariant: AppColors.mutedLight,
         outlineVariant: AppColors.borderLight,
+        error: AppColors.dangerRed,
+        onError: Colors.white,
       );
 
   static final ColorScheme _darkScheme =
@@ -49,6 +51,9 @@ abstract final class AppTheme {
         surfaceContainer: AppColors.darkSurface,
         onSurfaceVariant: AppColors.mutedDark,
         outlineVariant: AppColors.borderDark,
+        // De noche el rojo se aclara: así un aviso escrito se lee.
+        error: AppColors.dangerRedDark,
+        onError: AppColors.darkNavy,
       );
 
   static ThemeData _build(ColorScheme scheme) {

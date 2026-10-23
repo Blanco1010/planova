@@ -20,6 +20,15 @@ abstract final class AppColors {
   /// Azul oscuro: texto principal y base del tema oscuro.
   static const Color darkNavy = Color(0xFF0F172A);
 
+  /// Rojo de borrar: fondo del botón que no tiene vuelta atrás.
+  ///
+  /// Es el mismo en los dos temas, con texto blanco encima, para que ese
+  /// botón se vea rojo también de noche.
+  static const Color dangerRed = Color(0xFFDC2626);
+
+  /// El mismo rojo aclarado, para avisos escritos sobre fondo oscuro.
+  static const Color dangerRedDark = Color(0xFFF87171);
+
   // --- Tonos derivados ---
 
   /// Superficie de tarjetas y hojas en tema claro.
