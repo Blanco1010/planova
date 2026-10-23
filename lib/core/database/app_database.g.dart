@@ -1868,6 +1868,1008 @@ class RoomOpeningsCompanion extends UpdateCompanion<RoomOpeningRow> {
   }
 }
 
+class $ProjectMaterialSettingsTable extends ProjectMaterialSettings
+    with TableInfo<$ProjectMaterialSettingsTable, MaterialSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProjectMaterialSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _blockLengthMetersMeta = const VerificationMeta(
+    'blockLengthMeters',
+  );
+  @override
+  late final GeneratedColumn<double> blockLengthMeters =
+      GeneratedColumn<double>(
+        'block_length_meters',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0.39),
+      );
+  static const VerificationMeta _blockHeightMetersMeta = const VerificationMeta(
+    'blockHeightMeters',
+  );
+  @override
+  late final GeneratedColumn<double> blockHeightMeters =
+      GeneratedColumn<double>(
+        'block_height_meters',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0.19),
+      );
+  static const VerificationMeta _jointMetersMeta = const VerificationMeta(
+    'jointMeters',
+  );
+  @override
+  late final GeneratedColumn<double> jointMeters = GeneratedColumn<double>(
+    'joint_meters',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.015),
+  );
+  static const VerificationMeta _wallThicknessMetersMeta =
+      const VerificationMeta('wallThicknessMeters');
+  @override
+  late final GeneratedColumn<double> wallThicknessMeters =
+      GeneratedColumn<double>(
+        'wall_thickness_meters',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0.12),
+      );
+  static const VerificationMeta _masonryWastePercentMeta =
+      const VerificationMeta('masonryWastePercent');
+  @override
+  late final GeneratedColumn<double> masonryWastePercent =
+      GeneratedColumn<double>(
+        'masonry_waste_percent',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(5),
+      );
+  static const VerificationMeta _cementBagsPerCubicMeterMeta =
+      const VerificationMeta('cementBagsPerCubicMeter');
+  @override
+  late final GeneratedColumn<double> cementBagsPerCubicMeter =
+      GeneratedColumn<double>(
+        'cement_bags_per_cubic_meter',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(7.5),
+      );
+  static const VerificationMeta _sandCubicMetersPerCubicMeterMeta =
+      const VerificationMeta('sandCubicMetersPerCubicMeter');
+  @override
+  late final GeneratedColumn<double> sandCubicMetersPerCubicMeter =
+      GeneratedColumn<double>(
+        'sand_cubic_meters_per_cubic_meter',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(1.1),
+      );
+  static const VerificationMeta _paintCoatsMeta = const VerificationMeta(
+    'paintCoats',
+  );
+  @override
+  late final GeneratedColumn<int> paintCoats = GeneratedColumn<int>(
+    'paint_coats',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
+  static const VerificationMeta _squareMetersPerLiterMeta =
+      const VerificationMeta('squareMetersPerLiter');
+  @override
+  late final GeneratedColumn<double> squareMetersPerLiter =
+      GeneratedColumn<double>(
+        'square_meters_per_liter',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(10),
+      );
+  static const VerificationMeta _paintWastePercentMeta = const VerificationMeta(
+    'paintWastePercent',
+  );
+  @override
+  late final GeneratedColumn<double> paintWastePercent =
+      GeneratedColumn<double>(
+        'paint_waste_percent',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(5),
+      );
+  static const VerificationMeta _includeCeilingMeta = const VerificationMeta(
+    'includeCeiling',
+  );
+  @override
+  late final GeneratedColumn<bool> includeCeiling = GeneratedColumn<bool>(
+    'include_ceiling',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("include_ceiling" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _tileLengthMetersMeta = const VerificationMeta(
+    'tileLengthMeters',
+  );
+  @override
+  late final GeneratedColumn<double> tileLengthMeters = GeneratedColumn<double>(
+    'tile_length_meters',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.33),
+  );
+  static const VerificationMeta _tileWidthMetersMeta = const VerificationMeta(
+    'tileWidthMeters',
+  );
+  @override
+  late final GeneratedColumn<double> tileWidthMeters = GeneratedColumn<double>(
+    'tile_width_meters',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.33),
+  );
+  static const VerificationMeta _floorWastePercentMeta = const VerificationMeta(
+    'floorWastePercent',
+  );
+  @override
+  late final GeneratedColumn<double> floorWastePercent =
+      GeneratedColumn<double>(
+        'floor_waste_percent',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(10),
+      );
+  static const VerificationMeta _adhesiveKilogramsPerSquareMeterMeta =
+      const VerificationMeta('adhesiveKilogramsPerSquareMeter');
+  @override
+  late final GeneratedColumn<double> adhesiveKilogramsPerSquareMeter =
+      GeneratedColumn<double>(
+        'adhesive_kilograms_per_square_meter',
+        aliasedName,
+        false,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(5),
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    projectId,
+    blockLengthMeters,
+    blockHeightMeters,
+    jointMeters,
+    wallThicknessMeters,
+    masonryWastePercent,
+    cementBagsPerCubicMeter,
+    sandCubicMetersPerCubicMeter,
+    paintCoats,
+    squareMetersPerLiter,
+    paintWastePercent,
+    includeCeiling,
+    tileLengthMeters,
+    tileWidthMeters,
+    floorWastePercent,
+    adhesiveKilogramsPerSquareMeter,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'project_material_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MaterialSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    }
+    if (data.containsKey('block_length_meters')) {
+      context.handle(
+        _blockLengthMetersMeta,
+        blockLengthMeters.isAcceptableOrUnknown(
+          data['block_length_meters']!,
+          _blockLengthMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('block_height_meters')) {
+      context.handle(
+        _blockHeightMetersMeta,
+        blockHeightMeters.isAcceptableOrUnknown(
+          data['block_height_meters']!,
+          _blockHeightMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('joint_meters')) {
+      context.handle(
+        _jointMetersMeta,
+        jointMeters.isAcceptableOrUnknown(
+          data['joint_meters']!,
+          _jointMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('wall_thickness_meters')) {
+      context.handle(
+        _wallThicknessMetersMeta,
+        wallThicknessMeters.isAcceptableOrUnknown(
+          data['wall_thickness_meters']!,
+          _wallThicknessMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('masonry_waste_percent')) {
+      context.handle(
+        _masonryWastePercentMeta,
+        masonryWastePercent.isAcceptableOrUnknown(
+          data['masonry_waste_percent']!,
+          _masonryWastePercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cement_bags_per_cubic_meter')) {
+      context.handle(
+        _cementBagsPerCubicMeterMeta,
+        cementBagsPerCubicMeter.isAcceptableOrUnknown(
+          data['cement_bags_per_cubic_meter']!,
+          _cementBagsPerCubicMeterMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sand_cubic_meters_per_cubic_meter')) {
+      context.handle(
+        _sandCubicMetersPerCubicMeterMeta,
+        sandCubicMetersPerCubicMeter.isAcceptableOrUnknown(
+          data['sand_cubic_meters_per_cubic_meter']!,
+          _sandCubicMetersPerCubicMeterMeta,
+        ),
+      );
+    }
+    if (data.containsKey('paint_coats')) {
+      context.handle(
+        _paintCoatsMeta,
+        paintCoats.isAcceptableOrUnknown(data['paint_coats']!, _paintCoatsMeta),
+      );
+    }
+    if (data.containsKey('square_meters_per_liter')) {
+      context.handle(
+        _squareMetersPerLiterMeta,
+        squareMetersPerLiter.isAcceptableOrUnknown(
+          data['square_meters_per_liter']!,
+          _squareMetersPerLiterMeta,
+        ),
+      );
+    }
+    if (data.containsKey('paint_waste_percent')) {
+      context.handle(
+        _paintWastePercentMeta,
+        paintWastePercent.isAcceptableOrUnknown(
+          data['paint_waste_percent']!,
+          _paintWastePercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('include_ceiling')) {
+      context.handle(
+        _includeCeilingMeta,
+        includeCeiling.isAcceptableOrUnknown(
+          data['include_ceiling']!,
+          _includeCeilingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tile_length_meters')) {
+      context.handle(
+        _tileLengthMetersMeta,
+        tileLengthMeters.isAcceptableOrUnknown(
+          data['tile_length_meters']!,
+          _tileLengthMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tile_width_meters')) {
+      context.handle(
+        _tileWidthMetersMeta,
+        tileWidthMeters.isAcceptableOrUnknown(
+          data['tile_width_meters']!,
+          _tileWidthMetersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('floor_waste_percent')) {
+      context.handle(
+        _floorWastePercentMeta,
+        floorWastePercent.isAcceptableOrUnknown(
+          data['floor_waste_percent']!,
+          _floorWastePercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('adhesive_kilograms_per_square_meter')) {
+      context.handle(
+        _adhesiveKilogramsPerSquareMeterMeta,
+        adhesiveKilogramsPerSquareMeter.isAcceptableOrUnknown(
+          data['adhesive_kilograms_per_square_meter']!,
+          _adhesiveKilogramsPerSquareMeterMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {projectId};
+  @override
+  MaterialSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MaterialSettingsRow(
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}project_id'],
+      )!,
+      blockLengthMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}block_length_meters'],
+      )!,
+      blockHeightMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}block_height_meters'],
+      )!,
+      jointMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}joint_meters'],
+      )!,
+      wallThicknessMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}wall_thickness_meters'],
+      )!,
+      masonryWastePercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}masonry_waste_percent'],
+      )!,
+      cementBagsPerCubicMeter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}cement_bags_per_cubic_meter'],
+      )!,
+      sandCubicMetersPerCubicMeter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sand_cubic_meters_per_cubic_meter'],
+      )!,
+      paintCoats: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}paint_coats'],
+      )!,
+      squareMetersPerLiter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}square_meters_per_liter'],
+      )!,
+      paintWastePercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}paint_waste_percent'],
+      )!,
+      includeCeiling: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}include_ceiling'],
+      )!,
+      tileLengthMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}tile_length_meters'],
+      )!,
+      tileWidthMeters: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}tile_width_meters'],
+      )!,
+      floorWastePercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}floor_waste_percent'],
+      )!,
+      adhesiveKilogramsPerSquareMeter: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}adhesive_kilograms_per_square_meter'],
+      )!,
+    );
+  }
+
+  @override
+  $ProjectMaterialSettingsTable createAlias(String alias) {
+    return $ProjectMaterialSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class MaterialSettingsRow extends DataClass
+    implements Insertable<MaterialSettingsRow> {
+  final int projectId;
+  final double blockLengthMeters;
+  final double blockHeightMeters;
+  final double jointMeters;
+  final double wallThicknessMeters;
+  final double masonryWastePercent;
+  final double cementBagsPerCubicMeter;
+  final double sandCubicMetersPerCubicMeter;
+  final int paintCoats;
+  final double squareMetersPerLiter;
+  final double paintWastePercent;
+  final bool includeCeiling;
+  final double tileLengthMeters;
+  final double tileWidthMeters;
+  final double floorWastePercent;
+  final double adhesiveKilogramsPerSquareMeter;
+  const MaterialSettingsRow({
+    required this.projectId,
+    required this.blockLengthMeters,
+    required this.blockHeightMeters,
+    required this.jointMeters,
+    required this.wallThicknessMeters,
+    required this.masonryWastePercent,
+    required this.cementBagsPerCubicMeter,
+    required this.sandCubicMetersPerCubicMeter,
+    required this.paintCoats,
+    required this.squareMetersPerLiter,
+    required this.paintWastePercent,
+    required this.includeCeiling,
+    required this.tileLengthMeters,
+    required this.tileWidthMeters,
+    required this.floorWastePercent,
+    required this.adhesiveKilogramsPerSquareMeter,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['project_id'] = Variable<int>(projectId);
+    map['block_length_meters'] = Variable<double>(blockLengthMeters);
+    map['block_height_meters'] = Variable<double>(blockHeightMeters);
+    map['joint_meters'] = Variable<double>(jointMeters);
+    map['wall_thickness_meters'] = Variable<double>(wallThicknessMeters);
+    map['masonry_waste_percent'] = Variable<double>(masonryWastePercent);
+    map['cement_bags_per_cubic_meter'] = Variable<double>(
+      cementBagsPerCubicMeter,
+    );
+    map['sand_cubic_meters_per_cubic_meter'] = Variable<double>(
+      sandCubicMetersPerCubicMeter,
+    );
+    map['paint_coats'] = Variable<int>(paintCoats);
+    map['square_meters_per_liter'] = Variable<double>(squareMetersPerLiter);
+    map['paint_waste_percent'] = Variable<double>(paintWastePercent);
+    map['include_ceiling'] = Variable<bool>(includeCeiling);
+    map['tile_length_meters'] = Variable<double>(tileLengthMeters);
+    map['tile_width_meters'] = Variable<double>(tileWidthMeters);
+    map['floor_waste_percent'] = Variable<double>(floorWastePercent);
+    map['adhesive_kilograms_per_square_meter'] = Variable<double>(
+      adhesiveKilogramsPerSquareMeter,
+    );
+    return map;
+  }
+
+  ProjectMaterialSettingsCompanion toCompanion(bool nullToAbsent) {
+    return ProjectMaterialSettingsCompanion(
+      projectId: Value(projectId),
+      blockLengthMeters: Value(blockLengthMeters),
+      blockHeightMeters: Value(blockHeightMeters),
+      jointMeters: Value(jointMeters),
+      wallThicknessMeters: Value(wallThicknessMeters),
+      masonryWastePercent: Value(masonryWastePercent),
+      cementBagsPerCubicMeter: Value(cementBagsPerCubicMeter),
+      sandCubicMetersPerCubicMeter: Value(sandCubicMetersPerCubicMeter),
+      paintCoats: Value(paintCoats),
+      squareMetersPerLiter: Value(squareMetersPerLiter),
+      paintWastePercent: Value(paintWastePercent),
+      includeCeiling: Value(includeCeiling),
+      tileLengthMeters: Value(tileLengthMeters),
+      tileWidthMeters: Value(tileWidthMeters),
+      floorWastePercent: Value(floorWastePercent),
+      adhesiveKilogramsPerSquareMeter: Value(adhesiveKilogramsPerSquareMeter),
+    );
+  }
+
+  factory MaterialSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MaterialSettingsRow(
+      projectId: serializer.fromJson<int>(json['projectId']),
+      blockLengthMeters: serializer.fromJson<double>(json['blockLengthMeters']),
+      blockHeightMeters: serializer.fromJson<double>(json['blockHeightMeters']),
+      jointMeters: serializer.fromJson<double>(json['jointMeters']),
+      wallThicknessMeters: serializer.fromJson<double>(
+        json['wallThicknessMeters'],
+      ),
+      masonryWastePercent: serializer.fromJson<double>(
+        json['masonryWastePercent'],
+      ),
+      cementBagsPerCubicMeter: serializer.fromJson<double>(
+        json['cementBagsPerCubicMeter'],
+      ),
+      sandCubicMetersPerCubicMeter: serializer.fromJson<double>(
+        json['sandCubicMetersPerCubicMeter'],
+      ),
+      paintCoats: serializer.fromJson<int>(json['paintCoats']),
+      squareMetersPerLiter: serializer.fromJson<double>(
+        json['squareMetersPerLiter'],
+      ),
+      paintWastePercent: serializer.fromJson<double>(json['paintWastePercent']),
+      includeCeiling: serializer.fromJson<bool>(json['includeCeiling']),
+      tileLengthMeters: serializer.fromJson<double>(json['tileLengthMeters']),
+      tileWidthMeters: serializer.fromJson<double>(json['tileWidthMeters']),
+      floorWastePercent: serializer.fromJson<double>(json['floorWastePercent']),
+      adhesiveKilogramsPerSquareMeter: serializer.fromJson<double>(
+        json['adhesiveKilogramsPerSquareMeter'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'projectId': serializer.toJson<int>(projectId),
+      'blockLengthMeters': serializer.toJson<double>(blockLengthMeters),
+      'blockHeightMeters': serializer.toJson<double>(blockHeightMeters),
+      'jointMeters': serializer.toJson<double>(jointMeters),
+      'wallThicknessMeters': serializer.toJson<double>(wallThicknessMeters),
+      'masonryWastePercent': serializer.toJson<double>(masonryWastePercent),
+      'cementBagsPerCubicMeter': serializer.toJson<double>(
+        cementBagsPerCubicMeter,
+      ),
+      'sandCubicMetersPerCubicMeter': serializer.toJson<double>(
+        sandCubicMetersPerCubicMeter,
+      ),
+      'paintCoats': serializer.toJson<int>(paintCoats),
+      'squareMetersPerLiter': serializer.toJson<double>(squareMetersPerLiter),
+      'paintWastePercent': serializer.toJson<double>(paintWastePercent),
+      'includeCeiling': serializer.toJson<bool>(includeCeiling),
+      'tileLengthMeters': serializer.toJson<double>(tileLengthMeters),
+      'tileWidthMeters': serializer.toJson<double>(tileWidthMeters),
+      'floorWastePercent': serializer.toJson<double>(floorWastePercent),
+      'adhesiveKilogramsPerSquareMeter': serializer.toJson<double>(
+        adhesiveKilogramsPerSquareMeter,
+      ),
+    };
+  }
+
+  MaterialSettingsRow copyWith({
+    int? projectId,
+    double? blockLengthMeters,
+    double? blockHeightMeters,
+    double? jointMeters,
+    double? wallThicknessMeters,
+    double? masonryWastePercent,
+    double? cementBagsPerCubicMeter,
+    double? sandCubicMetersPerCubicMeter,
+    int? paintCoats,
+    double? squareMetersPerLiter,
+    double? paintWastePercent,
+    bool? includeCeiling,
+    double? tileLengthMeters,
+    double? tileWidthMeters,
+    double? floorWastePercent,
+    double? adhesiveKilogramsPerSquareMeter,
+  }) => MaterialSettingsRow(
+    projectId: projectId ?? this.projectId,
+    blockLengthMeters: blockLengthMeters ?? this.blockLengthMeters,
+    blockHeightMeters: blockHeightMeters ?? this.blockHeightMeters,
+    jointMeters: jointMeters ?? this.jointMeters,
+    wallThicknessMeters: wallThicknessMeters ?? this.wallThicknessMeters,
+    masonryWastePercent: masonryWastePercent ?? this.masonryWastePercent,
+    cementBagsPerCubicMeter:
+        cementBagsPerCubicMeter ?? this.cementBagsPerCubicMeter,
+    sandCubicMetersPerCubicMeter:
+        sandCubicMetersPerCubicMeter ?? this.sandCubicMetersPerCubicMeter,
+    paintCoats: paintCoats ?? this.paintCoats,
+    squareMetersPerLiter: squareMetersPerLiter ?? this.squareMetersPerLiter,
+    paintWastePercent: paintWastePercent ?? this.paintWastePercent,
+    includeCeiling: includeCeiling ?? this.includeCeiling,
+    tileLengthMeters: tileLengthMeters ?? this.tileLengthMeters,
+    tileWidthMeters: tileWidthMeters ?? this.tileWidthMeters,
+    floorWastePercent: floorWastePercent ?? this.floorWastePercent,
+    adhesiveKilogramsPerSquareMeter:
+        adhesiveKilogramsPerSquareMeter ?? this.adhesiveKilogramsPerSquareMeter,
+  );
+  MaterialSettingsRow copyWithCompanion(ProjectMaterialSettingsCompanion data) {
+    return MaterialSettingsRow(
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      blockLengthMeters: data.blockLengthMeters.present
+          ? data.blockLengthMeters.value
+          : this.blockLengthMeters,
+      blockHeightMeters: data.blockHeightMeters.present
+          ? data.blockHeightMeters.value
+          : this.blockHeightMeters,
+      jointMeters: data.jointMeters.present
+          ? data.jointMeters.value
+          : this.jointMeters,
+      wallThicknessMeters: data.wallThicknessMeters.present
+          ? data.wallThicknessMeters.value
+          : this.wallThicknessMeters,
+      masonryWastePercent: data.masonryWastePercent.present
+          ? data.masonryWastePercent.value
+          : this.masonryWastePercent,
+      cementBagsPerCubicMeter: data.cementBagsPerCubicMeter.present
+          ? data.cementBagsPerCubicMeter.value
+          : this.cementBagsPerCubicMeter,
+      sandCubicMetersPerCubicMeter: data.sandCubicMetersPerCubicMeter.present
+          ? data.sandCubicMetersPerCubicMeter.value
+          : this.sandCubicMetersPerCubicMeter,
+      paintCoats: data.paintCoats.present
+          ? data.paintCoats.value
+          : this.paintCoats,
+      squareMetersPerLiter: data.squareMetersPerLiter.present
+          ? data.squareMetersPerLiter.value
+          : this.squareMetersPerLiter,
+      paintWastePercent: data.paintWastePercent.present
+          ? data.paintWastePercent.value
+          : this.paintWastePercent,
+      includeCeiling: data.includeCeiling.present
+          ? data.includeCeiling.value
+          : this.includeCeiling,
+      tileLengthMeters: data.tileLengthMeters.present
+          ? data.tileLengthMeters.value
+          : this.tileLengthMeters,
+      tileWidthMeters: data.tileWidthMeters.present
+          ? data.tileWidthMeters.value
+          : this.tileWidthMeters,
+      floorWastePercent: data.floorWastePercent.present
+          ? data.floorWastePercent.value
+          : this.floorWastePercent,
+      adhesiveKilogramsPerSquareMeter:
+          data.adhesiveKilogramsPerSquareMeter.present
+          ? data.adhesiveKilogramsPerSquareMeter.value
+          : this.adhesiveKilogramsPerSquareMeter,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MaterialSettingsRow(')
+          ..write('projectId: $projectId, ')
+          ..write('blockLengthMeters: $blockLengthMeters, ')
+          ..write('blockHeightMeters: $blockHeightMeters, ')
+          ..write('jointMeters: $jointMeters, ')
+          ..write('wallThicknessMeters: $wallThicknessMeters, ')
+          ..write('masonryWastePercent: $masonryWastePercent, ')
+          ..write('cementBagsPerCubicMeter: $cementBagsPerCubicMeter, ')
+          ..write(
+            'sandCubicMetersPerCubicMeter: $sandCubicMetersPerCubicMeter, ',
+          )
+          ..write('paintCoats: $paintCoats, ')
+          ..write('squareMetersPerLiter: $squareMetersPerLiter, ')
+          ..write('paintWastePercent: $paintWastePercent, ')
+          ..write('includeCeiling: $includeCeiling, ')
+          ..write('tileLengthMeters: $tileLengthMeters, ')
+          ..write('tileWidthMeters: $tileWidthMeters, ')
+          ..write('floorWastePercent: $floorWastePercent, ')
+          ..write(
+            'adhesiveKilogramsPerSquareMeter: $adhesiveKilogramsPerSquareMeter',
+          )
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    projectId,
+    blockLengthMeters,
+    blockHeightMeters,
+    jointMeters,
+    wallThicknessMeters,
+    masonryWastePercent,
+    cementBagsPerCubicMeter,
+    sandCubicMetersPerCubicMeter,
+    paintCoats,
+    squareMetersPerLiter,
+    paintWastePercent,
+    includeCeiling,
+    tileLengthMeters,
+    tileWidthMeters,
+    floorWastePercent,
+    adhesiveKilogramsPerSquareMeter,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MaterialSettingsRow &&
+          other.projectId == this.projectId &&
+          other.blockLengthMeters == this.blockLengthMeters &&
+          other.blockHeightMeters == this.blockHeightMeters &&
+          other.jointMeters == this.jointMeters &&
+          other.wallThicknessMeters == this.wallThicknessMeters &&
+          other.masonryWastePercent == this.masonryWastePercent &&
+          other.cementBagsPerCubicMeter == this.cementBagsPerCubicMeter &&
+          other.sandCubicMetersPerCubicMeter ==
+              this.sandCubicMetersPerCubicMeter &&
+          other.paintCoats == this.paintCoats &&
+          other.squareMetersPerLiter == this.squareMetersPerLiter &&
+          other.paintWastePercent == this.paintWastePercent &&
+          other.includeCeiling == this.includeCeiling &&
+          other.tileLengthMeters == this.tileLengthMeters &&
+          other.tileWidthMeters == this.tileWidthMeters &&
+          other.floorWastePercent == this.floorWastePercent &&
+          other.adhesiveKilogramsPerSquareMeter ==
+              this.adhesiveKilogramsPerSquareMeter);
+}
+
+class ProjectMaterialSettingsCompanion
+    extends UpdateCompanion<MaterialSettingsRow> {
+  final Value<int> projectId;
+  final Value<double> blockLengthMeters;
+  final Value<double> blockHeightMeters;
+  final Value<double> jointMeters;
+  final Value<double> wallThicknessMeters;
+  final Value<double> masonryWastePercent;
+  final Value<double> cementBagsPerCubicMeter;
+  final Value<double> sandCubicMetersPerCubicMeter;
+  final Value<int> paintCoats;
+  final Value<double> squareMetersPerLiter;
+  final Value<double> paintWastePercent;
+  final Value<bool> includeCeiling;
+  final Value<double> tileLengthMeters;
+  final Value<double> tileWidthMeters;
+  final Value<double> floorWastePercent;
+  final Value<double> adhesiveKilogramsPerSquareMeter;
+  const ProjectMaterialSettingsCompanion({
+    this.projectId = const Value.absent(),
+    this.blockLengthMeters = const Value.absent(),
+    this.blockHeightMeters = const Value.absent(),
+    this.jointMeters = const Value.absent(),
+    this.wallThicknessMeters = const Value.absent(),
+    this.masonryWastePercent = const Value.absent(),
+    this.cementBagsPerCubicMeter = const Value.absent(),
+    this.sandCubicMetersPerCubicMeter = const Value.absent(),
+    this.paintCoats = const Value.absent(),
+    this.squareMetersPerLiter = const Value.absent(),
+    this.paintWastePercent = const Value.absent(),
+    this.includeCeiling = const Value.absent(),
+    this.tileLengthMeters = const Value.absent(),
+    this.tileWidthMeters = const Value.absent(),
+    this.floorWastePercent = const Value.absent(),
+    this.adhesiveKilogramsPerSquareMeter = const Value.absent(),
+  });
+  ProjectMaterialSettingsCompanion.insert({
+    this.projectId = const Value.absent(),
+    this.blockLengthMeters = const Value.absent(),
+    this.blockHeightMeters = const Value.absent(),
+    this.jointMeters = const Value.absent(),
+    this.wallThicknessMeters = const Value.absent(),
+    this.masonryWastePercent = const Value.absent(),
+    this.cementBagsPerCubicMeter = const Value.absent(),
+    this.sandCubicMetersPerCubicMeter = const Value.absent(),
+    this.paintCoats = const Value.absent(),
+    this.squareMetersPerLiter = const Value.absent(),
+    this.paintWastePercent = const Value.absent(),
+    this.includeCeiling = const Value.absent(),
+    this.tileLengthMeters = const Value.absent(),
+    this.tileWidthMeters = const Value.absent(),
+    this.floorWastePercent = const Value.absent(),
+    this.adhesiveKilogramsPerSquareMeter = const Value.absent(),
+  });
+  static Insertable<MaterialSettingsRow> custom({
+    Expression<int>? projectId,
+    Expression<double>? blockLengthMeters,
+    Expression<double>? blockHeightMeters,
+    Expression<double>? jointMeters,
+    Expression<double>? wallThicknessMeters,
+    Expression<double>? masonryWastePercent,
+    Expression<double>? cementBagsPerCubicMeter,
+    Expression<double>? sandCubicMetersPerCubicMeter,
+    Expression<int>? paintCoats,
+    Expression<double>? squareMetersPerLiter,
+    Expression<double>? paintWastePercent,
+    Expression<bool>? includeCeiling,
+    Expression<double>? tileLengthMeters,
+    Expression<double>? tileWidthMeters,
+    Expression<double>? floorWastePercent,
+    Expression<double>? adhesiveKilogramsPerSquareMeter,
+  }) {
+    return RawValuesInsertable({
+      if (projectId != null) 'project_id': projectId,
+      if (blockLengthMeters != null) 'block_length_meters': blockLengthMeters,
+      if (blockHeightMeters != null) 'block_height_meters': blockHeightMeters,
+      if (jointMeters != null) 'joint_meters': jointMeters,
+      if (wallThicknessMeters != null)
+        'wall_thickness_meters': wallThicknessMeters,
+      if (masonryWastePercent != null)
+        'masonry_waste_percent': masonryWastePercent,
+      if (cementBagsPerCubicMeter != null)
+        'cement_bags_per_cubic_meter': cementBagsPerCubicMeter,
+      if (sandCubicMetersPerCubicMeter != null)
+        'sand_cubic_meters_per_cubic_meter': sandCubicMetersPerCubicMeter,
+      if (paintCoats != null) 'paint_coats': paintCoats,
+      if (squareMetersPerLiter != null)
+        'square_meters_per_liter': squareMetersPerLiter,
+      if (paintWastePercent != null) 'paint_waste_percent': paintWastePercent,
+      if (includeCeiling != null) 'include_ceiling': includeCeiling,
+      if (tileLengthMeters != null) 'tile_length_meters': tileLengthMeters,
+      if (tileWidthMeters != null) 'tile_width_meters': tileWidthMeters,
+      if (floorWastePercent != null) 'floor_waste_percent': floorWastePercent,
+      if (adhesiveKilogramsPerSquareMeter != null)
+        'adhesive_kilograms_per_square_meter': adhesiveKilogramsPerSquareMeter,
+    });
+  }
+
+  ProjectMaterialSettingsCompanion copyWith({
+    Value<int>? projectId,
+    Value<double>? blockLengthMeters,
+    Value<double>? blockHeightMeters,
+    Value<double>? jointMeters,
+    Value<double>? wallThicknessMeters,
+    Value<double>? masonryWastePercent,
+    Value<double>? cementBagsPerCubicMeter,
+    Value<double>? sandCubicMetersPerCubicMeter,
+    Value<int>? paintCoats,
+    Value<double>? squareMetersPerLiter,
+    Value<double>? paintWastePercent,
+    Value<bool>? includeCeiling,
+    Value<double>? tileLengthMeters,
+    Value<double>? tileWidthMeters,
+    Value<double>? floorWastePercent,
+    Value<double>? adhesiveKilogramsPerSquareMeter,
+  }) {
+    return ProjectMaterialSettingsCompanion(
+      projectId: projectId ?? this.projectId,
+      blockLengthMeters: blockLengthMeters ?? this.blockLengthMeters,
+      blockHeightMeters: blockHeightMeters ?? this.blockHeightMeters,
+      jointMeters: jointMeters ?? this.jointMeters,
+      wallThicknessMeters: wallThicknessMeters ?? this.wallThicknessMeters,
+      masonryWastePercent: masonryWastePercent ?? this.masonryWastePercent,
+      cementBagsPerCubicMeter:
+          cementBagsPerCubicMeter ?? this.cementBagsPerCubicMeter,
+      sandCubicMetersPerCubicMeter:
+          sandCubicMetersPerCubicMeter ?? this.sandCubicMetersPerCubicMeter,
+      paintCoats: paintCoats ?? this.paintCoats,
+      squareMetersPerLiter: squareMetersPerLiter ?? this.squareMetersPerLiter,
+      paintWastePercent: paintWastePercent ?? this.paintWastePercent,
+      includeCeiling: includeCeiling ?? this.includeCeiling,
+      tileLengthMeters: tileLengthMeters ?? this.tileLengthMeters,
+      tileWidthMeters: tileWidthMeters ?? this.tileWidthMeters,
+      floorWastePercent: floorWastePercent ?? this.floorWastePercent,
+      adhesiveKilogramsPerSquareMeter:
+          adhesiveKilogramsPerSquareMeter ??
+          this.adhesiveKilogramsPerSquareMeter,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (projectId.present) {
+      map['project_id'] = Variable<int>(projectId.value);
+    }
+    if (blockLengthMeters.present) {
+      map['block_length_meters'] = Variable<double>(blockLengthMeters.value);
+    }
+    if (blockHeightMeters.present) {
+      map['block_height_meters'] = Variable<double>(blockHeightMeters.value);
+    }
+    if (jointMeters.present) {
+      map['joint_meters'] = Variable<double>(jointMeters.value);
+    }
+    if (wallThicknessMeters.present) {
+      map['wall_thickness_meters'] = Variable<double>(
+        wallThicknessMeters.value,
+      );
+    }
+    if (masonryWastePercent.present) {
+      map['masonry_waste_percent'] = Variable<double>(
+        masonryWastePercent.value,
+      );
+    }
+    if (cementBagsPerCubicMeter.present) {
+      map['cement_bags_per_cubic_meter'] = Variable<double>(
+        cementBagsPerCubicMeter.value,
+      );
+    }
+    if (sandCubicMetersPerCubicMeter.present) {
+      map['sand_cubic_meters_per_cubic_meter'] = Variable<double>(
+        sandCubicMetersPerCubicMeter.value,
+      );
+    }
+    if (paintCoats.present) {
+      map['paint_coats'] = Variable<int>(paintCoats.value);
+    }
+    if (squareMetersPerLiter.present) {
+      map['square_meters_per_liter'] = Variable<double>(
+        squareMetersPerLiter.value,
+      );
+    }
+    if (paintWastePercent.present) {
+      map['paint_waste_percent'] = Variable<double>(paintWastePercent.value);
+    }
+    if (includeCeiling.present) {
+      map['include_ceiling'] = Variable<bool>(includeCeiling.value);
+    }
+    if (tileLengthMeters.present) {
+      map['tile_length_meters'] = Variable<double>(tileLengthMeters.value);
+    }
+    if (tileWidthMeters.present) {
+      map['tile_width_meters'] = Variable<double>(tileWidthMeters.value);
+    }
+    if (floorWastePercent.present) {
+      map['floor_waste_percent'] = Variable<double>(floorWastePercent.value);
+    }
+    if (adhesiveKilogramsPerSquareMeter.present) {
+      map['adhesive_kilograms_per_square_meter'] = Variable<double>(
+        adhesiveKilogramsPerSquareMeter.value,
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectMaterialSettingsCompanion(')
+          ..write('projectId: $projectId, ')
+          ..write('blockLengthMeters: $blockLengthMeters, ')
+          ..write('blockHeightMeters: $blockHeightMeters, ')
+          ..write('jointMeters: $jointMeters, ')
+          ..write('wallThicknessMeters: $wallThicknessMeters, ')
+          ..write('masonryWastePercent: $masonryWastePercent, ')
+          ..write('cementBagsPerCubicMeter: $cementBagsPerCubicMeter, ')
+          ..write(
+            'sandCubicMetersPerCubicMeter: $sandCubicMetersPerCubicMeter, ',
+          )
+          ..write('paintCoats: $paintCoats, ')
+          ..write('squareMetersPerLiter: $squareMetersPerLiter, ')
+          ..write('paintWastePercent: $paintWastePercent, ')
+          ..write('includeCeiling: $includeCeiling, ')
+          ..write('tileLengthMeters: $tileLengthMeters, ')
+          ..write('tileWidthMeters: $tileWidthMeters, ')
+          ..write('floorWastePercent: $floorWastePercent, ')
+          ..write(
+            'adhesiveKilogramsPerSquareMeter: $adhesiveKilogramsPerSquareMeter',
+          )
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1876,6 +2878,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RoomsTable rooms = $RoomsTable(this);
   late final $RoomWallsTable roomWalls = $RoomWallsTable(this);
   late final $RoomOpeningsTable roomOpenings = $RoomOpeningsTable(this);
+  late final $ProjectMaterialSettingsTable projectMaterialSettings =
+      $ProjectMaterialSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1886,6 +2890,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     rooms,
     roomWalls,
     roomOpenings,
+    projectMaterialSettings,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1909,6 +2914,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('room_openings', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('project_material_settings', kind: UpdateKind.delete),
+      ],
     ),
   ]);
 }
@@ -1950,6 +2964,31 @@ final class $$ProjectsTableReferences
     ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_roomsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ProjectMaterialSettingsTable,
+    List<MaterialSettingsRow>
+  >
+  _projectMaterialSettingsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.projectMaterialSettings,
+        aliasName: 'projects__id__project_material_settings__project_id',
+      );
+
+  $$ProjectMaterialSettingsTableProcessedTableManager
+  get projectMaterialSettingsRefs {
+    final manager = $$ProjectMaterialSettingsTableTableManager(
+      $_db,
+      $_db.projectMaterialSettings,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _projectMaterialSettingsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2022,6 +3061,32 @@ class $$ProjectsTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> projectMaterialSettingsRefs(
+    Expression<bool> Function($$ProjectMaterialSettingsTableFilterComposer f) f,
+  ) {
+    final $$ProjectMaterialSettingsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.projectMaterialSettings,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectMaterialSettingsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectMaterialSettings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -2125,6 +3190,33 @@ class $$ProjectsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> projectMaterialSettingsRefs<T extends Object>(
+    Expression<T> Function($$ProjectMaterialSettingsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$ProjectMaterialSettingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.projectMaterialSettings,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectMaterialSettingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectMaterialSettings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -2140,7 +3232,10 @@ class $$ProjectsTableTableManager
           $$ProjectsTableUpdateCompanionBuilder,
           (ProjectRow, $$ProjectsTableReferences),
           ProjectRow,
-          PrefetchHooks Function({bool roomsRefs})
+          PrefetchHooks Function({
+            bool roomsRefs,
+            bool projectMaterialSettingsRefs,
+          })
         > {
   $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
     : super(
@@ -2197,32 +3292,63 @@ class $$ProjectsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({roomsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (roomsRefs) db.rooms],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (roomsRefs)
-                    await $_getPrefetchedData<
-                      ProjectRow,
-                      $ProjectsTable,
-                      RoomRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ProjectsTableReferences
-                          ._roomsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ProjectsTableReferences(db, table, p0).roomsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.projectId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({roomsRefs = false, projectMaterialSettingsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (roomsRefs) db.rooms,
+                    if (projectMaterialSettingsRefs) db.projectMaterialSettings,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (roomsRefs)
+                        await $_getPrefetchedData<
+                          ProjectRow,
+                          $ProjectsTable,
+                          RoomRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._roomsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).roomsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (projectMaterialSettingsRefs)
+                        await $_getPrefetchedData<
+                          ProjectRow,
+                          $ProjectsTable,
+                          MaterialSettingsRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._projectMaterialSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).projectMaterialSettingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2239,7 +3365,7 @@ typedef $$ProjectsTableProcessedTableManager =
       $$ProjectsTableUpdateCompanionBuilder,
       (ProjectRow, $$ProjectsTableReferences),
       ProjectRow,
-      PrefetchHooks Function({bool roomsRefs})
+      PrefetchHooks Function({bool roomsRefs, bool projectMaterialSettingsRefs})
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -3534,6 +4660,590 @@ typedef $$RoomOpeningsTableProcessedTableManager =
       RoomOpeningRow,
       PrefetchHooks Function({bool wallId})
     >;
+typedef $$ProjectMaterialSettingsTableCreateCompanionBuilder =
+    ProjectMaterialSettingsCompanion Function({
+      Value<int> projectId,
+      Value<double> blockLengthMeters,
+      Value<double> blockHeightMeters,
+      Value<double> jointMeters,
+      Value<double> wallThicknessMeters,
+      Value<double> masonryWastePercent,
+      Value<double> cementBagsPerCubicMeter,
+      Value<double> sandCubicMetersPerCubicMeter,
+      Value<int> paintCoats,
+      Value<double> squareMetersPerLiter,
+      Value<double> paintWastePercent,
+      Value<bool> includeCeiling,
+      Value<double> tileLengthMeters,
+      Value<double> tileWidthMeters,
+      Value<double> floorWastePercent,
+      Value<double> adhesiveKilogramsPerSquareMeter,
+    });
+typedef $$ProjectMaterialSettingsTableUpdateCompanionBuilder =
+    ProjectMaterialSettingsCompanion Function({
+      Value<int> projectId,
+      Value<double> blockLengthMeters,
+      Value<double> blockHeightMeters,
+      Value<double> jointMeters,
+      Value<double> wallThicknessMeters,
+      Value<double> masonryWastePercent,
+      Value<double> cementBagsPerCubicMeter,
+      Value<double> sandCubicMetersPerCubicMeter,
+      Value<int> paintCoats,
+      Value<double> squareMetersPerLiter,
+      Value<double> paintWastePercent,
+      Value<bool> includeCeiling,
+      Value<double> tileLengthMeters,
+      Value<double> tileWidthMeters,
+      Value<double> floorWastePercent,
+      Value<double> adhesiveKilogramsPerSquareMeter,
+    });
+
+final class $$ProjectMaterialSettingsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ProjectMaterialSettingsTable,
+          MaterialSettingsRow
+        > {
+  $$ProjectMaterialSettingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
+      .createAlias('project_material_settings__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ProjectMaterialSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProjectMaterialSettingsTable> {
+  $$ProjectMaterialSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<double> get blockLengthMeters => $composableBuilder(
+    column: $table.blockLengthMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get blockHeightMeters => $composableBuilder(
+    column: $table.blockHeightMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get jointMeters => $composableBuilder(
+    column: $table.jointMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get wallThicknessMeters => $composableBuilder(
+    column: $table.wallThicknessMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get masonryWastePercent => $composableBuilder(
+    column: $table.masonryWastePercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get cementBagsPerCubicMeter => $composableBuilder(
+    column: $table.cementBagsPerCubicMeter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get sandCubicMetersPerCubicMeter => $composableBuilder(
+    column: $table.sandCubicMetersPerCubicMeter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paintCoats => $composableBuilder(
+    column: $table.paintCoats,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get squareMetersPerLiter => $composableBuilder(
+    column: $table.squareMetersPerLiter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get paintWastePercent => $composableBuilder(
+    column: $table.paintWastePercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get includeCeiling => $composableBuilder(
+    column: $table.includeCeiling,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get tileLengthMeters => $composableBuilder(
+    column: $table.tileLengthMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get tileWidthMeters => $composableBuilder(
+    column: $table.tileWidthMeters,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get floorWastePercent => $composableBuilder(
+    column: $table.floorWastePercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get adhesiveKilogramsPerSquareMeter =>
+      $composableBuilder(
+        column: $table.adhesiveKilogramsPerSquareMeter,
+        builder: (column) => ColumnFilters(column),
+      );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProjectMaterialSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProjectMaterialSettingsTable> {
+  $$ProjectMaterialSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<double> get blockLengthMeters => $composableBuilder(
+    column: $table.blockLengthMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get blockHeightMeters => $composableBuilder(
+    column: $table.blockHeightMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get jointMeters => $composableBuilder(
+    column: $table.jointMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get wallThicknessMeters => $composableBuilder(
+    column: $table.wallThicknessMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get masonryWastePercent => $composableBuilder(
+    column: $table.masonryWastePercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get cementBagsPerCubicMeter => $composableBuilder(
+    column: $table.cementBagsPerCubicMeter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get sandCubicMetersPerCubicMeter =>
+      $composableBuilder(
+        column: $table.sandCubicMetersPerCubicMeter,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<int> get paintCoats => $composableBuilder(
+    column: $table.paintCoats,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get squareMetersPerLiter => $composableBuilder(
+    column: $table.squareMetersPerLiter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get paintWastePercent => $composableBuilder(
+    column: $table.paintWastePercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get includeCeiling => $composableBuilder(
+    column: $table.includeCeiling,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get tileLengthMeters => $composableBuilder(
+    column: $table.tileLengthMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get tileWidthMeters => $composableBuilder(
+    column: $table.tileWidthMeters,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get floorWastePercent => $composableBuilder(
+    column: $table.floorWastePercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get adhesiveKilogramsPerSquareMeter =>
+      $composableBuilder(
+        column: $table.adhesiveKilogramsPerSquareMeter,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProjectMaterialSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProjectMaterialSettingsTable> {
+  $$ProjectMaterialSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<double> get blockLengthMeters => $composableBuilder(
+    column: $table.blockLengthMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get blockHeightMeters => $composableBuilder(
+    column: $table.blockHeightMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get jointMeters => $composableBuilder(
+    column: $table.jointMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get wallThicknessMeters => $composableBuilder(
+    column: $table.wallThicknessMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get masonryWastePercent => $composableBuilder(
+    column: $table.masonryWastePercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get cementBagsPerCubicMeter => $composableBuilder(
+    column: $table.cementBagsPerCubicMeter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get sandCubicMetersPerCubicMeter =>
+      $composableBuilder(
+        column: $table.sandCubicMetersPerCubicMeter,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get paintCoats => $composableBuilder(
+    column: $table.paintCoats,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get squareMetersPerLiter => $composableBuilder(
+    column: $table.squareMetersPerLiter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get paintWastePercent => $composableBuilder(
+    column: $table.paintWastePercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get includeCeiling => $composableBuilder(
+    column: $table.includeCeiling,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get tileLengthMeters => $composableBuilder(
+    column: $table.tileLengthMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get tileWidthMeters => $composableBuilder(
+    column: $table.tileWidthMeters,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get floorWastePercent => $composableBuilder(
+    column: $table.floorWastePercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get adhesiveKilogramsPerSquareMeter =>
+      $composableBuilder(
+        column: $table.adhesiveKilogramsPerSquareMeter,
+        builder: (column) => column,
+      );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProjectMaterialSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProjectMaterialSettingsTable,
+          MaterialSettingsRow,
+          $$ProjectMaterialSettingsTableFilterComposer,
+          $$ProjectMaterialSettingsTableOrderingComposer,
+          $$ProjectMaterialSettingsTableAnnotationComposer,
+          $$ProjectMaterialSettingsTableCreateCompanionBuilder,
+          $$ProjectMaterialSettingsTableUpdateCompanionBuilder,
+          (MaterialSettingsRow, $$ProjectMaterialSettingsTableReferences),
+          MaterialSettingsRow,
+          PrefetchHooks Function({bool projectId})
+        > {
+  $$ProjectMaterialSettingsTableTableManager(
+    _$AppDatabase db,
+    $ProjectMaterialSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProjectMaterialSettingsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ProjectMaterialSettingsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ProjectMaterialSettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> projectId = const Value.absent(),
+                Value<double> blockLengthMeters = const Value.absent(),
+                Value<double> blockHeightMeters = const Value.absent(),
+                Value<double> jointMeters = const Value.absent(),
+                Value<double> wallThicknessMeters = const Value.absent(),
+                Value<double> masonryWastePercent = const Value.absent(),
+                Value<double> cementBagsPerCubicMeter = const Value.absent(),
+                Value<double> sandCubicMetersPerCubicMeter =
+                    const Value.absent(),
+                Value<int> paintCoats = const Value.absent(),
+                Value<double> squareMetersPerLiter = const Value.absent(),
+                Value<double> paintWastePercent = const Value.absent(),
+                Value<bool> includeCeiling = const Value.absent(),
+                Value<double> tileLengthMeters = const Value.absent(),
+                Value<double> tileWidthMeters = const Value.absent(),
+                Value<double> floorWastePercent = const Value.absent(),
+                Value<double> adhesiveKilogramsPerSquareMeter =
+                    const Value.absent(),
+              }) => ProjectMaterialSettingsCompanion(
+                projectId: projectId,
+                blockLengthMeters: blockLengthMeters,
+                blockHeightMeters: blockHeightMeters,
+                jointMeters: jointMeters,
+                wallThicknessMeters: wallThicknessMeters,
+                masonryWastePercent: masonryWastePercent,
+                cementBagsPerCubicMeter: cementBagsPerCubicMeter,
+                sandCubicMetersPerCubicMeter: sandCubicMetersPerCubicMeter,
+                paintCoats: paintCoats,
+                squareMetersPerLiter: squareMetersPerLiter,
+                paintWastePercent: paintWastePercent,
+                includeCeiling: includeCeiling,
+                tileLengthMeters: tileLengthMeters,
+                tileWidthMeters: tileWidthMeters,
+                floorWastePercent: floorWastePercent,
+                adhesiveKilogramsPerSquareMeter:
+                    adhesiveKilogramsPerSquareMeter,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> projectId = const Value.absent(),
+                Value<double> blockLengthMeters = const Value.absent(),
+                Value<double> blockHeightMeters = const Value.absent(),
+                Value<double> jointMeters = const Value.absent(),
+                Value<double> wallThicknessMeters = const Value.absent(),
+                Value<double> masonryWastePercent = const Value.absent(),
+                Value<double> cementBagsPerCubicMeter = const Value.absent(),
+                Value<double> sandCubicMetersPerCubicMeter =
+                    const Value.absent(),
+                Value<int> paintCoats = const Value.absent(),
+                Value<double> squareMetersPerLiter = const Value.absent(),
+                Value<double> paintWastePercent = const Value.absent(),
+                Value<bool> includeCeiling = const Value.absent(),
+                Value<double> tileLengthMeters = const Value.absent(),
+                Value<double> tileWidthMeters = const Value.absent(),
+                Value<double> floorWastePercent = const Value.absent(),
+                Value<double> adhesiveKilogramsPerSquareMeter =
+                    const Value.absent(),
+              }) => ProjectMaterialSettingsCompanion.insert(
+                projectId: projectId,
+                blockLengthMeters: blockLengthMeters,
+                blockHeightMeters: blockHeightMeters,
+                jointMeters: jointMeters,
+                wallThicknessMeters: wallThicknessMeters,
+                masonryWastePercent: masonryWastePercent,
+                cementBagsPerCubicMeter: cementBagsPerCubicMeter,
+                sandCubicMetersPerCubicMeter: sandCubicMetersPerCubicMeter,
+                paintCoats: paintCoats,
+                squareMetersPerLiter: squareMetersPerLiter,
+                paintWastePercent: paintWastePercent,
+                includeCeiling: includeCeiling,
+                tileLengthMeters: tileLengthMeters,
+                tileWidthMeters: tileWidthMeters,
+                floorWastePercent: floorWastePercent,
+                adhesiveKilogramsPerSquareMeter:
+                    adhesiveKilogramsPerSquareMeter,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $ProjectMaterialSettingsTable,
+                    MaterialSettingsRow
+                  >(table),
+                  $$ProjectMaterialSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({projectId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (projectId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.projectId,
+                        referencedTable:
+                            $$ProjectMaterialSettingsTableReferences
+                                ._projectIdTable(db),
+                        referencedColumn:
+                            $$ProjectMaterialSettingsTableReferences
+                                ._projectIdTable(db)
+                                .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ProjectMaterialSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProjectMaterialSettingsTable,
+      MaterialSettingsRow,
+      $$ProjectMaterialSettingsTableFilterComposer,
+      $$ProjectMaterialSettingsTableOrderingComposer,
+      $$ProjectMaterialSettingsTableAnnotationComposer,
+      $$ProjectMaterialSettingsTableCreateCompanionBuilder,
+      $$ProjectMaterialSettingsTableUpdateCompanionBuilder,
+      (MaterialSettingsRow, $$ProjectMaterialSettingsTableReferences),
+      MaterialSettingsRow,
+      PrefetchHooks Function({bool projectId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3548,4 +5258,9 @@ class $AppDatabaseManager {
       $$RoomWallsTableTableManager(_db, _db.roomWalls);
   $$RoomOpeningsTableTableManager get roomOpenings =>
       $$RoomOpeningsTableTableManager(_db, _db.roomOpenings);
+  $$ProjectMaterialSettingsTableTableManager get projectMaterialSettings =>
+      $$ProjectMaterialSettingsTableTableManager(
+        _db,
+        _db.projectMaterialSettings,
+      );
 }

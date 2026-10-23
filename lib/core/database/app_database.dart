@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/materials/data/tables/material_settings_table.dart';
 import '../../features/projects/data/tables/projects_table.dart';
 import '../../features/rooms/data/tables/room_openings_table.dart';
 import '../../features/rooms/data/tables/room_walls_table.dart';
@@ -12,7 +13,16 @@ import '../../features/settings/data/tables/app_settings_table.dart';
 part 'app_database.g.dart';
 
 /// Base de datos local (SQLite) de la app. Cada feature aporta sus tablas.
-@DriftDatabase(tables: [Projects, AppSettings, Rooms, RoomWalls, RoomOpenings])
+@DriftDatabase(
+  tables: [
+    Projects,
+    AppSettings,
+    Rooms,
+    RoomWalls,
+    RoomOpenings,
+    ProjectMaterialSettings,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _fileName));
 
@@ -22,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _fileName = 'planova';
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -31,6 +41,9 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(rooms);
         await m.createTable(roomWalls);
         await m.createTable(roomOpenings);
+      }
+      if (from < 3) {
+        await m.createTable(projectMaterialSettings);
       }
     },
     beforeOpen: (OpeningDetails details) async {

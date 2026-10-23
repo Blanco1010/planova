@@ -63,6 +63,19 @@ class ProjectDetailScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
           children: [
             _ProjectHeader(project: project, rooms: rooms),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.calculate_outlined),
+                title: const Text('Materiales'),
+                subtitle: const Text(
+                  'Bloques, mortero, pintura y piso con tus rendimientos',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () =>
+                    context.push(AppRoutes.materialsPath(projectId)),
+              ),
+            ),
             const SizedBox(height: 20),
             Text(
               'Habitaciones',

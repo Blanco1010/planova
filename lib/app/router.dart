@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/materials/presentation/screens/materials_screen.dart';
 import '../features/projects/presentation/screens/project_detail_screen.dart';
 import '../features/projects/presentation/screens/projects_screen.dart';
 import '../features/room_scan/presentation/screens/room_scan_screen.dart';
@@ -22,6 +23,10 @@ abstract final class AppRoutes {
 
   /// Medición con la cámara: `/projects/7/scan`.
   static String scanPath(int projectId) => '${projectPath(projectId)}/scan';
+
+  /// Materiales del proyecto: `/projects/7/materials`.
+  static String materialsPath(int projectId) =>
+      '${projectPath(projectId)}/materials';
 }
 
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
@@ -38,6 +43,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 ProjectDetailScreen(projectId: _idOf(state, 'projectId')),
             routes: <RouteBase>[
+              GoRoute(
+                path: 'materials',
+                builder: (BuildContext context, GoRouterState state) =>
+                    MaterialsScreen(projectId: _idOf(state, 'projectId')),
+              ),
               GoRoute(
                 path: 'scan',
                 builder: (BuildContext context, GoRouterState state) =>
