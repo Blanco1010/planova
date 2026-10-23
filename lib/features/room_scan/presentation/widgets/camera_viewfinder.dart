@@ -5,10 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../providers/scan_providers.dart';
 
-/// Visor de la cámara con la mira en el centro.
+/// La imagen de la cámara, entera y sin recortar.
 ///
-/// Si no hay cámara o el permiso está denegado, lo dice y deja la mira: la
-/// medición es por sensores, la imagen solo sirve para apuntar.
+/// Se enseña completa a propósito: el dibujo del plano se coloca encima
+/// usando el ángulo que abarca la cámara, y si la imagen viniera recortada
+/// ese ángulo ya no cuadraría.
 class CameraViewfinder extends ConsumerWidget {
   const CameraViewfinder({super.key});
 
@@ -19,31 +20,18 @@ class CameraViewfinder extends ConsumerWidget {
     );
 
     return ColoredBox(
-      color: AppColors.darkNavy,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          camera.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (Object error, StackTrace _) =>
-                _Unavailable(message: _messageFor(error)),
-            data: (CameraController? controller) => controller == null
-                ? const _Unavailable(
-                    message:
-                        'Este aparato no tiene cámara. Puedes medir igual '
-                        'apuntando con el teléfono.',
-                  )
-                : FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: controller.value.previewSize?.height ?? 1,
-                      height: controller.value.previewSize?.width ?? 1,
-                      child: CameraPreview(controller),
-                    ),
-                  ),
-          ),
-          const Center(child: _Reticle()),
-        ],
+      color: Colors.black,
+      child: camera.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (Object error, StackTrace _) =>
+            _Unavailable(message: _messageFor(error)),
+        data: (CameraController? controller) => controller == null
+            ? const _Unavailable(
+                message:
+                    'Este aparato no tiene cámara. Puedes medir igual '
+                    'apuntando con el teléfono.',
+              )
+            : CameraPreview(controller),
       ),
     );
   }
@@ -61,20 +49,24 @@ class CameraViewfinder extends ConsumerWidget {
 }
 
 /// La cruz del centro: lo que se apunta al pie de la esquina.
-class _Reticle extends StatelessWidget {
-  const _Reticle();
+class ScanReticle extends StatelessWidget {
+  const ScanReticle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 56,
-      height: 56,
-      child: CustomPaint(painter: _ReticlePainter()),
+    return const Center(
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: CustomPaint(painter: _ReticlePainter()),
+      ),
     );
   }
 }
 
 class _ReticlePainter extends CustomPainter {
+  const _ReticlePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final Offset center = size.center(Offset.zero);

@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ import '../../../../core/widgets/number_prompt_dialog.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/presentation/widgets/room_form_sheet.dart';
 import '../../../settings/presentation/providers/settings_providers.dart';
+import '../../domain/entities/camera_field_of_view.dart';
 import '../../domain/entities/device_aim.dart';
 import '../../domain/entities/scan_session.dart';
 import '../../domain/services/scan_snap.dart';
@@ -48,6 +50,15 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
   @override
   Widget build(BuildContext context) {
     final DeviceAim? aim = ref.watch(deviceAimProvider).value;
+    final CameraController? camera = ref.watch(cameraControllerProvider).value;
+    // De pie, la imagen es más alta que ancha: 3 de ancho por 4 de alto si
+    // todavía no se sabe la de la cámara.
+    final double previewAspect = camera == null
+        ? 3 / 4
+        : 1 / camera.value.aspectRatio;
+    final CameraFieldOfView fieldOfView =
+        ref.watch(cameraFieldOfViewProvider).value ??
+        CameraFieldOfView.estimated;
     final double phoneHeight =
         ref.watch(phoneHeightProvider).value ?? _defaultPhoneHeight;
     final double? distance = aim == null
@@ -90,15 +101,35 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const CameraViewfinder(),
-          ScanOverlay(
-            session: _session,
-            aim: aim,
-            phoneHeightMeters: phoneHeight,
-            // Mientras se vuelve a situar, la línea viva estorba: todavía
-            // sale del sitio antiguo.
-            liveDistanceMeters: relocating == null ? distance : null,
-            snappedCorner: relocating ?? snapped,
+          // El dibujo va dentro del mismo encuadre que la imagen: así el
+          // ángulo de la cámara vale para colocar cada esquina.
+          Center(
+            child: AspectRatio(
+              aspectRatio: previewAspect,
+              // Lo que se dibuje fuera de la imagen no se enseña: ahí ya no
+              // hay nada que mirar.
+              child: ClipRect(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    const CameraViewfinder(),
+                    ScanOverlay(
+                      session: _session,
+                      aim: aim,
+                      phoneHeightMeters: phoneHeight,
+                      // Mientras se vuelve a situar, la línea viva estorba:
+                      // todavía sale del sitio antiguo.
+                      liveDistanceMeters: relocating == null ? distance : null,
+                      snappedCorner: relocating ?? snapped,
+                      horizontalFovRadians: fieldOfView.horizontalFor(
+                        previewAspect,
+                      ),
+                    ),
+                    const ScanReticle(),
+                  ],
+                ),
+              ),
+            ),
           ),
           Align(
             alignment: Alignment.topCenter,

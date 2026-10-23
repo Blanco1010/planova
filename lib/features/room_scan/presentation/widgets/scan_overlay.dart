@@ -22,6 +22,7 @@ class ScanOverlay extends StatelessWidget {
     required this.phoneHeightMeters,
     required this.liveDistanceMeters,
     required this.snappedCorner,
+    required this.horizontalFovRadians,
     super.key,
   });
 
@@ -36,6 +37,9 @@ class ScanOverlay extends StatelessWidget {
   /// volver a situarse.
   final int? snappedCorner;
 
+  /// Cuánto abarca a lo ancho la imagen que hay debajo.
+  final double horizontalFovRadians;
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -46,6 +50,7 @@ class ScanOverlay extends StatelessWidget {
         phoneHeightMeters: phoneHeightMeters,
         liveDistanceMeters: liveDistanceMeters,
         snappedCorner: snappedCorner,
+        horizontalFovRadians: horizontalFovRadians,
       ),
     );
   }
@@ -58,6 +63,7 @@ class _ScanOverlayPainter extends CustomPainter {
     required this.phoneHeightMeters,
     required this.liveDistanceMeters,
     required this.snappedCorner,
+    required this.horizontalFovRadians,
   });
 
   final ScanSession session;
@@ -65,6 +71,7 @@ class _ScanOverlayPainter extends CustomPainter {
   final double phoneHeightMeters;
   final double? liveDistanceMeters;
   final int? snappedCorner;
+  final double horizontalFovRadians;
 
   /// El trazo oscuro de debajo: sin él las líneas se pierden sobre la imagen.
   static const Color _halo = Color(0xCC0F172A);
@@ -80,6 +87,7 @@ class _ScanOverlayPainter extends CustomPainter {
       aimTurnRadians: aim.turnRadians,
       aimPitchRadians: aim.pitchRadians,
       phoneHeightMeters: phoneHeightMeters,
+      horizontalFovRadians: horizontalFovRadians,
     );
 
     final List<Offset?> corners = <Offset?>[

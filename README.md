@@ -78,13 +78,26 @@ flutter analyze
 flutter build apk --debug
 ```
 
+## Medir con la cámara
+
+La parte más delicada, y la que más se ha rehecho probándola en obra:
+
+- La orientación sale de la **fusión de sensores de Android** (el vector de
+  rotación, por canal nativo). Integrar el giroscopio a mano deriva en
+  segundos y las esquinas marcadas se van de sitio; hay respaldo al
+  giroscopio para aparatos sin ese sensor.
+- El ángulo que abarca la cámara se le pregunta al sistema (Camera2), no se
+  estima, y la imagen se enseña **entera** para que el dibujo encaje con ella.
+- Las esquinas se guardan en **coordenadas de la habitación**, no respecto a
+  quien mide, así que se puede caminar: con «Me moví» se apunta a una esquina
+  ya marcada y la app vuelve a situarse.
+
 ## Lo que falta
 
-Nada se ha probado todavía en un teléfono de verdad: solo pruebas y
-compilación. Lo que más conviene revisar allí es la **medición con sensores**;
-si el plano escaneado sale en espejo, el arreglo es el signo de
-`turnRateToTheRight` en [`sighting_math.dart`](lib/core/measuring/sighting_math.dart),
-en un solo sitio.
+Probar en el teléfono que las esquinas se quedan quietas al girar y al
+caminar. Si el dibujo cayera corrido respecto a la pared real, el número a
+revisar es el ángulo de la cámara en
+[`view_projection.dart`](lib/core/measuring/view_projection.dart).
 
 ## Hecho con
 
