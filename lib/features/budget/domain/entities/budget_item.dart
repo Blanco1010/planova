@@ -1,6 +1,15 @@
 /// En qué capítulo del presupuesto entra una partida.
 enum BudgetCategory { material, labor, other }
 
+/// Cómo se nombra cada capítulo.
+extension BudgetCategoryDisplay on BudgetCategory {
+  String get label => switch (this) {
+    BudgetCategory.material => 'Material',
+    BudgetCategory.labor => 'Mano de obra',
+    BudgetCategory.other => 'Otros',
+  };
+}
+
 /// Una partida que se escribe a mano: acero, teja, transporte, el maestro…
 ///
 /// Lo que sale del plano (bloques, pintura, baldosa) no vive aquí: se calcula

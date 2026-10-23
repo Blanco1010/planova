@@ -7,10 +7,14 @@ import 'package:planova/features/budget/domain/entities/budget_item.dart';
 import 'package:planova/features/budget/presentation/providers/budget_providers.dart';
 import 'package:planova/features/budget/presentation/screens/budget_screen.dart';
 import 'package:planova/features/materials/presentation/providers/material_providers.dart';
+import 'package:planova/features/projects/domain/entities/project_draft.dart';
+import 'package:planova/features/projects/presentation/providers/project_providers.dart';
 import 'package:planova/features/rooms/domain/entities/room_drafts.dart';
 import 'package:planova/features/rooms/presentation/providers/room_providers.dart';
 
+import '../fakes/fake_budget_exporter.dart';
 import '../fakes/fake_budget_repository.dart';
+import '../fakes/fake_project_repository.dart';
 import '../fakes/fake_material_settings_repository.dart';
 import '../fakes/fake_room_repository.dart';
 
@@ -20,17 +24,23 @@ void main() {
   late FakeRoomRepository rooms;
   late FakeMaterialSettingsRepository settings;
   late FakeBudgetRepository budget;
+  late FakeProjectRepository projects;
+  late FakeBudgetExporter exporter;
 
-  setUp(() {
+  setUp(() async {
     rooms = FakeRoomRepository();
     settings = FakeMaterialSettingsRepository();
     budget = FakeBudgetRepository();
+    exporter = FakeBudgetExporter();
+    projects = FakeProjectRepository();
+    await projects.create(const ProjectDraft(name: 'Casa López'));
   });
 
   tearDown(() {
     rooms.dispose();
     settings.dispose();
     budget.dispose();
+    projects.dispose();
   });
 
   Future<void> pumpBudget(WidgetTester tester) async {
@@ -44,6 +54,8 @@ void main() {
           roomRepositoryProvider.overrideWithValue(rooms),
           materialSettingsRepositoryProvider.overrideWithValue(settings),
           budgetRepositoryProvider.overrideWithValue(budget),
+          projectRepositoryProvider.overrideWithValue(projects),
+          budgetExporterProvider.overrideWithValue(exporter),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -143,5 +155,19 @@ void main() {
     expect(find.text('Maestro de obra'), findsOneWidget);
     expect(find.text(r'$ 1.080.000'), findsWidgets);
     expect(find.text('Mano de obra · 12 unid × \$ 90.000'), findsOneWidget);
+  });
+
+  testWidgets('exportar entrega un PDF con el nombre del proyecto', (
+    WidgetTester tester,
+  ) async {
+    await addRoom();
+    await pumpBudget(tester);
+
+    await tester.tap(find.byTooltip('Exportar en PDF'));
+    await tester.pumpAndSettle();
+
+    expect(exporter.lastFileName, 'presupuesto-casa-l-pez.pdf');
+    expect(exporter.lastBytes, isNotNull);
+    expect(exporter.lastBytes!.length, greaterThan(2000));
   });
 }

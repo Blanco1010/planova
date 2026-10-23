@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,11 +10,14 @@ import '../../../materials/domain/entities/material_estimates.dart';
 import '../../../materials/domain/entities/material_settings.dart';
 import '../../../materials/domain/services/material_calculator.dart';
 import '../../../materials/presentation/providers/material_providers.dart';
+import '../../../projects/domain/entities/project.dart';
+import '../../../projects/presentation/providers/project_providers.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/budget_item.dart';
 import '../../domain/entities/budget_summary.dart';
 import '../../domain/entities/material_kind.dart';
+import '../../data/services/budget_pdf_builder.dart';
 import '../../domain/services/budget_calculator.dart';
 import '../providers/budget_providers.dart';
 import '../widgets/budget_item_sheet.dart';
@@ -34,6 +39,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     final int projectId = widget.projectId;
+    final Project? project = ref.watch(projectProvider(projectId)).value;
     final List<Room> rooms =
         ref.watch(projectRoomsProvider(projectId)).value ?? const <Room>[];
     final MaterialSettings settings =
@@ -70,7 +76,24 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Presupuesto')),
+      appBar: AppBar(
+        title: const Text('Presupuesto'),
+        actions: [
+          IconButton(
+            onPressed: project == null
+                ? null
+                : () => _export(
+                    project: project,
+                    rooms: scopedRooms.toList(growable: false),
+                    lines: lines,
+                    items: items,
+                    summary: summary,
+                  ),
+            tooltip: 'Exportar en PDF',
+            icon: const Icon(Icons.ios_share),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
@@ -106,6 +129,39 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         ],
       ),
     );
+  }
+
+  /// Arma el PDF y lo entrega a la hoja de compartir del teléfono.
+  Future<void> _export({
+    required Project project,
+    required List<Room> rooms,
+    required List<MaterialLine> lines,
+    required List<BudgetItem> items,
+    required BudgetSummary summary,
+  }) async {
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    final String scopeLabel = _roomId == null
+        ? 'Todo el proyecto'
+        : rooms.firstOrNull?.name ?? 'Una habitación';
+
+    try {
+      final Uint8List bytes = await BudgetPdfBuilder.build(
+        project: project,
+        scopeLabel: scopeLabel,
+        rooms: rooms,
+        materialLines: lines,
+        items: items,
+        summary: summary,
+        generatedAt: DateTime.now(),
+      );
+      await ref
+          .read(budgetExporterProvider)
+          .share(bytes: bytes, fileName: BudgetPdfBuilder.fileNameFor(project));
+    } catch (error) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('No se pudo crear el PDF: $error')),
+      );
+    }
   }
 
   Future<void> _editPrice(MaterialLine line) async {
