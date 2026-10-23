@@ -68,7 +68,7 @@ class _ProjectList extends ConsumerWidget {
         final Project project = projects[index];
         return ProjectCard(
           project: project,
-          onTap: () => ProjectFormSheet.show(context, project: project),
+          onTap: () => context.push(AppRoutes.projectPath(project.id)),
           onDelete: () => _confirmDelete(context, ref, project),
         );
       },

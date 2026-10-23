@@ -6,6 +6,9 @@ abstract interface class ProjectRepository {
   /// Proyectos ordenados por fecha de modificación, el más reciente primero.
   Stream<List<Project>> watchAll();
 
+  /// Un proyecto concreto, en vivo; `null` si ya no existe.
+  Stream<Project?> watchById(int id);
+
   Future<Project?> findById(int id);
 
   /// Crea el proyecto y devuelve su `id`.

@@ -84,8 +84,8 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
                 ),
                 validator: (String? value) =>
                     (value == null || value.trim().isEmpty)
-                        ? 'Ponle un nombre al proyecto'
-                        : null,
+                    ? 'Ponle un nombre al proyecto'
+                    : null,
               ),
               const SizedBox(height: 12),
               TextFormField(

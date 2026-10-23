@@ -11,48 +11,51 @@ abstract final class AppTheme {
 
   static ThemeData get dark => _build(_darkScheme);
 
-  static final ColorScheme _lightScheme = ColorScheme.fromSeed(
-    seedColor: AppColors.primaryBlue,
-    brightness: Brightness.light,
-  ).copyWith(
-    primary: AppColors.primaryBlue,
-    onPrimary: Colors.white,
-    primaryContainer: AppColors.deepBlue,
-    onPrimaryContainer: Colors.white,
-    secondary: AppColors.lightBlue,
-    onSecondary: AppColors.deepBlue,
-    surface: AppColors.lightSurface,
-    onSurface: AppColors.darkNavy,
-    surfaceContainerLowest: AppColors.lightSurface,
-    surfaceContainerLow: AppColors.lightBackground,
-    surfaceContainer: AppColors.lightBackground,
-    onSurfaceVariant: AppColors.mutedLight,
-    outlineVariant: AppColors.borderLight,
-  );
+  static final ColorScheme _lightScheme =
+      ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        brightness: Brightness.light,
+      ).copyWith(
+        primary: AppColors.primaryBlue,
+        onPrimary: Colors.white,
+        primaryContainer: AppColors.deepBlue,
+        onPrimaryContainer: Colors.white,
+        secondary: AppColors.lightBlue,
+        onSecondary: AppColors.deepBlue,
+        surface: AppColors.lightSurface,
+        onSurface: AppColors.darkNavy,
+        surfaceContainerLowest: AppColors.lightSurface,
+        surfaceContainerLow: AppColors.lightBackground,
+        surfaceContainer: AppColors.lightBackground,
+        onSurfaceVariant: AppColors.mutedLight,
+        outlineVariant: AppColors.borderLight,
+      );
 
-  static final ColorScheme _darkScheme = ColorScheme.fromSeed(
-    seedColor: AppColors.primaryBlue,
-    brightness: Brightness.dark,
-  ).copyWith(
-    primary: AppColors.lightBlue,
-    onPrimary: AppColors.darkNavy,
-    primaryContainer: AppColors.deepBlue,
-    onPrimaryContainer: Colors.white,
-    secondary: AppColors.primaryBlue,
-    onSecondary: Colors.white,
-    surface: AppColors.darkSurface,
-    onSurface: AppColors.onDark,
-    surfaceContainerLowest: AppColors.darkSunken,
-    surfaceContainerLow: AppColors.darkNavy,
-    surfaceContainer: AppColors.darkSurface,
-    onSurfaceVariant: AppColors.mutedDark,
-    outlineVariant: AppColors.borderDark,
-  );
+  static final ColorScheme _darkScheme =
+      ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        brightness: Brightness.dark,
+      ).copyWith(
+        primary: AppColors.lightBlue,
+        onPrimary: AppColors.darkNavy,
+        primaryContainer: AppColors.deepBlue,
+        onPrimaryContainer: Colors.white,
+        secondary: AppColors.primaryBlue,
+        onSecondary: Colors.white,
+        surface: AppColors.darkSurface,
+        onSurface: AppColors.onDark,
+        surfaceContainerLowest: AppColors.darkSunken,
+        surfaceContainerLow: AppColors.darkNavy,
+        surfaceContainer: AppColors.darkSurface,
+        onSurfaceVariant: AppColors.mutedDark,
+        outlineVariant: AppColors.borderDark,
+      );
 
   static ThemeData _build(ColorScheme scheme) {
     final bool isLight = scheme.brightness == Brightness.light;
-    final Color canvas =
-        isLight ? AppColors.lightBackground : AppColors.darkNavy;
+    final Color canvas = isLight
+        ? AppColors.lightBackground
+        : AppColors.darkNavy;
     final Color titleColor = isLight ? AppColors.deepBlue : Colors.white;
 
     final ThemeData base = ThemeData(colorScheme: scheme);
@@ -109,15 +112,17 @@ abstract final class AppTheme {
       listTileTheme: ListTileThemeData(
         iconColor: scheme.primary,
         titleTextStyle: text.titleMedium,
-        subtitleTextStyle:
-            text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+        subtitleTextStyle: text.bodyMedium?.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           textStyle: text.labelLarge,
         ),
       ),
@@ -125,8 +130,9 @@ abstract final class AppTheme {
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
           side: BorderSide(color: scheme.primary),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           textStyle: text.labelLarge,
         ),
       ),
@@ -136,8 +142,9 @@ abstract final class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.primaryBlue,
         foregroundColor: Colors.white,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+        ),
       ),
       inputDecorationTheme: InputDecorationThemeData(
         filled: true,
@@ -148,14 +155,17 @@ abstract final class AppTheme {
           borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radius),
+        ),
         titleTextStyle: text.titleLarge,
       ),
       bottomSheetTheme: BottomSheetThemeData(
@@ -170,8 +180,7 @@ abstract final class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.deepBlue,
         contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

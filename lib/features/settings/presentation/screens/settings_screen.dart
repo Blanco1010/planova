@@ -17,10 +17,7 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            'Apariencia',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text('Apariencia', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
             child: RadioGroup<AppThemeMode>(

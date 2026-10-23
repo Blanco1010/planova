@@ -14,12 +14,19 @@ class DriftProjectRepository implements ProjectRepository {
 
   @override
   Stream<List<Project>> watchAll() {
-    final SimpleSelectStatement<$ProjectsTable, ProjectRow> query =
-        _db.select(_db.projects)
-          ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
+    final SimpleSelectStatement<$ProjectsTable, ProjectRow> query = _db.select(
+      _db.projects,
+    )..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
     return query.watch().map(
       (rows) => rows.map((row) => row.toEntity()).toList(growable: false),
     );
+  }
+
+  @override
+  Stream<Project?> watchById(int id) {
+    return (_db.select(_db.projects)..where((t) => t.id.equals(id)))
+        .watchSingleOrNull()
+        .map((ProjectRow? row) => row?.toEntity());
   }
 
   @override
@@ -33,16 +40,18 @@ class DriftProjectRepository implements ProjectRepository {
   @override
   Future<int> create(ProjectDraft draft) {
     final DateTime now = DateTime.now();
-    return _db.into(_db.projects).insert(
-      ProjectsCompanion.insert(
-        name: draft.name,
-        client: Value(draft.client),
-        address: Value(draft.address),
-        notes: Value(draft.notes),
-        createdAt: Value(now),
-        updatedAt: Value(now),
-      ),
-    );
+    return _db
+        .into(_db.projects)
+        .insert(
+          ProjectsCompanion.insert(
+            name: draft.name,
+            client: Value(draft.client),
+            address: Value(draft.address),
+            notes: Value(draft.notes),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
   }
 
   @override

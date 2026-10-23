@@ -21,10 +21,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [projectRepositoryProvider.overrideWithValue(repository)],
-        child: MaterialApp(
-          theme: AppTheme.light,
-          home: const ProjectsScreen(),
-        ),
+        child: MaterialApp(theme: AppTheme.light, home: const ProjectsScreen()),
       ),
     );
     await tester.pumpAndSettle();

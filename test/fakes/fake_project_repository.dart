@@ -7,7 +7,7 @@ import 'package:planova/features/projects/domain/repositories/project_repository
 /// Repositorio en memoria para las pruebas de interfaz: sin SQLite de por medio.
 class FakeProjectRepository implements ProjectRepository {
   FakeProjectRepository([List<Project> initial = const <Project>[]])
-      : _projects = List<Project>.of(initial);
+    : _projects = List<Project>.of(initial);
 
   final List<Project> _projects;
   final StreamController<List<Project>> _changes =
@@ -18,6 +18,12 @@ class FakeProjectRepository implements ProjectRepository {
   Stream<List<Project>> watchAll() async* {
     yield List<Project>.unmodifiable(_projects);
     yield* _changes.stream;
+  }
+
+  @override
+  Stream<Project?> watchById(int id) async* {
+    yield await findById(id);
+    yield* _changes.stream.asyncMap((_) => findById(id));
   }
 
   @override

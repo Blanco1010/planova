@@ -16,3 +16,8 @@ final StreamProvider<List<Project>> projectsProvider =
     StreamProvider<List<Project>>(
       (ref) => ref.watch(projectRepositoryProvider).watchAll(),
     );
+
+/// Un proyecto concreto, en vivo, para su pantalla de detalle.
+final projectProvider = StreamProvider.family<Project?, int>(
+  (ref, int id) => ref.watch(projectRepositoryProvider).watchById(id),
+);
