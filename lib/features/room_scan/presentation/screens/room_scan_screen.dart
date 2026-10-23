@@ -13,7 +13,6 @@ import '../../../../core/utils/measure_input.dart';
 import '../../../../core/widgets/number_prompt_dialog.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/presentation/widgets/room_form_sheet.dart';
-import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/entities/camera_field_of_view.dart';
 import '../../domain/entities/device_aim.dart';
 import '../../domain/entities/scan_session.dart';
@@ -22,14 +21,19 @@ import '../providers/scan_providers.dart';
 import '../widgets/camera_viewfinder.dart';
 import '../widgets/scan_overlay.dart';
 
+/// Paso de la calibración en el que se está.
+enum _Calibration { idle, floor, ceiling }
+
 /// Mide una habitación apuntando con la cámara al pie de cada esquina.
 ///
-/// El plano se dibuja encima de la imagen y las esquinas van en coordenadas
-/// de la habitación, así que se quedan en su sitio. Si hace falta caminar,
-/// se apunta a una esquina ya marcada y la app vuelve a situarse.
+/// La distancia sale de la inclinación del teléfono, y para eso hace falta
+/// saber a qué altura se lleva. En vez de preguntarlo, se calibra mirando el
+/// pie y el techo de una pared: con la altura del techo, que sí se sabe,
+/// salen la altura del teléfono y la distancia de una vez.
 ///
-/// Las medidas son estimaciones: al terminar se abre el plano para
-/// corregirlas con el flexómetro.
+/// El plano se dibuja encima de la imagen y las esquinas van en coordenadas
+/// de la habitación, así que se puede caminar: se apunta a una esquina ya
+/// marcada y la app vuelve a situarse.
 class RoomScanScreen extends ConsumerStatefulWidget {
   const RoomScanScreen({required this.projectId, super.key});
 
@@ -40,12 +44,17 @@ class RoomScanScreen extends ConsumerStatefulWidget {
 }
 
 class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
-  static const double _defaultPhoneHeight = 1.50;
-
   ScanSession _session = ScanSession.empty;
 
   /// Esquina a la que se está apuntando para volver a situarse, si toca.
   int? _relocatingTo;
+
+  _Calibration _calibration = _Calibration.idle;
+  double _ceilingHeight = 2.4;
+  double? _floorPitch;
+
+  double _phoneHeight = SightingMath.assumedPhoneHeightMeters;
+  bool _calibrated = false;
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +68,16 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     final CameraFieldOfView fieldOfView =
         ref.watch(cameraFieldOfViewProvider).value ??
         CameraFieldOfView.estimated;
-    final double phoneHeight =
-        ref.watch(phoneHeightProvider).value ?? _defaultPhoneHeight;
+
     final double? distance = aim == null
         ? null
         : SightingMath.distanceToFloorPoint(
             pitchRadians: aim.pitchRadians,
-            eyeHeightMeters: phoneHeight,
+            eyeHeightMeters: _phoneHeight,
           );
 
-    final Point2D? aimPoint = (aim == null || distance == null)
+    final bool calibrating = _calibration != _Calibration.idle;
+    final Point2D? aimPoint = (aim == null || distance == null || calibrating)
         ? null
         : _session.aimPoint(
             distanceMeters: distance,
@@ -116,10 +125,12 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
                     ScanOverlay(
                       session: _session,
                       aim: aim,
-                      phoneHeightMeters: phoneHeight,
-                      // Mientras se vuelve a situar, la línea viva estorba:
-                      // todavía sale del sitio antiguo.
-                      liveDistanceMeters: relocating == null ? distance : null,
+                      phoneHeightMeters: _phoneHeight,
+                      // Mientras se calibra o se vuelve a situar, la línea
+                      // viva estorba.
+                      liveDistanceMeters: relocating == null && !calibrating
+                          ? distance
+                          : null,
                       snappedCorner: relocating ?? snapped,
                       horizontalFovRadians: fieldOfView.horizontalFor(
                         previewAspect,
@@ -138,16 +149,23 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
               hasSensors: aim != null,
               closing: closing,
               relocatingTo: relocating,
+              calibration: _calibration,
             ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
             child: _ScanBar(
               corners: _session.corners.length,
-              phoneHeight: phoneHeight,
+              calibrated: _calibrated,
+              phoneHeight: _phoneHeight,
+              calibration: _calibration,
               closing: closing,
               relocatingTo: relocating,
-              onCapture: distance == null || closing || relocating != null
+              onCapture:
+                  distance == null ||
+                      closing ||
+                      relocating != null ||
+                      calibrating
                   ? null
                   : () => _mark(aim!, distance),
               onClose: closing ? _finish : null,
@@ -155,12 +173,20 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
                   ? null
                   : () => _relocate(aim!, distance, relocating),
               onCancelRelocate: () => setState(() => _relocatingTo = null),
-              onStartRelocate: _session.isEmpty || relocating != null
+              onStartRelocate:
+                  _session.isEmpty || relocating != null || calibrating
                   ? null
                   : _askWhereIAm,
-              onUndo: _session.isEmpty || relocating != null ? null : _undo,
-              onEditHeight: () => _editHeight(phoneHeight),
-              onFinish: _session.corners.length < 3 || closing ? null : _finish,
+              onStartCalibration: calibrating ? null : _startCalibration,
+              onCalibrationStep: aim == null ? null : () => _calibrateStep(aim),
+              onCancelCalibration: () =>
+                  setState(() => _calibration = _Calibration.idle),
+              onUndo: _session.isEmpty || relocating != null || calibrating
+                  ? null
+                  : _undo,
+              onFinish: _session.corners.length < 3 || closing || calibrating
+                  ? null
+                  : _finish,
             ),
           ),
         ],
@@ -189,6 +215,75 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       );
       _relocatingTo = null;
     });
+  }
+
+  /// Pregunta la altura del techo y arranca la calibración.
+  Future<void> _startCalibration() async {
+    final double? ceiling = await NumberPromptDialog.show(
+      context,
+      title: 'Altura del techo',
+      label: 'Metros del suelo al techo',
+      helperText: 'Es lo único que hay que saber: con eso salen las demás',
+      initialText: Formatters.decimal(_ceilingHeight),
+      validator: (String? value) =>
+          MeasureInput.validate(value, min: 1.5, max: 6),
+      parse: MeasureInput.parse,
+    );
+
+    if (ceiling == null || !mounted) return;
+    setState(() {
+      _ceilingHeight = ceiling;
+      _floorPitch = null;
+      _calibration = _Calibration.floor;
+    });
+  }
+
+  void _calibrateStep(DeviceAim aim) {
+    if (_calibration == _Calibration.floor) {
+      setState(() {
+        _floorPitch = aim.pitchRadians;
+        _calibration = _Calibration.ceiling;
+      });
+      return;
+    }
+
+    final double? floorPitch = _floorPitch;
+    if (floorPitch == null) return;
+
+    final ({double phoneHeight, double distance})? result = SightingMath
+        .calibrateWithCeiling(
+          ceilingHeightMeters: _ceilingHeight,
+          floorAimPitchRadians: floorPitch,
+          ceilingAimPitchRadians: aim.pitchRadians,
+        );
+
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No cuadra: apunta al pie de una pared y luego al techo de esa '
+            'misma pared.',
+          ),
+        ),
+      );
+      setState(() => _calibration = _Calibration.floor);
+      return;
+    }
+
+    setState(() {
+      _phoneHeight = result.phoneHeight;
+      _calibrated = true;
+      _calibration = _Calibration.idle;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Listo: llevas el teléfono a '
+          '${Formatters.meters(result.phoneHeight)} del suelo y esa pared '
+          'está a ${Formatters.meters(result.distance)}.',
+        ),
+      ),
+    );
   }
 
   /// Pregunta a qué esquina se está apuntando desde el sitio nuevo.
@@ -226,22 +321,6 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     setState(() => _relocatingTo = corner);
   }
 
-  Future<void> _editHeight(double current) async {
-    final double? height = await NumberPromptDialog.show(
-      context,
-      title: 'Altura del teléfono',
-      label: 'Metros desde el suelo',
-      helperText: 'A la altura del pecho suele ser 1,40 o 1,50 m',
-      initialText: Formatters.decimal(current),
-      validator: (String? value) =>
-          MeasureInput.validate(value, min: 0.3, max: 2.5),
-      parse: MeasureInput.parse,
-    );
-
-    if (height == null || !mounted) return;
-    await ref.read(settingsRepositoryProvider).savePhoneHeight(height);
-  }
-
   Future<void> _finish() async {
     final List<WallDraft> walls = PlanGeometry.chainFromVertices(
       _session.corners,
@@ -252,6 +331,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       context,
       projectId: widget.projectId,
       scannedWalls: walls,
+      // Si se calibró, la altura del techo ya está medida de verdad.
+      wallHeightMeters: _calibrated ? _ceilingHeight : null,
       onCreated: (int roomId) {
         if (!mounted) return;
         context.pushReplacement(
@@ -271,7 +352,10 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
         title: const Text('Cómo se mide'),
         content: const SingleChildScrollView(
           child: Text(
-            '1. Comprueba la altura a la que llevas el teléfono.\n'
+            '1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al '
+            'pie de una pared, fija, y luego al techo de esa misma pared. '
+            'Con eso la app sabe a qué altura llevas el teléfono y mide '
+            'bien.\n'
             '2. Apunta con la mira al pie de una esquina, donde la pared '
             'toca el suelo, y marca.\n'
             '3. Gira sobre ti mismo: desde la esquina marcada sale una '
@@ -282,9 +366,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
             'Si tienes que caminar, toca «Me moví», apunta a una esquina '
             'que ya hayas marcado y fija tu posición: el plano se queda '
             'donde está.\n\n'
-            'La medida sale de la inclinación del teléfono, así que es una '
-            'estimación: después puedes corregir cada pared con el '
-            'flexómetro en el editor del plano.',
+            'Todo esto es una estimación: después puedes corregir cada '
+            'pared con el flexómetro en el editor del plano.',
           ),
         ),
         actions: [
@@ -305,24 +388,38 @@ class _Readout extends StatelessWidget {
     required this.hasSensors,
     required this.closing,
     required this.relocatingTo,
+    required this.calibration,
   });
 
   final double? distance;
   final bool hasSensors;
   final bool closing;
   final int? relocatingTo;
+  final _Calibration calibration;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final int? relocating = relocatingTo;
-    final bool big = distance != null && !closing && relocating == null;
-    final String text = switch ((hasSensors, relocating, closing, distance)) {
-      (false, _, _, _) => 'Esperando a los sensores…',
-      (_, final int corner?, _, _) =>
+    final bool highlighted =
+        closing || relocating != null || calibration != _Calibration.idle;
+    final bool big = distance != null && !highlighted;
+
+    final String text = switch ((
+      hasSensors,
+      calibration,
+      relocating,
+      closing,
+      distance,
+    )) {
+      (false, _, _, _, _) => 'Esperando a los sensores…',
+      (_, _Calibration.floor, _, _, _) =>
+        'Apunta al pie de una pared y fija el suelo',
+      (_, _Calibration.ceiling, _, _, _) => 'Ahora al techo de esa misma pared',
+      (_, _, final int corner?, _, _) =>
         'Apunta al pie de la esquina ${corner + 1} y fija tu posición',
-      (_, _, true, _) => 'Estás en la esquina 1: cierra la habitación',
-      (_, _, _, final double value?) => Formatters.meters(value),
+      (_, _, _, true, _) => 'Estás en la esquina 1: cierra la habitación',
+      (_, _, _, _, final double value?) => Formatters.meters(value),
       _ => 'Apunta más abajo, al pie de la pared',
     };
 
@@ -331,7 +428,7 @@ class _Readout extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(24, 64, 24, 0),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: closing || relocating != null
+            color: highlighted
                 ? AppColors.primaryBlue
                 : Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(999),
@@ -361,7 +458,9 @@ class _Readout extends StatelessWidget {
 class _ScanBar extends StatelessWidget {
   const _ScanBar({
     required this.corners,
+    required this.calibrated,
     required this.phoneHeight,
+    required this.calibration,
     required this.closing,
     required this.relocatingTo,
     required this.onCapture,
@@ -369,13 +468,17 @@ class _ScanBar extends StatelessWidget {
     required this.onRelocate,
     required this.onCancelRelocate,
     required this.onStartRelocate,
+    required this.onStartCalibration,
+    required this.onCalibrationStep,
+    required this.onCancelCalibration,
     required this.onUndo,
-    required this.onEditHeight,
     required this.onFinish,
   });
 
   final int corners;
+  final bool calibrated;
   final double phoneHeight;
+  final _Calibration calibration;
   final bool closing;
   final int? relocatingTo;
   final VoidCallback? onCapture;
@@ -383,9 +486,13 @@ class _ScanBar extends StatelessWidget {
   final VoidCallback? onRelocate;
   final VoidCallback onCancelRelocate;
   final VoidCallback? onStartRelocate;
+  final VoidCallback? onStartCalibration;
+  final VoidCallback? onCalibrationStep;
+  final VoidCallback onCancelCalibration;
   final VoidCallback? onUndo;
-  final VoidCallback onEditHeight;
   final VoidCallback? onFinish;
+
+  bool get _calibrating => calibration != _Calibration.idle;
 
   @override
   Widget build(BuildContext context) {
@@ -409,15 +516,21 @@ class _ScanBar extends StatelessWidget {
                 children: [
                   Flexible(
                     child: ActionChip(
-                      avatar: const Icon(Icons.height, size: 18),
+                      avatar: Icon(
+                        calibrated ? Icons.check_circle : Icons.straighten,
+                        size: 18,
+                        color: calibrated ? AppColors.lightBlue : null,
+                      ),
                       backgroundColor: Colors.white24,
                       labelStyle: const TextStyle(color: Colors.white),
                       side: BorderSide.none,
                       label: Text(
-                        'Altura ${Formatters.meters(phoneHeight)}',
+                        calibrated
+                            ? 'Calibrado · ${Formatters.meters(phoneHeight)}'
+                            : 'Sin calibrar',
                         overflow: TextOverflow.ellipsis,
                       ),
-                      onPressed: onEditHeight,
+                      onPressed: onStartCalibration,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -439,31 +552,16 @@ class _ScanBar extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              if (relocatingTo != null)
-                FilledButton.icon(
-                  onPressed: onRelocate,
-                  icon: const Icon(Icons.my_location),
-                  label: const Text('Estoy aquí'),
-                )
-              else if (closing)
-                FilledButton.icon(
-                  onPressed: onClose,
-                  icon: const Icon(Icons.check_circle_outline),
-                  label: const Text('Cerrar habitación'),
-                )
-              else
-                FilledButton.icon(
-                  onPressed: onCapture,
-                  icon: const Icon(Icons.add_location_alt_outlined),
-                  label: const Text('Marcar esquina'),
-                ),
+              _primaryButton(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (relocatingTo != null)
+                  if (_calibrating || relocatingTo != null)
                     Flexible(
                       child: TextButton(
-                        onPressed: onCancelRelocate,
+                        onPressed: _calibrating
+                            ? onCancelCalibration
+                            : onCancelRelocate,
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                         ),
@@ -508,5 +606,35 @@ class _ScanBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _primaryButton() {
+    return switch (calibration) {
+      _Calibration.floor => FilledButton.icon(
+        onPressed: onCalibrationStep,
+        icon: const Icon(Icons.vertical_align_bottom),
+        label: const Text('Fijar el suelo'),
+      ),
+      _Calibration.ceiling => FilledButton.icon(
+        onPressed: onCalibrationStep,
+        icon: const Icon(Icons.vertical_align_top),
+        label: const Text('Fijar el techo'),
+      ),
+      _Calibration.idle when relocatingTo != null => FilledButton.icon(
+        onPressed: onRelocate,
+        icon: const Icon(Icons.my_location),
+        label: const Text('Estoy aquí'),
+      ),
+      _Calibration.idle when closing => FilledButton.icon(
+        onPressed: onClose,
+        icon: const Icon(Icons.check_circle_outline),
+        label: const Text('Cerrar habitación'),
+      ),
+      _Calibration.idle => FilledButton.icon(
+        onPressed: onCapture,
+        icon: const Icon(Icons.add_location_alt_outlined),
+        label: const Text('Marcar esquina'),
+      ),
+    };
   }
 }

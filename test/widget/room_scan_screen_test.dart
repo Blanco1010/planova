@@ -7,20 +7,20 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
 import 'package:planova/core/geometry/point2d.dart';
+import 'package:planova/core/measuring/sighting_math.dart';
 import 'package:planova/features/room_scan/domain/entities/device_aim.dart';
 import 'package:planova/features/room_scan/presentation/providers/scan_providers.dart';
 import 'package:planova/features/room_scan/presentation/screens/room_scan_screen.dart';
 import 'package:planova/features/rooms/domain/entities/room.dart';
 import 'package:planova/features/rooms/presentation/providers/room_providers.dart';
-import 'package:planova/features/settings/presentation/providers/settings_providers.dart';
 
 import '../fakes/fake_orientation_tracker.dart';
 import '../fakes/fake_room_repository.dart';
-import '../fakes/fake_settings_repository.dart';
 
-/// Inclinación con la que una esquina queda a [distance] metros, sosteniendo
-/// el teléfono a 1,50 m del suelo.
-double _pitchFor(double distance) => math.atan(1.5 / distance);
+/// Inclinación con la que una esquina queda a [distance] metros, con la
+/// altura de teléfono que la app supone mientras no se calibre.
+double _pitchFor(double distance) =>
+    math.atan(SightingMath.assumedPhoneHeightMeters / distance);
 
 /// Las cuatro esquinas de una habitación de 4 × 3 vistas desde el centro:
 /// todas a 2,50 m, girando siempre hacia la derecha.
@@ -32,7 +32,7 @@ DeviceAim _aimFrom(Point2D from, Point2D target) {
   final double dy = target.y - from.y;
   final double distance = math.sqrt(dx * dx + dy * dy);
   return DeviceAim(
-    pitchRadians: math.atan(1.5 / distance),
+    pitchRadians: _pitchFor(distance),
     turnRadians: math.atan2(dy, dx),
   );
 }
@@ -42,18 +42,15 @@ void main() {
 
   late FakeOrientationTracker tracker;
   late FakeRoomRepository rooms;
-  late FakeSettingsRepository settings;
 
   setUp(() {
     tracker = FakeOrientationTracker();
     rooms = FakeRoomRepository();
-    settings = FakeSettingsRepository();
   });
 
   tearDown(() {
     tracker.dispose();
     rooms.dispose();
-    settings.dispose();
   });
 
   Future<void> pumpScan(WidgetTester tester) async {
@@ -82,7 +79,6 @@ void main() {
         overrides: [
           orientationTrackerProvider.overrideWithValue(tracker),
           roomRepositoryProvider.overrideWithValue(rooms),
-          settingsRepositoryProvider.overrideWithValue(settings),
           cameraControllerProvider.overrideWith((ref) async => null),
         ],
         child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
@@ -108,6 +104,7 @@ void main() {
     await pumpScan(tester);
 
     expect(find.text('Esperando a los sensores…'), findsOneWidget);
+    expect(find.text('Sin calibrar'), findsOneWidget);
     expect(
       tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
       isNull,
@@ -290,5 +287,60 @@ void main() {
       closeTo(4, 0.01),
       closeTo(3, 0.01),
     ]);
+  });
+
+  testWidgets('calibrar con el techo deja la medida en su sitio', (
+    WidgetTester tester,
+  ) async {
+    // Teléfono a 1,60 m, pared a 3 m, techo a 2,50 m.
+    await pumpScan(tester);
+
+    await tester.tap(find.text('Sin calibrar'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), '2,50');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    tracker.emit(DeviceAim(pitchRadians: math.atan(1.6 / 3), turnRadians: 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fijar el suelo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ahora al techo de esa misma pared'), findsOneWidget);
+    tracker.emit(DeviceAim(pitchRadians: -math.atan(0.9 / 3), turnRadians: 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fijar el techo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Calibrado · 1,60 m'), findsOneWidget);
+
+    // Y a partir de ahí las distancias salen con esa altura.
+    tracker.emit(DeviceAim(pitchRadians: math.atan(1.6 / 4), turnRadians: 0));
+    await tester.pumpAndSettle();
+    expect(find.text('4,00 m'), findsOneWidget);
+  });
+
+  testWidgets('si las dos miradas no cuadran, lo dice y repite', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester);
+
+    await tester.tap(find.text('Sin calibrar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
+    tracker.emit(DeviceAim(pitchRadians: math.atan(1.5 / 3), turnRadians: 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fijar el suelo'));
+    await tester.pumpAndSettle();
+
+    // Mirando otra vez hacia abajo: eso no es el techo.
+    await tester.tap(find.text('Fijar el techo'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('No cuadra'), findsOneWidget);
+    expect(find.text('Fijar el suelo'), findsOneWidget);
+    expect(find.text('Sin calibrar'), findsOneWidget);
   });
 }

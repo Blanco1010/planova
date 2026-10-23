@@ -73,7 +73,7 @@ va por la **versión 4**; cada tabla nueva se añade con su migración en
 [`app_database.dart`](lib/core/database/app_database.dart).
 
 ```bash
-flutter test            # 92 pruebas
+flutter test            # 99 pruebas
 flutter analyze
 flutter build apk --debug
 ```
@@ -88,6 +88,9 @@ La parte más delicada, y la que más se ha rehecho probándola en obra:
   giroscopio para aparatos sin ese sensor.
 - El ángulo que abarca la cámara se le pregunta al sistema (Camera2), no se
   estima, y la imagen se enseña **entera** para que el dibujo encaje con ella.
+- La distancia sale de la inclinación, y la altura a la que se lleva el
+  teléfono **no se pregunta**: se calibra mirando el pie y el techo de una
+  pared, que con la altura del techo despeja las dos de una vez.
 - Las esquinas se guardan en **coordenadas de la habitación**, no respecto a
   quien mide, así que se puede caminar: con «Me moví» se apunta a una esquina
   ya marcada y la app vuelve a situarse.
@@ -95,9 +98,10 @@ La parte más delicada, y la que más se ha rehecho probándola en obra:
 ## Lo que falta
 
 Probar en el teléfono que las esquinas se quedan quietas al girar y al
-caminar. Si el dibujo cayera corrido respecto a la pared real, el número a
-revisar es el ángulo de la cámara en
-[`view_projection.dart`](lib/core/measuring/view_projection.dart).
+caminar. El sentido del giro que entrega el aparato está invertido respecto
+al convenio de la app y se corrige en `_turnSense`, en
+[`native_orientation_tracker.dart`](lib/features/room_scan/data/services/native_orientation_tracker.dart):
+si el dibujo se fuera hacia el mismo lado que la cámara, ese es el número.
 
 ## Hecho con
 

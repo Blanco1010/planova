@@ -18,10 +18,7 @@ void main() {
       corners: <Point2D>[],
     );
 
-    final ScanSession marked = session.mark(
-      distanceMeters: 2,
-      turnRadians: 0,
-    );
+    final ScanSession marked = session.mark(distanceMeters: 2, turnRadians: 0);
 
     expect(marked.corners.single.x, closeTo(4, 1e-9));
     expect(marked.corners.single.y, closeTo(1, 1e-9));
@@ -32,10 +29,7 @@ void main() {
     const Point2D c1 = Point2D(0, 0);
     const Point2D c2 = Point2D(4, 0);
 
-    ScanSession session = const ScanSession(
-      observer: a,
-      corners: <Point2D>[],
-    );
+    ScanSession session = const ScanSession(observer: a, corners: <Point2D>[]);
     for (final Point2D corner in <Point2D>[c1, c2]) {
       final sight = _sightOf(a, corner);
       session = session.mark(

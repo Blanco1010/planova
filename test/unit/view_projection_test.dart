@@ -68,10 +68,8 @@ void main() {
       distanceMeters: 3,
       turnRadians: 0.2,
     )!;
-    final Point2D izquierda = _projection(turn: 0.4).project(
-      distanceMeters: 3,
-      turnRadians: 0.2,
-    )!;
+    final Point2D izquierda = _projection(turn: 0.4)
+        .project(distanceMeters: 3, turnRadians: 0.2)!;
 
     expect(derecha.x, greaterThan(200));
     expect(izquierda.x, lessThan(200));

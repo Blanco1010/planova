@@ -16,6 +16,10 @@ abstract final class SightingMath {
   /// Más allá de esto no es una habitación, es una lectura perdida.
   static const double maxDistanceMeters = 30;
 
+  /// A qué altura se da por hecho que va el teléfono mientras no se calibre.
+  /// Es la altura del pecho de una persona de pie, más o menos.
+  static const double assumedPhoneHeightMeters = 1.45;
+
   /// Inclinación de la cámara por debajo de la horizontal, en radianes.
   ///
   /// Toma la lectura del acelerómetro en reposo, que apunta hacia arriba:
@@ -43,6 +47,39 @@ abstract final class SightingMath {
     final double distance = eyeHeightMeters / tangent;
     if (!distance.isFinite || distance > maxDistanceMeters) return null;
     return distance;
+  }
+
+  /// Altura del teléfono y distancia a una pared, mirando su pie y el punto
+  /// donde esa misma pared toca el techo.
+  ///
+  /// La altura del techo sí se sabe (se mide una vez y no cambia), y con
+  /// ella sobran datos para despejar las dos incógnitas. Así no hay que
+  /// decirle a la app a qué altura se lleva el teléfono.
+  ///
+  /// Devuelve `null` si las dos miradas no cuadran: hay que mirar hacia
+  /// abajo al pie y hacia arriba al techo.
+  static ({double phoneHeight, double distance})? calibrateWithCeiling({
+    required double ceilingHeightMeters,
+    required double floorAimPitchRadians,
+    required double ceilingAimPitchRadians,
+  }) {
+    if (ceilingHeightMeters <= 0) return null;
+    if (floorAimPitchRadians < minPitchDegrees * math.pi / 180) return null;
+    if (ceilingAimPitchRadians >= 0) return null;
+
+    final double down = math.tan(floorAimPitchRadians);
+    final double up = math.tan(-ceilingAimPitchRadians);
+    if (down <= 0 || up <= 0) return null;
+
+    final double phoneHeight = ceilingHeightMeters / (1 + up / down);
+    final double distance = phoneHeight / down;
+    if (!phoneHeight.isFinite || phoneHeight < 0.3 || phoneHeight > 2.5) {
+      return null;
+    }
+    if (!distance.isFinite || distance <= 0 || distance > maxDistanceMeters) {
+      return null;
+    }
+    return (phoneHeight: phoneHeight, distance: distance);
   }
 
   /// Velocidad de giro hacia la derecha, en radianes por segundo.

@@ -144,4 +144,64 @@ void main() {
       expect(point.y, closeTo(2, 1e-9));
     });
   });
+
+  group('calibrateWithCeiling', () {
+    test('de las dos miradas salen la altura y la distancia', () {
+      // Teléfono a 1,50 m, pared a 3 m, techo a 2,40 m.
+      final calibration = SightingMath.calibrateWithCeiling(
+        ceilingHeightMeters: 2.4,
+        floorAimPitchRadians: math.atan(1.5 / 3),
+        ceilingAimPitchRadians: -math.atan(0.9 / 3),
+      );
+
+      expect(calibration, isNotNull);
+      expect(calibration!.phoneHeight, closeTo(1.5, 1e-9));
+      expect(calibration.distance, closeTo(3, 1e-9));
+    });
+
+    test('sirve igual desde más lejos', () {
+      final calibration = SightingMath.calibrateWithCeiling(
+        ceilingHeightMeters: 2.6,
+        floorAimPitchRadians: math.atan(1.4 / 5),
+        ceilingAimPitchRadians: -math.atan(1.2 / 5),
+      );
+
+      expect(calibration!.phoneHeight, closeTo(1.4, 1e-9));
+      expect(calibration.distance, closeTo(5, 1e-9));
+    });
+
+    test('si no se mira hacia arriba al techo, no vale', () {
+      expect(
+        SightingMath.calibrateWithCeiling(
+          ceilingHeightMeters: 2.4,
+          floorAimPitchRadians: math.atan(1.5 / 3),
+          ceilingAimPitchRadians: 0.1,
+        ),
+        isNull,
+      );
+    });
+
+    test('con el teléfono casi horizontal tampoco', () {
+      expect(
+        SightingMath.calibrateWithCeiling(
+          ceilingHeightMeters: 2.4,
+          floorAimPitchRadians: 0.05,
+          ceilingAimPitchRadians: -0.3,
+        ),
+        isNull,
+      );
+    });
+
+    test('una altura de teléfono imposible se descarta', () {
+      // Mirando al techo casi en vertical: saldría un teléfono a 16 cm.
+      expect(
+        SightingMath.calibrateWithCeiling(
+          ceilingHeightMeters: 2.4,
+          floorAimPitchRadians: math.atan(1.5 / 3),
+          ceilingAimPitchRadians: -math.atan(7),
+        ),
+        isNull,
+      );
+    });
+  });
 }

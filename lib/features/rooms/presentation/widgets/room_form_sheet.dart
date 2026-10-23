@@ -17,6 +17,7 @@ class RoomFormSheet extends ConsumerStatefulWidget {
     required this.projectId,
     this.room,
     this.scannedWalls,
+    this.wallHeightMeters,
     this.onCreated,
   });
 
@@ -25,6 +26,7 @@ class RoomFormSheet extends ConsumerStatefulWidget {
     required int projectId,
     Room? room,
     List<WallDraft>? scannedWalls,
+    double? wallHeightMeters,
     ValueChanged<int>? onCreated,
   }) {
     return showModalBottomSheet<void>(
@@ -38,6 +40,7 @@ class RoomFormSheet extends ConsumerStatefulWidget {
           projectId: projectId,
           room: room,
           scannedWalls: scannedWalls,
+          wallHeightMeters: wallHeightMeters,
           onCreated: onCreated,
         ),
       ),
@@ -49,6 +52,9 @@ class RoomFormSheet extends ConsumerStatefulWidget {
 
   /// Paredes que trae un escaneo; si vienen, no se piden ancho y largo.
   final List<WallDraft>? scannedWalls;
+
+  /// Altura de las paredes ya medida, si se sabe.
+  final double? wallHeightMeters;
 
   /// Avisa con el `id` de la habitación recién creada.
   final ValueChanged<int>? onCreated;
@@ -78,7 +84,9 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
     _width = TextEditingController(text: Formatters.decimal(3));
     _length = TextEditingController(text: Formatters.decimal(4));
     _height = TextEditingController(
-      text: Formatters.decimal(room?.wallHeightMeters ?? 2.4),
+      text: Formatters.decimal(
+        room?.wallHeightMeters ?? widget.wallHeightMeters ?? 2.4,
+      ),
     );
   }
 

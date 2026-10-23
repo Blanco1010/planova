@@ -43,10 +43,10 @@ void main() {
 
     test('con menos de tres esquinas todavía no hay nada que cerrar', () {
       expect(
-        ScanSnap.closesRoom(
-          const <Point2D>[Point2D(0, 0), Point2D(4, 0)],
-          const Point2D(0, 0),
-        ),
+        ScanSnap.closesRoom(const <Point2D>[
+          Point2D(0, 0),
+          Point2D(4, 0),
+        ], const Point2D(0, 0)),
         isFalse,
       );
     });

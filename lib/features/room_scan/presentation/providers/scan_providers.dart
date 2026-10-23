@@ -4,7 +4,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../data/services/fallback_orientation_tracker.dart';
 import '../../data/services/native_orientation_tracker.dart';
 import '../../data/services/sensors_orientation_tracker.dart';
@@ -25,11 +24,6 @@ final Provider<OrientationTracker> orientationTrackerProvider =
 final deviceAimProvider = StreamProvider<DeviceAim>(
   (ref) => ref.watch(orientationTrackerProvider).watch(),
   isAutoDispose: true,
-);
-
-/// Altura a la que el usuario sostiene el teléfono, en metros.
-final phoneHeightProvider = StreamProvider<double>(
-  (ref) => ref.watch(settingsRepositoryProvider).watchPhoneHeight(),
 );
 
 /// Cámara trasera lista para el visor; `null` si el aparato no tiene.
