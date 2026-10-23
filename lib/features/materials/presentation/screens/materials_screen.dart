@@ -156,17 +156,22 @@ class _MasonryCard extends StatelessWidget {
       icon: Icons.grid_view,
       title: 'Mampostería',
       headline: '${Formatters.units(estimate.blocks)} bloques',
+      source:
+          'De ${Formatters.squareMeters(estimate.wallAreaM2)} de muros '
+          '(no del piso)',
       rows: <(String, String)>[
         ('Mortero de pega', Formatters.cubicMeters(estimate.mortarCubicMeters)),
         ('Cemento', '${Formatters.units(estimate.cementBags)} bultos'),
         ('Arena', Formatters.cubicMeters(estimate.sandCubicMeters)),
       ],
       footnote:
+          '${Formatters.squareMeters(estimate.wallAreaM2)} × '
+          '${Formatters.decimal(estimate.blocksPerSquareMeter)} bloques/m² + '
+          '${Formatters.quantity(params.wastePercent)} % de desperdicio. '
           'Bloque de ${Formatters.centimeters(params.blockLengthMeters)} × '
           '${Formatters.centimeters(params.blockHeightMeters)}, junta de '
           '${Formatters.centimeters(params.jointMeters)}, muro de '
-          '${Formatters.centimeters(params.wallThicknessMeters)} · '
-          '${Formatters.decimal(estimate.blocksPerSquareMeter)} por m²',
+          '${Formatters.centimeters(params.wallThicknessMeters)}.',
     );
   }
 }
@@ -184,6 +189,11 @@ class _PaintCard extends StatelessWidget {
       icon: Icons.format_paint_outlined,
       title: 'Pintura',
       headline: Formatters.liters(estimate.liters),
+      source: params.includeCeiling
+          ? 'De ${Formatters.squareMeters(estimate.areaM2)} de muros y cielo '
+                'raso'
+          : 'De ${Formatters.squareMeters(estimate.areaM2)} de muros '
+                '(no del piso)',
       rows: <(String, String)>[
         ('En galones', '${Formatters.decimal(estimate.gallons)} gal'),
         ('Superficie', Formatters.squareMeters(estimate.areaM2)),
@@ -209,14 +219,17 @@ class _FloorCard extends StatelessWidget {
       icon: Icons.dashboard_outlined,
       title: 'Piso',
       headline: '${Formatters.units(estimate.tiles)} baldosas',
+      source: 'De ${Formatters.squareMeters(estimate.areaM2)} de piso',
       rows: <(String, String)>[
         ('Pegante', Formatters.kilograms(estimate.adhesiveKilograms)),
         ('Superficie', Formatters.squareMeters(estimate.areaM2)),
       ],
       footnote:
+          '${Formatters.squareMeters(estimate.areaM2)} × '
+          '${Formatters.decimal(estimate.tilesPerSquareMeter)} baldosas/m² + '
+          '${Formatters.quantity(params.wastePercent)} % de desperdicio. '
           'Baldosa de ${Formatters.centimeters(params.tileLengthMeters)} × '
-          '${Formatters.centimeters(params.tileWidthMeters)} · '
-          '${Formatters.decimal(estimate.tilesPerSquareMeter)} por m²',
+          '${Formatters.centimeters(params.tileWidthMeters)}.',
     );
   }
 }
@@ -226,6 +239,7 @@ class _EstimateCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.headline,
+    required this.source,
     required this.rows,
     required this.footnote,
   });
@@ -233,6 +247,10 @@ class _EstimateCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String headline;
+
+  /// De qué superficie sale la cuenta: es lo primero que uno se pregunta.
+  final String source;
+
   final List<(String, String)> rows;
   final String footnote;
 
@@ -258,6 +276,12 @@ class _EstimateCard extends StatelessWidget {
               headline,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              source,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),

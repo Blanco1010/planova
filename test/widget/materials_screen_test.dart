@@ -82,6 +82,13 @@ void main() {
     // 12 m² × 9,18 baldosas/m² × 1,10.
     expect(find.text('122 baldosas'), findsOneWidget);
     expect(find.text('66,00 kg'), findsOneWidget);
+    // Y queda claro de dónde sale cada cuenta.
+    expect(find.text('De 33,60 m² de muros (no del piso)'), findsNWidgets(2));
+    expect(find.text('De 12,00 m² de piso'), findsOneWidget);
+    expect(
+      find.textContaining('33,60 m² × 12,04 bloques/m² + 5 % de desperdicio'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('se puede mirar una sola habitación', (
