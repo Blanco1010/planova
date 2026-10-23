@@ -101,7 +101,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Medir con la cámara'),
+        title: const Text('Nueva habitación'),
         actions: [
           IconButton(
             onPressed: _showHelp,

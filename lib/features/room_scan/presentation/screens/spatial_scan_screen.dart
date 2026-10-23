@@ -59,7 +59,7 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Medir con la cámara'),
+        title: const Text('Nueva habitación'),
         actions: [
           IconButton(
             onPressed: _showHelp,
@@ -170,6 +170,9 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
             'mueve.\n'
             '4. Al volver a la primera esquina, la línea se engancha a '
             'ella: ahí se cierra la habitación.\n\n'
+            'Al cerrar le pones nombre y la habitación queda creada con '
+            'sus paredes. La altura del techo se mide después, desde la '
+            'habitación. '
             'Aquí la distancia la mide el aparato, no se estima. Aun así '
             'conviene revisar las paredes en el plano antes de comprar '
             'material.',

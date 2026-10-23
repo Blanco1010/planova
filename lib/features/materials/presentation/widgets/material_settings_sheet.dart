@@ -133,11 +133,12 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
                   'cementBags',
                   'Bultos de cemento por m³',
                 ),
-                _field('sand', 'Arena por m³ de mortero (m³)'),
+                _spaced(_field('sand', 'Arena por m³ de mortero (m³)')),
                 const SizedBox(height: 20),
                 _Section(title: 'Pintura'),
                 _pair('coats', 'Manos', 'coverage', 'Rendimiento (m² por L)'),
-                _field('paintWaste', 'Desperdicio (%)'),
+                _spaced(_field('paintWaste', 'Desperdicio (%)')),
+                const SizedBox(height: 4),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: _includeCeiling,
@@ -171,6 +172,10 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
       ),
     );
   }
+
+  /// El mismo aire que hay entre dos campos emparejados.
+  Widget _spaced(Widget field) =>
+      Padding(padding: const EdgeInsets.only(top: 12), child: field);
 
   Widget _pair(
     String firstKey,
@@ -261,9 +266,12 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+      ),
     );
   }
 }
