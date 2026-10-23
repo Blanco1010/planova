@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../rooms/domain/entities/room.dart';
+import '../../../rooms/domain/entities/room_drafts.dart';
+import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/scan_surface.dart';
 import '../providers/scan_providers.dart';
 import 'measure_distance_screen.dart';
@@ -37,13 +40,13 @@ class ScanEntryScreen extends ConsumerWidget {
 }
 
 /// ¿Qué vamos a medir?
-class _SurfaceChooser extends StatelessWidget {
+class _SurfaceChooser extends ConsumerWidget {
   const _SurfaceChooser({required this.projectId});
 
   final int projectId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -75,28 +78,76 @@ class _SurfaceChooser extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _Option(
-            icon: Icons.straighten,
+            icon: Icons.height,
             title: ScanSurface.wall.label,
             subtitle:
-                'Mides el largo o el alto de una pared apuntando a sus dos '
-                'extremos, sin levantar el plano.',
-            onTap: () => _measureWall(context),
+                'Mides del suelo al techo apuntando a los dos puntos, y esa '
+                'altura queda guardada en la habitación que elijas.',
+            onTap: () => _measureHeight(context, ref),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _measureWall(BuildContext context) async {
+  /// Mide del suelo al techo y le pone esa altura a una habitación.
+  Future<void> _measureHeight(BuildContext context, WidgetRef ref) async {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final double? meters = await MeasureDistanceScreen.show(
       context,
-      title: 'Medir una pared',
+      title: 'Medir la altura',
+      surface: ScanSurface.wall,
     );
-    if (meters == null) return;
+    if (meters == null || !context.mounted) return;
 
+    final List<Room> rooms =
+        ref.read(projectRoomsProvider(projectId)).value ?? const <Room>[];
+    if (rooms.isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Mide ${Formatters.meters(meters)}. Crea una habitación para '
+            'usarla.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final Room? room = rooms.length == 1
+        ? rooms.single
+        : await _pickRoom(context, rooms);
+    if (room == null) return;
+
+    await ref
+        .read(roomRepositoryProvider)
+        .update(room.id, RoomDraft(name: room.name, wallHeightMeters: meters));
     messenger.showSnackBar(
-      SnackBar(content: Text('Esa pared mide ${Formatters.meters(meters)}')),
+      SnackBar(
+        content: Text(
+          'Listo: «${room.name}» queda con ${Formatters.meters(meters)} '
+          'de altura.',
+        ),
+      ),
+    );
+  }
+
+  Future<Room?> _pickRoom(BuildContext context, List<Room> rooms) {
+    return showDialog<Room>(
+      context: context,
+      builder: (BuildContext dialogContext) => SimpleDialog(
+        title: const Text('¿A qué habitación?'),
+        children: <Widget>[
+          for (final Room room in rooms)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(room),
+              child: Text(
+                '${room.name} · ahora '
+                '${Formatters.meters(room.wallHeightMeters)}',
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -104,6 +104,8 @@ class _ScanOverlayPainter extends CustomPainter {
       meters: corners.last.distanceTo(endPoint),
       color: closing ? Colors.white : AppColors.primaryBlue,
       dashed: !closing,
+      // La mira ya tiene su cruz: la medida se aparta de ella.
+      labelAt: 0.35,
     );
   }
 
@@ -130,9 +132,11 @@ class _ScanOverlayPainter extends CustomPainter {
       _label(
         canvas,
         // El aro de enganche es más grande: el número se aparta de él.
-        corner.translate(0, highlighted ? -36 : -26),
+        corner.translate(0, highlighted ? -34 : -24),
         '${i + 1}',
         background: AppColors.deepBlue,
+        fontSize: 11,
+        padding: 6,
       );
     }
   }
@@ -144,6 +148,7 @@ class _ScanOverlayPainter extends CustomPainter {
     required double meters,
     required Color color,
     bool dashed = false,
+    double labelAt = 0.5,
   }) {
     if (from == null || to == null) return;
 
@@ -164,12 +169,14 @@ class _ScanOverlayPainter extends CustomPainter {
       canvas.drawLine(from, to, line);
     }
 
-    if (meters > 0.05) {
-      _label(
-        canvas,
-        Offset((from.dx + to.dx) / 2, (from.dy + to.dy) / 2),
-        Formatters.meters(meters),
-      );
+    // En un tramo corto la etiqueta tapa más de lo que explica.
+    final double onScreen = (to - from).distance;
+    if (meters > 0.05 && onScreen > 56) {
+      final Offset middle = from + (to - from) * labelAt;
+      final Offset unit = (to - from) / onScreen;
+      // Apartada de la línea, para que el trazo no cruce los números.
+      final Offset away = Offset(-unit.dy, unit.dx) * 22;
+      _label(canvas, middle + away, Formatters.meters(meters));
     }
   }
 
@@ -193,13 +200,15 @@ class _ScanOverlayPainter extends CustomPainter {
     Offset center,
     String text, {
     Color background = _halo,
+    double fontSize = 17,
+    double padding = 12,
   }) {
     final TextPainter painter = TextPainter(
       text: TextSpan(
         text: text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 13,
+          fontSize: fontSize,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -208,11 +217,11 @@ class _ScanOverlayPainter extends CustomPainter {
 
     final Rect box = Rect.fromCenter(
       center: center,
-      width: painter.width + 14,
-      height: painter.height + 8,
+      width: painter.width + padding * 2,
+      height: painter.height + padding,
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(box, const Radius.circular(10)),
+      RRect.fromRectAndRadius(box, const Radius.circular(12)),
       Paint()..color = background,
     );
     painter.paint(

@@ -8,6 +8,6 @@ enum ScanSurface { floor, wall }
 extension ScanSurfaceDisplay on ScanSurface {
   String get label => switch (this) {
     ScanSurface.floor => 'El piso',
-    ScanSurface.wall => 'Una pared',
+    ScanSurface.wall => 'La altura del techo',
   };
 }

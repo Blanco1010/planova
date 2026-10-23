@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../room_scan/domain/entities/scan_surface.dart';
+import '../../../room_scan/presentation/providers/scan_providers.dart';
+import '../../../room_scan/presentation/screens/measure_distance_screen.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
 import '../providers/room_providers.dart';
@@ -170,6 +173,15 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                 ),
                 validator: (String? value) => MeasureInput.validate(value),
               ),
+              if (ref.watch(arCoreProvider).value ?? false)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: _saving ? null : _measureHeight,
+                    icon: const Icon(Icons.height),
+                    label: const Text('Medir la altura con la cámara'),
+                  ),
+                ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
@@ -188,6 +200,18 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
     if (_isEditing) return 'Editar habitación';
     if (widget.scannedWalls != null) return 'Guardar lo escaneado';
     return 'Nueva habitación';
+  }
+
+  /// Mide del suelo al techo y lo deja escrito en el campo.
+  Future<void> _measureHeight() async {
+    final double? meters = await MeasureDistanceScreen.show(
+      context,
+      title: 'Medir la altura',
+      surface: ScanSurface.wall,
+    );
+    if (meters == null || !mounted) return;
+
+    setState(() => _height.text = Formatters.decimal(meters));
   }
 
   Future<void> _save() async {
