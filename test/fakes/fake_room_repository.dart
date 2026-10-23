@@ -29,29 +29,24 @@ class FakeRoomRepository implements RoomRepository {
   }
 
   @override
-  Future<int> createRectangular(
+  Future<int> createFromWalls(
     int projectId,
-    RectangularRoomDraft draft,
+    RoomDraft draft,
+    List<WallDraft> walls,
   ) async {
     final DateTime now = DateTime.now();
-    final List<double> lengths = <double>[
-      draft.widthMeters,
-      draft.lengthMeters,
-      draft.widthMeters,
-      draft.lengthMeters,
-    ];
     final Room room = Room(
       id: _nextRoomId++,
       projectId: projectId,
-      name: draft.room.name,
-      wallHeightMeters: draft.room.wallHeightMeters,
+      name: draft.name,
+      wallHeightMeters: draft.wallHeightMeters,
       walls: <RoomWall>[
-        for (int i = 0; i < lengths.length; i++)
+        for (int i = 0; i < walls.length; i++)
           RoomWall(
             id: _nextWallId++,
             position: i,
-            lengthMeters: lengths[i],
-            turnDegrees: i == 0 ? 0 : 90,
+            lengthMeters: walls[i].lengthMeters,
+            turnDegrees: i == 0 ? 0 : walls[i].turnDegrees,
           ),
       ],
       createdAt: now,

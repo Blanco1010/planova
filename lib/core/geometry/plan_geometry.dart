@@ -46,6 +46,38 @@ abstract final class PlanGeometry {
     return vertices;
   }
 
+  /// Camino inverso a [traceChain]: de los vértices de un polígono a la
+  /// cadena de paredes que lo recorre.
+  ///
+  /// Devuelve una pared por vértice; la última vuelve al punto de partida.
+  /// La primera no gira, porque es la que marca el arranque del plano.
+  static List<WallStep> chainFromVertices(List<Point2D> vertices) {
+    if (vertices.length < 2) return const <WallStep>[];
+
+    final List<WallStep> steps = <WallStep>[];
+    double previousHeading = 0;
+    for (int i = 0; i < vertices.length; i++) {
+      final Point2D start = vertices[i];
+      final Point2D end = vertices[(i + 1) % vertices.length];
+      final double dx = end.x - start.x;
+      final double dy = end.y - start.y;
+      final double heading = math.atan2(dy, dx) * 180 / math.pi;
+
+      steps.add(
+        WallStep(
+          lengthMeters: math.sqrt(dx * dx + dy * dy),
+          turnDegrees: i == 0 ? 0 : normalizeDegrees(heading - previousHeading),
+        ),
+      );
+      previousHeading = heading;
+    }
+    return steps;
+  }
+
+  /// Deja un ángulo en el rango [-180, 180), que es como se leen los giros.
+  static double normalizeDegrees(double degrees) =>
+      ((degrees + 180) % 360) - 180;
+
   /// Área del polígono por la fórmula del cordón de zapato, en m².
   static double polygonArea(List<Point2D> vertices) {
     if (vertices.length < 3) return 0;

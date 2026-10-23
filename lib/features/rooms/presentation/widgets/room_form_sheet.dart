@@ -7,17 +7,25 @@ import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
 import '../providers/room_providers.dart';
 
-/// Hoja para crear una habitación rectangular o renombrar una existente.
+/// Hoja para crear una habitación o cambiarle el nombre y la altura.
 ///
-/// Al crear se piden ancho y largo y salen las cuatro paredes; a partir de ahí
-/// las medidas se cambian en el plano, pared por pared.
+/// Al crearla a mano se piden ancho y largo y salen las cuatro paredes; si
+/// viene de un escaneo, las paredes ya están hechas y aquí solo se bautiza.
+/// A partir de ahí las medidas se cambian en el plano, pared por pared.
 class RoomFormSheet extends ConsumerStatefulWidget {
-  const RoomFormSheet._({required this.projectId, this.room});
+  const RoomFormSheet._({
+    required this.projectId,
+    this.room,
+    this.scannedWalls,
+    this.onCreated,
+  });
 
   static Future<void> show(
     BuildContext context, {
     required int projectId,
     Room? room,
+    List<WallDraft>? scannedWalls,
+    ValueChanged<int>? onCreated,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -26,13 +34,24 @@ class RoomFormSheet extends ConsumerStatefulWidget {
         padding: EdgeInsets.only(
           bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
         ),
-        child: RoomFormSheet._(projectId: projectId, room: room),
+        child: RoomFormSheet._(
+          projectId: projectId,
+          room: room,
+          scannedWalls: scannedWalls,
+          onCreated: onCreated,
+        ),
       ),
     );
   }
 
   final int projectId;
   final Room? room;
+
+  /// Paredes que trae un escaneo; si vienen, no se piden ancho y largo.
+  final List<WallDraft>? scannedWalls;
+
+  /// Avisa con el `id` de la habitación recién creada.
+  final ValueChanged<int>? onCreated;
 
   @override
   ConsumerState<RoomFormSheet> createState() => _RoomFormSheetState();
@@ -47,6 +66,9 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
   bool _saving = false;
 
   bool get _isEditing => widget.room != null;
+
+  /// Solo se piden ancho y largo al crear una habitación a mano.
+  bool get _asksForSize => !_isEditing && widget.scannedWalls == null;
 
   @override
   void initState() {
@@ -80,10 +102,7 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                _isEditing ? 'Editar habitación' : 'Nueva habitación',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text(_title, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _name,
@@ -98,7 +117,7 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                     ? 'Ponle un nombre a la habitación'
                     : null,
               ),
-              if (!_isEditing) ...[
+              if (_asksForSize) ...[
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -146,15 +165,19 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(
-                  _isEditing ? 'Guardar cambios' : 'Crear habitación',
-                ),
+                child: Text(_isEditing ? 'Guardar cambios' : 'Crear habitación'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String get _title {
+    if (_isEditing) return 'Editar habitación';
+    if (widget.scannedWalls != null) return 'Guardar lo escaneado';
+    return 'Nueva habitación';
   }
 
   Future<void> _save() async {
@@ -168,20 +191,22 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
 
     setState(() => _saving = true);
     final Room? room = widget.room;
-    if (room == null) {
-      await ref
-          .read(roomRepositoryProvider)
-          .createRectangular(
-            widget.projectId,
-            RectangularRoomDraft(
-              room: draft,
-              widthMeters: MeasureInput.parse(_width.text)!,
-              lengthMeters: MeasureInput.parse(_length.text)!,
-            ),
-          );
-    } else {
+    if (room != null) {
       await ref.read(roomRepositoryProvider).update(room.id, draft);
+      navigator.pop();
+      return;
     }
+
+    final List<WallDraft> walls =
+        widget.scannedWalls ??
+        rectangleWalls(
+          widthMeters: MeasureInput.parse(_width.text)!,
+          lengthMeters: MeasureInput.parse(_length.text)!,
+        );
+    final int roomId = await ref
+        .read(roomRepositoryProvider)
+        .createFromWalls(widget.projectId, draft, walls);
     navigator.pop();
+    widget.onCreated?.call(roomId);
   }
 }

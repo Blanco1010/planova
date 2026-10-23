@@ -37,7 +37,11 @@ class DriftRoomRepository implements RoomRepository {
   }
 
   @override
-  Future<int> createRectangular(int projectId, RectangularRoomDraft draft) {
+  Future<int> createFromWalls(
+    int projectId,
+    RoomDraft draft,
+    List<WallDraft> walls,
+  ) {
     return _db.transaction(() async {
       final DateTime now = DateTime.now();
       final int roomId = await _db
@@ -45,28 +49,22 @@ class DriftRoomRepository implements RoomRepository {
           .insert(
             RoomsCompanion.insert(
               projectId: projectId,
-              name: draft.room.name,
-              wallHeightMeters: Value(draft.room.wallHeightMeters),
+              name: draft.name,
+              wallHeightMeters: Value(draft.wallHeightMeters),
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
           );
 
-      final List<double> lengths = <double>[
-        draft.widthMeters,
-        draft.lengthMeters,
-        draft.widthMeters,
-        draft.lengthMeters,
-      ];
-      for (int i = 0; i < lengths.length; i++) {
+      for (int i = 0; i < walls.length; i++) {
         await _db
             .into(_db.roomWalls)
             .insert(
               RoomWallsCompanion.insert(
                 roomId: roomId,
                 position: i,
-                lengthMeters: lengths[i],
-                turnDegrees: Value(i == 0 ? 0 : 90),
+                lengthMeters: walls[i].lengthMeters,
+                turnDegrees: Value(i == 0 ? 0 : walls[i].turnDegrees),
               ),
             );
       }

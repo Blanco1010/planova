@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/projects/presentation/screens/project_detail_screen.dart';
 import '../features/projects/presentation/screens/projects_screen.dart';
+import '../features/room_scan/presentation/screens/room_scan_screen.dart';
 import '../features/rooms/presentation/screens/room_editor_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
 
@@ -18,6 +19,9 @@ abstract final class AppRoutes {
   /// Editor de una habitación: `/projects/7/rooms/3`.
   static String roomEditorPath(int projectId, int roomId) =>
       '${projectPath(projectId)}/rooms/$roomId';
+
+  /// Medición con la cámara: `/projects/7/scan`.
+  static String scanPath(int projectId) => '${projectPath(projectId)}/scan';
 }
 
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
@@ -34,6 +38,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 ProjectDetailScreen(projectId: _idOf(state, 'projectId')),
             routes: <RouteBase>[
+              GoRoute(
+                path: 'scan',
+                builder: (BuildContext context, GoRouterState state) =>
+                    RoomScanScreen(projectId: _idOf(state, 'projectId')),
+              ),
               GoRoute(
                 path: 'rooms/:roomId',
                 builder: (BuildContext context, GoRouterState state) =>

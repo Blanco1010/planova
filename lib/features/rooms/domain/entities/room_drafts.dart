@@ -8,25 +8,25 @@ class RoomDraft {
   final double wallHeightMeters;
 }
 
-/// Medidas de una habitación rectangular, para crearla de un tirón.
-class RectangularRoomDraft {
-  const RectangularRoomDraft({
-    required this.room,
-    required this.widthMeters,
-    required this.lengthMeters,
-  });
-
-  final RoomDraft room;
-  final double widthMeters;
-  final double lengthMeters;
-}
-
 /// Datos de una pared que escribe el usuario.
 class WallDraft {
   const WallDraft({required this.lengthMeters, this.turnDegrees = 90});
 
   final double lengthMeters;
   final double turnDegrees;
+}
+
+/// Las cuatro paredes de una habitación rectangular.
+List<WallDraft> rectangleWalls({
+  required double widthMeters,
+  required double lengthMeters,
+}) {
+  return <WallDraft>[
+    WallDraft(lengthMeters: widthMeters, turnDegrees: 0),
+    WallDraft(lengthMeters: lengthMeters),
+    WallDraft(lengthMeters: widthMeters),
+    WallDraft(lengthMeters: lengthMeters),
+  ];
 }
 
 /// Datos de un vano que escribe el usuario.

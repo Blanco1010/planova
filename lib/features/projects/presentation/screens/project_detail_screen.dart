@@ -90,9 +90,43 @@ class ProjectDetailScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => RoomFormSheet.show(context, projectId: projectId),
+        onPressed: () => _showNewRoomOptions(context),
         icon: const Icon(Icons.add),
         label: const Text('Nueva habitación'),
+      ),
+    );
+  }
+
+  /// Las dos maneras de crear una habitación, tras un solo botón.
+  Future<void> _showNewRoomOptions(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Medir con la cámara'),
+              subtitle: const Text(
+                'Apunta al pie de cada esquina y sale el plano',
+              ),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                context.push(AppRoutes.scanPath(projectId));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.straighten),
+              title: const Text('Escribir las medidas'),
+              subtitle: const Text('Ancho y largo, y luego ajustas el plano'),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                RoomFormSheet.show(context, projectId: projectId);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

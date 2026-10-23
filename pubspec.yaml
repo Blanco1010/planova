@@ -41,6 +41,8 @@ dependencies:
   intl: ^0.20.3
   flutter_localizations:
     sdk: flutter
+  camera: ^0.12.1
+  sensors_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:

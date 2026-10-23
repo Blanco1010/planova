@@ -21,6 +21,7 @@ class FloorPlanView extends StatelessWidget {
     required this.plan,
     this.selectedWallId,
     this.onWallTap,
+    this.showDimensions = true,
     super.key,
   });
 
@@ -28,6 +29,9 @@ class FloorPlanView extends StatelessWidget {
   final RoomPlan plan;
   final int? selectedWallId;
   final ValueChanged<RoomWall>? onWallTap;
+
+  /// Las cotas sobran cuando el plano se enseña en pequeño.
+  final bool showDimensions;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +68,7 @@ class FloorPlanView extends StatelessWidget {
               plan: plan,
               transform: transform,
               selectedWallId: selectedWallId,
+              showDimensions: showDimensions,
               wallColor: theme.brightness == Brightness.light
                   ? AppColors.deepBlue
                   : AppColors.onDark,
@@ -158,6 +163,7 @@ class _FloorPlanPainter extends CustomPainter {
     required this.plan,
     required this.transform,
     required this.selectedWallId,
+    required this.showDimensions,
     required this.wallColor,
     required this.selectedColor,
     required this.fillColor,
@@ -171,6 +177,7 @@ class _FloorPlanPainter extends CustomPainter {
   final RoomPlan plan;
   final _PlanTransform transform;
   final int? selectedWallId;
+  final bool showDimensions;
   final Color wallColor;
   final Color selectedColor;
   final Color fillColor;
@@ -198,7 +205,9 @@ class _FloorPlanPainter extends CustomPainter {
 
       _paintWall(canvas, start, end, selected);
       _paintOpenings(canvas, wall, start, end, centroid);
-      _paintDimension(canvas, wall, startPoint, endPoint, centroid, selected);
+      if (showDimensions) {
+        _paintDimension(canvas, wall, startPoint, endPoint, centroid, selected);
+      }
     }
 
     _paintVertices(canvas, points);
@@ -359,6 +368,7 @@ class _FloorPlanPainter extends CustomPainter {
   bool shouldRepaint(_FloorPlanPainter oldDelegate) {
     return oldDelegate.room != room ||
         oldDelegate.plan != plan ||
+        oldDelegate.showDimensions != showDimensions ||
         oldDelegate.selectedWallId != selectedWallId ||
         oldDelegate.wallColor != wallColor;
   }

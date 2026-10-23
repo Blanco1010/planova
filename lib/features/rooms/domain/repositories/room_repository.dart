@@ -9,8 +9,13 @@ abstract interface class RoomRepository {
   /// Una habitación concreta; `null` si ya no existe.
   Stream<Room?> watchById(int roomId);
 
-  /// Crea una habitación rectangular con sus cuatro paredes.
-  Future<int> createRectangular(int projectId, RectangularRoomDraft draft);
+  /// Crea una habitación con el recorrido de paredes que se le pase, venga
+  /// de las medidas escritas a mano o de un escaneo.
+  Future<int> createFromWalls(
+    int projectId,
+    RoomDraft draft,
+    List<WallDraft> walls,
+  );
 
   Future<void> update(int roomId, RoomDraft draft);
 

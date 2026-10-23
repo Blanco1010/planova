@@ -17,13 +17,10 @@ void main() {
 
   setUp(() async {
     repository = FakeRoomRepository();
-    roomId = await repository.createRectangular(
+    roomId = await repository.createFromWalls(
       1,
-      const RectangularRoomDraft(
-        room: RoomDraft(name: 'Sala', wallHeightMeters: 2.4),
-        widthMeters: 4,
-        lengthMeters: 3,
-      ),
+      const RoomDraft(name: 'Sala', wallHeightMeters: 2.4),
+      rectangleWalls(widthMeters: 4, lengthMeters: 3),
     );
   });
 
