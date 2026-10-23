@@ -25,6 +25,7 @@ abstract final class BudgetPdfBuilder {
     required Project project,
     required String scopeLabel,
     required List<Room> rooms,
+
     /// Dibujo del plano de cada habitación, por `id`. Las que no estén salen
     /// solo con sus medidas.
     required Map<int, Uint8List> roomPlans,
@@ -52,8 +53,7 @@ abstract final class BudgetPdfBuilder {
         build: (pw.Context context) => <pw.Widget>[
           if (rooms.isNotEmpty) ...<pw.Widget>[
             _title('Habitaciones'),
-            for (final Room room in rooms)
-              _roomBlock(room, roomPlans[room.id]),
+            for (final Room room in rooms) _roomBlock(room, roomPlans[room.id]),
             pw.SizedBox(height: 8),
           ],
           _title('Materiales calculados'),
@@ -220,7 +220,10 @@ abstract final class BudgetPdfBuilder {
                   ),
                 ),
                 pw.SizedBox(height: 5),
-                _fact('Área de piso', Formatters.squareMeters(plan.floorAreaM2)),
+                _fact(
+                  'Área de piso',
+                  Formatters.squareMeters(plan.floorAreaM2),
+                ),
                 _fact('Perímetro', Formatters.meters(plan.perimeterMeters)),
                 _fact('Altura', Formatters.meters(room.wallHeightMeters)),
                 _fact(

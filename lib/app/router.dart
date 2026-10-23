@@ -6,7 +6,7 @@ import '../features/budget/presentation/screens/budget_screen.dart';
 import '../features/materials/presentation/screens/materials_screen.dart';
 import '../features/projects/presentation/screens/project_detail_screen.dart';
 import '../features/projects/presentation/screens/projects_screen.dart';
-import '../features/room_scan/presentation/screens/room_scan_screen.dart';
+import '../features/room_scan/presentation/screens/scan_entry_screen.dart';
 import '../features/rooms/presentation/screens/room_editor_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
 
@@ -60,7 +60,7 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'scan',
                 builder: (BuildContext context, GoRouterState state) =>
-                    RoomScanScreen(projectId: _idOf(state, 'projectId')),
+                    ScanEntryScreen(projectId: _idOf(state, 'projectId')),
               ),
               GoRoute(
                 path: 'rooms/:roomId',

@@ -8,6 +8,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/plan_geometry.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/measuring/sighting_math.dart';
+import '../../../../core/measuring/view_projection.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
 import '../../../../core/widgets/number_prompt_dialog.dart';
@@ -120,6 +121,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
               relocating: relocating,
               snapped: snapped,
               closing: closing,
+              aimPoint: aimPoint,
             )
           : const _NoTurnSensor(),
     );
@@ -135,6 +137,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     required int? relocating,
     required int? snapped,
     required bool closing,
+    required Point2D? aimPoint,
   }) {
     return Stack(
       fit: StackFit.expand,
@@ -152,18 +155,32 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
                 children: [
                   const CameraViewfinder(),
                   ScanOverlay(
-                    session: _session,
-                    aim: aim,
-                    phoneHeightMeters: _phoneHeight,
+                    corners: _session.corners,
+                    project: (Point2D floor, Size viewport) {
+                      final ({double distance, double turn}) view = _session
+                          .viewOf(floor);
+                      final Point2D? screen =
+                          ViewProjection(
+                            widthPx: viewport.width,
+                            heightPx: viewport.height,
+                            aimTurnRadians: aim?.turnRadians ?? 0,
+                            aimPitchRadians: aim?.pitchRadians ?? 0,
+                            phoneHeightMeters: _phoneHeight,
+                            horizontalFovRadians: fieldOfView.horizontalFor(
+                              previewAspect,
+                            ),
+                          ).project(
+                            distanceMeters: view.distance,
+                            turnRadians: view.turn,
+                          );
+                      return screen == null ? null : Offset(screen.x, screen.y);
+                    },
                     // Mientras se calibra o se vuelve a situar, la línea
                     // viva estorba.
-                    liveDistanceMeters: relocating == null && !calibrating
-                        ? distance
+                    aimPoint: relocating == null && !calibrating
+                        ? aimPoint
                         : null,
                     snappedCorner: relocating ?? snapped,
-                    horizontalFovRadians: fieldOfView.horizontalFor(
-                      previewAspect,
-                    ),
                   ),
                   const ScanReticle(),
                 ],

@@ -19,7 +19,9 @@ android {
         applicationId = "com.blancotech.planova"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // ARCore pide Android 9 para arriba. El resto de la app funcionaría
+        // en teléfonos más viejos, pero no hay forma de separarlo.
+        minSdk = maxOf(flutter.minSdkVersion, 28)
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -46,4 +48,10 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Para preguntarle a ARCore si este teléfono lo soporta. La versión es
+    // la que arrastra el paquete de medición (sceneview 2.2.1).
+    implementation("com.google.ar:core:1.42.0")
 }

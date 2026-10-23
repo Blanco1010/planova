@@ -13,7 +13,6 @@ import '../../domain/entities/room.dart';
 import '../../domain/entities/room_plan.dart';
 import '../../domain/entities/room_wall.dart';
 
-
 /// Colores con los que se dibuja el plano.
 ///
 /// Está aparte porque el mismo dibujo se pinta en pantalla, donde los colores
@@ -112,9 +111,7 @@ Future<Uint8List?> renderFloorPlanPng({
     (size.width * pixelRatio).round(),
     (size.height * pixelRatio).round(),
   );
-  final ByteData? data = await image.toByteData(
-    format: ui.ImageByteFormat.png,
-  );
+  final ByteData? data = await image.toByteData(format: ui.ImageByteFormat.png);
   image.dispose();
   return data?.buffer.asUint8List();
 }
@@ -368,7 +365,9 @@ class _FloorPlanPainter extends CustomPainter {
       );
 
       final Paint markPaint = Paint()
-        ..color = opening.kind == OpeningKind.door ? palette.wall : palette.guide
+        ..color = opening.kind == OpeningKind.door
+            ? palette.wall
+            : palette.guide
         ..strokeWidth = 2
         ..style = PaintingStyle.stroke;
 

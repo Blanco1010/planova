@@ -10,6 +10,8 @@ import '../../data/services/sensors_orientation_tracker.dart';
 import '../../domain/entities/camera_field_of_view.dart';
 import '../../domain/entities/device_aim.dart';
 import '../../domain/services/orientation_tracker.dart';
+import '../services/ar_core_spatial_scanner.dart';
+import '../services/spatial_scanner.dart';
 
 /// Lector de orientación. En las pruebas se sustituye por uno de mentira.
 final Provider<OrientationTracker> orientationTrackerProvider =
@@ -86,3 +88,17 @@ final turnSensorProvider = FutureProvider<bool>((ref) async {
     return true;
   }
 });
+
+/// Si este teléfono tiene ARCore, que mide con la cámara y sigue los pasos.
+final arCoreProvider = FutureProvider<bool>((ref) async {
+  const MethodChannel channel = MethodChannel('planova/sensors');
+  try {
+    return await channel.invokeMethod<bool>('hasArCore') ?? false;
+  } catch (_) {
+    return false;
+  }
+});
+
+/// La cámara con seguimiento espacial. En pruebas se sustituye.
+final Provider<SpatialScanner> spatialScannerProvider =
+    Provider<SpatialScanner>((ref) => const ArCoreSpatialScanner());

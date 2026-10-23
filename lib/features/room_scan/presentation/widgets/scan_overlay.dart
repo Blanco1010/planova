@@ -4,53 +4,44 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/point2d.dart';
-import '../../../../core/measuring/view_projection.dart';
 import '../../../../core/utils/formatters.dart';
-import '../../domain/entities/device_aim.dart';
-import '../../domain/entities/scan_session.dart';
 
 /// Dibuja el plano encima de la imagen de la cámara.
 ///
-/// Las esquinas van en coordenadas de la habitación, así que se quedan
-/// pegadas a su sitio aunque se camine: lo que cambia al moverse es desde
-/// dónde se miran. Desde la última sale una línea viva que sigue a la mira
-/// hasta que se marca la siguiente.
+/// No sabe de dónde salen las medidas: recibe las esquinas en planta y una
+/// forma de llevarlas a la pantalla. Así sirve igual con los sensores del
+/// teléfono que con el seguimiento espacial de ARCore.
 class ScanOverlay extends StatelessWidget {
   const ScanOverlay({
-    required this.session,
-    required this.aim,
-    required this.phoneHeightMeters,
-    required this.liveDistanceMeters,
+    required this.corners,
+    required this.project,
+    required this.aimPoint,
     required this.snappedCorner,
-    required this.horizontalFovRadians,
     super.key,
   });
 
-  final ScanSession session;
-  final DeviceAim? aim;
-  final double phoneHeightMeters;
+  /// Esquinas marcadas, vistas desde arriba.
+  final List<Point2D> corners;
 
-  /// Distancia al punto al que se apunta ahora, si la hay.
-  final double? liveDistanceMeters;
+  /// Dónde cae en la pantalla un punto de la planta, dentro de un lienzo de
+  /// ese tamaño; `null` si no se ve.
+  final Offset? Function(Point2D floorPoint, Size viewport) project;
 
-  /// Esquina resaltada: la enganchada o la que se está usando para
-  /// volver a situarse.
+  /// Dónde apunta la mira ahora, en planta; `null` si no hay medida.
+  final Point2D? aimPoint;
+
+  /// Esquina resaltada: la enganchada o la que se usa para situarse.
   final int? snappedCorner;
-
-  /// Cuánto abarca a lo ancho la imagen que hay debajo.
-  final double horizontalFovRadians;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size.infinite,
       painter: _ScanOverlayPainter(
-        session: session,
-        aim: aim,
-        phoneHeightMeters: phoneHeightMeters,
-        liveDistanceMeters: liveDistanceMeters,
+        corners: corners,
+        project: project,
+        aimPoint: aimPoint,
         snappedCorner: snappedCorner,
-        horizontalFovRadians: horizontalFovRadians,
       ),
     );
   }
@@ -58,92 +49,67 @@ class ScanOverlay extends StatelessWidget {
 
 class _ScanOverlayPainter extends CustomPainter {
   _ScanOverlayPainter({
-    required this.session,
-    required this.aim,
-    required this.phoneHeightMeters,
-    required this.liveDistanceMeters,
+    required this.corners,
+    required this.project,
+    required this.aimPoint,
     required this.snappedCorner,
-    required this.horizontalFovRadians,
   });
 
-  final ScanSession session;
-  final DeviceAim? aim;
-  final double phoneHeightMeters;
-  final double? liveDistanceMeters;
+  final List<Point2D> corners;
+  final Offset? Function(Point2D floorPoint, Size viewport) project;
+  final Point2D? aimPoint;
   final int? snappedCorner;
-  final double horizontalFovRadians;
 
   /// El trazo oscuro de debajo: sin él las líneas se pierden sobre la imagen.
   static const Color _halo = Color(0xCC0F172A);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final DeviceAim? aim = this.aim;
-    if (aim == null || session.isEmpty) return;
+    if (corners.isEmpty) return;
 
-    final ViewProjection projection = ViewProjection(
-      widthPx: size.width,
-      heightPx: size.height,
-      aimTurnRadians: aim.turnRadians,
-      aimPitchRadians: aim.pitchRadians,
-      phoneHeightMeters: phoneHeightMeters,
-      horizontalFovRadians: horizontalFovRadians,
-    );
-
-    final List<Offset?> corners = <Offset?>[
-      for (final Point2D corner in session.corners)
-        _project(projection, corner),
+    final List<Offset?> screen = <Offset?>[
+      for (final Point2D corner in corners) project(corner, size),
     ];
 
-    for (int i = 0; i + 1 < corners.length; i++) {
+    for (int i = 0; i + 1 < screen.length; i++) {
       _wall(
         canvas,
-        corners[i],
-        corners[i + 1],
-        meters: session.corners[i].distanceTo(session.corners[i + 1]),
+        screen[i],
+        screen[i + 1],
+        meters: corners[i].distanceTo(corners[i + 1]),
         color: AppColors.lightBlue,
       );
     }
 
-    _paintLiveWall(canvas, size, corners, aim);
-    _paintCorners(canvas, corners);
+    _paintLiveWall(canvas, size, screen);
+    _paintCorners(canvas, screen);
   }
 
   /// La línea que va desde la última esquina hasta donde apunta la mira.
-  void _paintLiveWall(
-    Canvas canvas,
-    Size size,
-    List<Offset?> corners,
-    DeviceAim aim,
-  ) {
-    final double? distance = liveDistanceMeters;
-    final Offset? from = corners.last;
-    if (distance == null || from == null) return;
+  void _paintLiveWall(Canvas canvas, Size size, List<Offset?> screen) {
+    final Point2D? aim = aimPoint;
+    final Offset? from = screen.last;
+    if (aim == null || from == null) return;
 
-    final bool closing = snappedCorner == 0 && session.corners.length >= 3;
-    final Point2D endPoint = closing
-        ? session.corners.first
-        : session.aimPoint(
-            distanceMeters: distance,
-            turnRadians: aim.turnRadians,
-          );
+    final bool closing = snappedCorner == 0 && corners.length >= 3;
+    final Point2D endPoint = closing ? corners.first : aim;
     final Offset to = closing
-        ? (corners.first ?? Offset(size.width / 2, size.height / 2))
-        : Offset(size.width / 2, size.height / 2);
+        ? (screen.first ?? size.center(Offset.zero))
+        : size.center(Offset.zero);
 
     _wall(
       canvas,
       from,
       to,
-      meters: session.corners.last.distanceTo(endPoint),
+      meters: corners.last.distanceTo(endPoint),
       color: closing ? Colors.white : AppColors.primaryBlue,
       dashed: !closing,
     );
   }
 
-  void _paintCorners(Canvas canvas, List<Offset?> corners) {
-    for (int i = 0; i < corners.length; i++) {
-      final Offset? corner = corners[i];
+  void _paintCorners(Canvas canvas, List<Offset?> screen) {
+    for (int i = 0; i < screen.length; i++) {
+      final Offset? corner = screen[i];
       if (corner == null) continue;
 
       final bool highlighted = i == snappedCorner;
@@ -169,15 +135,6 @@ class _ScanOverlayPainter extends CustomPainter {
         background: AppColors.deepBlue,
       );
     }
-  }
-
-  Offset? _project(ViewProjection projection, Point2D corner) {
-    final ({double distance, double turn}) view = session.viewOf(corner);
-    final Point2D? point = projection.project(
-      distanceMeters: view.distance,
-      turnRadians: view.turn,
-    );
-    return point == null ? null : Offset(point.x, point.y);
   }
 
   void _wall(

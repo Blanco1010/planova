@@ -5,7 +5,9 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.os.SystemClock
 import android.util.SizeF
+import com.google.ar.core.ArCoreApk
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -32,6 +34,7 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "hasTurnSensor" -> result.success(hasTurnSensor())
+                    "hasArCore" -> result.success(hasArCore())
                     else -> result.notImplemented()
                 }
             }
@@ -87,6 +90,27 @@ class MainActivity : FlutterActivity() {
         return manager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR) != null ||
             manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null ||
             manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null
+    }
+
+    /**
+     * Si este teléfono puede usar ARCore, que es lo que mide de verdad con
+     * la cámara y sigue los pasos de quien mide.
+     *
+     * La primera consulta puede tardar un momento en resolverse, así que se
+     * espera un poco antes de darla por perdida.
+     */
+    private fun hasArCore(): Boolean {
+        return try {
+            val deadline = SystemClock.elapsedRealtime() + 1_500
+            var availability = ArCoreApk.getInstance().checkAvailability(this)
+            while (availability.isTransient && SystemClock.elapsedRealtime() < deadline) {
+                Thread.sleep(100)
+                availability = ArCoreApk.getInstance().checkAvailability(this)
+            }
+            availability.isSupported
+        } catch (error: Exception) {
+            false
+        }
     }
 
     companion object {
