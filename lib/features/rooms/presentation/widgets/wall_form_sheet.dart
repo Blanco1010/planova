@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../room_scan/presentation/providers/scan_providers.dart';
+import '../../../room_scan/presentation/screens/measure_distance_screen.dart';
 import '../../domain/entities/opening.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
@@ -112,6 +114,17 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                         validator: _validateTurn,
                       ),
                     ],
+                    if (ref.watch(arCoreProvider).value ?? false)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: _saving
+                              ? null
+                              : () => _measureWithCamera(wall),
+                          icon: const Icon(Icons.straighten),
+                          label: const Text('Volver a medir con la cámara'),
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     FilledButton(
                       onPressed: _saving ? null : () => _save(wall),
@@ -198,6 +211,17 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
     if (value == null || value.isNaN) return 'Escribe los grados';
     if (value <= -360 || value >= 360) return 'Entre -359 y 359';
     return null;
+  }
+
+  /// Mide la pared apuntando a sus dos extremos y trae el largo.
+  Future<void> _measureWithCamera(RoomWall wall) async {
+    final double? meters = await MeasureDistanceScreen.show(
+      context,
+      title: 'Medir ${wall.label.toLowerCase()}',
+    );
+    if (meters == null || !mounted) return;
+
+    setState(() => _length.text = Formatters.decimal(meters));
   }
 
   Future<void> _save(RoomWall wall) async {

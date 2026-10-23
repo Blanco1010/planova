@@ -91,6 +91,7 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
             alignment: Alignment.bottomCenter,
             child: _SpatialBar(
               corners: _corners.length,
+              walls: _wallLengths,
               closing: closing,
               onMark: hit == null || closing ? null : () => _mark(hit),
               onClose: closing ? _finish : null,
@@ -121,6 +122,12 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
   }
 
   void _undo() => setState(_corners.removeLast);
+
+  /// Lo que mide cada pared ya cerrada entre dos esquinas.
+  List<double> get _wallLengths => <double>[
+    for (int i = 0; i + 1 < _corners.length; i++)
+      _corners[i].distanceTo(_corners[i + 1]),
+  ];
 
   Future<void> _finish() async {
     final List<WallDraft> walls = PlanGeometry.chainFromVertices(_corners)
@@ -229,6 +236,7 @@ class _Readout extends StatelessWidget {
 class _SpatialBar extends StatelessWidget {
   const _SpatialBar({
     required this.corners,
+    required this.walls,
     required this.closing,
     required this.onMark,
     required this.onClose,
@@ -237,6 +245,10 @@ class _SpatialBar extends StatelessWidget {
   });
 
   final int corners;
+
+  /// Lo que mide cada pared hecha hasta ahora.
+  final List<double> walls;
+
   final bool closing;
   final VoidCallback? onMark;
   final VoidCallback? onClose;
@@ -261,6 +273,23 @@ class _SpatialBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (walls.isNotEmpty)
+                SizedBox(
+                  height: 36,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: walls.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    itemBuilder: (BuildContext context, int index) => Chip(
+                      backgroundColor: Colors.white24,
+                      side: BorderSide.none,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      label: Text(
+                        'Pared ${index + 1} · ${Formatters.meters(walls[index])}',
+                      ),
+                    ),
+                  ),
+                ),
               Row(
                 children: [
                   Expanded(

@@ -144,4 +144,24 @@ void main() {
 
     expect(find.text('0 esquinas'), findsOneWidget);
   });
+
+  testWidgets('cada pared medida se ve en la barra', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester);
+
+    await aimAt(tester, _room[0]);
+    await tester.tap(find.text('Marcar esquina'));
+    await tester.pumpAndSettle();
+    await aimAt(tester, _room[1]);
+    await tester.tap(find.text('Marcar esquina'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pared 1 · 4,00 m'), findsOneWidget);
+
+    // Y al deshacer, la pared desaparece con la esquina.
+    await tester.tap(find.byTooltip('Quitar la última'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pared 1 · 4,00 m'), findsNothing);
+  });
 }

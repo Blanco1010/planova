@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'point2d.dart';
 
 /// Un punto del mundo real, en metros, tal como lo entrega ARCore.
@@ -12,6 +14,14 @@ class Point3D {
 
   /// Lo que se ve desde arriba: la planta.
   Point2D get onFloor => Point2D(x, z);
+
+  /// Distancia en línea recta hasta otro punto, en metros.
+  double distanceTo(Point3D other) {
+    final double dx = x - other.x;
+    final double dy = y - other.y;
+    final double dz = z - other.z;
+    return math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
 
   @override
   bool operator ==(Object other) =>

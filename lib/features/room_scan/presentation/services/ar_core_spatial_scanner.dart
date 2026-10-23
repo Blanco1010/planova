@@ -1,3 +1,4 @@
+import 'package:ar_measure_flutter/datatypes/config_planedetection.dart';
 import 'package:ar_measure_flutter/managers/ar_anchor_manager.dart';
 import 'package:ar_measure_flutter/managers/ar_location_manager.dart';
 import 'package:ar_measure_flutter/managers/ar_object_manager.dart';
@@ -54,6 +55,12 @@ class _ArCoreViewState extends State<_ArCoreView> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return ARView(
+          // Suelo y paredes: hace falta el suelo para la planta y las
+          // paredes para medir alturas.
+          planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+          permissionPromptDescription:
+              'Planova necesita la cámara para medir la habitación.',
+          permissionPromptButtonText: 'Dar permiso',
           onARViewCreated: (
             ARSessionManager session,
             ARObjectManager objects,
@@ -73,6 +80,8 @@ class _ArCoreViewState extends State<_ArCoreView> {
     _session = session;
     session
       ..onInitialize(
+        // La manita que da vueltas no se quita nunca y estorba.
+        showAnimatedGuide: false,
         showFeaturePoints: false,
         showPlanes: true,
         handleTaps: false,
