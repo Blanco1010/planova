@@ -10,6 +10,7 @@ import '../../../../core/geometry/point3d.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/presentation/widgets/room_form_sheet.dart';
+import '../../domain/entities/scan_surface.dart';
 import '../../domain/entities/spatial_frame.dart';
 import '../../domain/services/scan_snap.dart';
 import '../providers/scan_providers.dart';
@@ -71,6 +72,7 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
         fit: StackFit.expand,
         children: [
           scanner.view(
+            surface: ScanSurface.floor,
             onFrame: (SpatialFrame? frame) {
               if (!mounted) return;
               setState(() => _frame = frame);

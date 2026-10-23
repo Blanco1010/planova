@@ -172,6 +172,9 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
               if (_isEditing)
                 TextButton(
                   onPressed: _saving ? null : _delete,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                   child: const Text('Eliminar vano'),
                 ),
             ],

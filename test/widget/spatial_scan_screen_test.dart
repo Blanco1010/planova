@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
 import 'package:planova/core/geometry/point3d.dart';
+import 'package:planova/features/room_scan/domain/entities/scan_surface.dart';
 import 'package:planova/features/room_scan/presentation/providers/scan_providers.dart';
 import 'package:planova/features/room_scan/presentation/screens/spatial_scan_screen.dart';
 import 'package:planova/features/rooms/domain/entities/room.dart';
@@ -163,5 +164,13 @@ void main() {
     await tester.tap(find.byTooltip('Quitar la última'));
     await tester.pumpAndSettle();
     expect(find.text('Pared 1 · 4,00 m'), findsNothing);
+  });
+
+  testWidgets('para el plano, la cámara mira al suelo', (
+    WidgetTester tester,
+  ) async {
+    await pumpScan(tester);
+
+    expect(scanner.lastSurface, ScanSurface.floor);
   });
 }

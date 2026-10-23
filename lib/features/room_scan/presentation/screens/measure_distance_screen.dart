@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/geometry/point3d.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../domain/entities/scan_surface.dart';
 import '../../domain/entities/spatial_frame.dart';
 import '../providers/scan_providers.dart';
 import '../services/spatial_scanner.dart';
@@ -15,18 +16,30 @@ import '../widgets/camera_viewfinder.dart';
 /// Sirve para rehacer una pared que salió mal sin escanear la habitación
 /// entera: se marca un extremo, se apunta al otro y ya está.
 class MeasureDistanceScreen extends ConsumerStatefulWidget {
-  const MeasureDistanceScreen({required this.title, super.key});
+  const MeasureDistanceScreen({
+    required this.title,
+    this.surface = ScanSurface.wall,
+    super.key,
+  });
 
   /// Abre la pantalla y devuelve los metros medidos, o `null` si se cancela.
-  static Future<double?> show(BuildContext context, {required String title}) {
+  static Future<double?> show(
+    BuildContext context, {
+    required String title,
+    ScanSurface surface = ScanSurface.wall,
+  }) {
     return Navigator.of(context).push<double>(
       MaterialPageRoute<double>(
-        builder: (BuildContext context) => MeasureDistanceScreen(title: title),
+        builder: (BuildContext context) =>
+            MeasureDistanceScreen(title: title, surface: surface),
       ),
     );
   }
 
   final String title;
+
+  /// Qué mira la cámara mientras se mide.
+  final ScanSurface surface;
 
   @override
   ConsumerState<MeasureDistanceScreen> createState() =>
@@ -58,6 +71,7 @@ class _MeasureDistanceScreenState extends ConsumerState<MeasureDistanceScreen> {
         fit: StackFit.expand,
         children: [
           scanner.view(
+            surface: widget.surface,
             onFrame: (SpatialFrame? frame) {
               if (!mounted) return;
               setState(() => _frame = frame);

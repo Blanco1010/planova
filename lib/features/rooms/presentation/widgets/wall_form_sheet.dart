@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../room_scan/presentation/providers/scan_providers.dart';
 import '../../../room_scan/presentation/screens/measure_distance_screen.dart';
 import '../../domain/entities/opening.dart';
@@ -245,27 +246,15 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
 
   Future<void> _deleteWall(RoomWall wall) async {
     final NavigatorState navigator = Navigator.of(context);
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Text('Eliminar ${wall.label.toLowerCase()}'),
-        content: const Text(
-          'Se borra la pared con sus puertas y ventanas, y el plano se vuelve '
-          'a trazar con las que queden.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
+    final bool confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Eliminar ${wall.label.toLowerCase()}',
+      message:
+          'Se borra la pared con sus puertas y ventanas, y el plano se '
+          'vuelve a trazar con las que queden.',
     );
-    if (confirmed != true) return;
+
+    if (!confirmed) return;
 
     setState(() => _saving = true);
     await ref.read(roomRepositoryProvider).deleteWall(wall.id);

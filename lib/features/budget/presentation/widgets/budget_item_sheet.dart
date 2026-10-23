@@ -172,6 +172,9 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
               if (_isEditing)
                 TextButton(
                   onPressed: _saving ? null : _delete,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                   child: const Text('Eliminar partida'),
                 ),
             ],

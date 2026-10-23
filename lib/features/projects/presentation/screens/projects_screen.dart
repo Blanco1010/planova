@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../domain/entities/project.dart';
 import '../providers/project_providers.dart';
 import '../widgets/project_card.dart';
@@ -80,28 +81,15 @@ class _ProjectList extends ConsumerWidget {
     WidgetRef ref,
     Project project,
   ) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Eliminar proyecto'),
-        content: Text(
+    final bool confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Eliminar proyecto',
+      message:
           'Se borrará «${project.name}» y todo lo que guardes dentro. '
           'Esto no se puede deshacer.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
     );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
     await ref.read(projectRepositoryProvider).delete(project.id);
   }
 }

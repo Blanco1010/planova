@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../domain/entities/scan_surface.dart';
 import '../../domain/entities/spatial_frame.dart';
 
 /// La cámara con seguimiento espacial.
@@ -9,5 +10,10 @@ import '../../domain/entities/spatial_frame.dart';
 /// las pruebas ni en los emuladores.
 abstract interface class SpatialScanner {
   /// La vista de cámara. Llama a [onFrame] con cada fotograma.
-  Widget view({required ValueChanged<SpatialFrame?> onFrame});
+  ///
+  /// [surface] le dice al aparato qué buscar: el suelo o las paredes.
+  Widget view({
+    required ValueChanged<SpatialFrame?> onFrame,
+    required ScanSurface surface,
+  });
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
@@ -158,27 +159,14 @@ class ProjectDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Room room,
   ) async {
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Eliminar habitación'),
-        content: Text(
+    final bool confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Eliminar habitación',
+      message:
           'Se borrará «${room.name}» con su plano, sus paredes y sus vanos.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
     );
 
-    if (confirmed != true) return;
+    if (!confirmed) return;
     await ref.read(roomRepositoryProvider).delete(room.id);
   }
 }

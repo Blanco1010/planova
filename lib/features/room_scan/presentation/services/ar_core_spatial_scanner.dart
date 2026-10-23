@@ -11,6 +11,7 @@ import 'package:vector_math/vector_math_64.dart' as vm;
 
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/geometry/point3d.dart';
+import '../../domain/entities/scan_surface.dart';
 import '../../domain/entities/spatial_frame.dart';
 import 'spatial_scanner.dart';
 
@@ -26,15 +27,27 @@ class ArCoreSpatialScanner implements SpatialScanner {
   static const int _samplesPerSecond = 20;
 
   @override
-  Widget view({required ValueChanged<SpatialFrame?> onFrame}) {
-    return _ArCoreView(onFrame: onFrame, samplesPerSecond: _samplesPerSecond);
+  Widget view({
+    required ValueChanged<SpatialFrame?> onFrame,
+    required ScanSurface surface,
+  }) {
+    return _ArCoreView(
+      onFrame: onFrame,
+      surface: surface,
+      samplesPerSecond: _samplesPerSecond,
+    );
   }
 }
 
 class _ArCoreView extends StatefulWidget {
-  const _ArCoreView({required this.onFrame, required this.samplesPerSecond});
+  const _ArCoreView({
+    required this.onFrame,
+    required this.surface,
+    required this.samplesPerSecond,
+  });
 
   final ValueChanged<SpatialFrame?> onFrame;
+  final ScanSurface surface;
   final int samplesPerSecond;
 
   @override
@@ -55,9 +68,12 @@ class _ArCoreViewState extends State<_ArCoreView> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return ARView(
-          // Suelo y paredes: hace falta el suelo para la planta y las
-          // paredes para medir alturas.
-          planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
+          // Se le dice qué buscar: con las dos cosas a la vez tarda más y
+          // engancha la que no toca.
+          planeDetectionConfig: switch (widget.surface) {
+            ScanSurface.floor => PlaneDetectionConfig.horizontal,
+            ScanSurface.wall => PlaneDetectionConfig.vertical,
+          },
           permissionPromptDescription:
               'Planova necesita la cámara para medir la habitación.',
           permissionPromptButtonText: 'Dar permiso',
