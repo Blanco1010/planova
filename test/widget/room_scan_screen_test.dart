@@ -59,9 +59,8 @@ void main() {
         ),
         GoRoute(
           path: '/projects/1/rooms/:roomId',
-          builder: (BuildContext context, GoRouterState state) => Scaffold(
-            body: Text('editor ${state.pathParameters['roomId']}'),
-          ),
+          builder: (BuildContext context, GoRouterState state) =>
+              Scaffold(body: Text('editor ${state.pathParameters['roomId']}')),
         ),
       ],
     );
@@ -74,10 +73,7 @@ void main() {
           settingsRepositoryProvider.overrideWithValue(settings),
           cameraControllerProvider.overrideWith((ref) async => null),
         ],
-        child: MaterialApp.router(
-          theme: AppTheme.light,
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
       ),
     );
     await tester.pumpAndSettle();
@@ -119,9 +115,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await pumpScan(tester);
-    tracker.emit(
-      DeviceAim(pitchRadians: 3 * math.pi / 180, turnRadians: 0),
-    );
+    tracker.emit(DeviceAim(pitchRadians: 3 * math.pi / 180, turnRadians: 0));
     await tester.pumpAndSettle();
 
     expect(find.text('Apunta más abajo, al pie de la pared'), findsOneWidget);
@@ -148,10 +142,12 @@ void main() {
     final List<Room> saved = await rooms.watchByProject(1).first;
     expect(saved.length, 1);
     expect(saved.first.name, 'Sala medida');
-    expect(
-      saved.first.walls.map((wall) => wall.lengthMeters),
-      [closeTo(4, 0.01), closeTo(3, 0.01), closeTo(4, 0.01), closeTo(3, 0.01)],
-    );
+    expect(saved.first.walls.map((wall) => wall.lengthMeters), [
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+      closeTo(4, 0.01),
+      closeTo(3, 0.01),
+    ]);
     // Y se abre el plano de lo escaneado para corregirlo.
     expect(find.text('editor 1'), findsOneWidget);
   });

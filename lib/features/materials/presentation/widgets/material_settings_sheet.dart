@@ -44,8 +44,7 @@ class MaterialSettingsSheet extends ConsumerStatefulWidget {
       _MaterialSettingsSheetState();
 }
 
-class _MaterialSettingsSheetState
-    extends ConsumerState<MaterialSettingsSheet> {
+class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, TextEditingController> _fields =
       <String, TextEditingController>{};
@@ -116,12 +115,24 @@ class _MaterialSettingsSheetState
                 ),
                 const SizedBox(height: 20),
                 _Section(title: 'Mampostería'),
-                _pair('blockLength', 'Largo del bloque (cm)', 'blockHeight',
-                    'Alto del bloque (cm)'),
-                _pair('joint', 'Junta de pega (cm)', 'wallThickness',
-                    'Espesor del muro (cm)'),
-                _pair('masonryWaste', 'Desperdicio (%)', 'cementBags',
-                    'Bultos de cemento por m³'),
+                _pair(
+                  'blockLength',
+                  'Largo del bloque (cm)',
+                  'blockHeight',
+                  'Alto del bloque (cm)',
+                ),
+                _pair(
+                  'joint',
+                  'Junta de pega (cm)',
+                  'wallThickness',
+                  'Espesor del muro (cm)',
+                ),
+                _pair(
+                  'masonryWaste',
+                  'Desperdicio (%)',
+                  'cementBags',
+                  'Bultos de cemento por m³',
+                ),
                 _field('sand', 'Arena por m³ de mortero (m³)'),
                 const SizedBox(height: 20),
                 _Section(title: 'Pintura'),
@@ -136,10 +147,18 @@ class _MaterialSettingsSheetState
                 ),
                 const SizedBox(height: 12),
                 _Section(title: 'Piso'),
-                _pair('tileLength', 'Largo de la baldosa (cm)', 'tileWidth',
-                    'Ancho de la baldosa (cm)'),
-                _pair('floorWaste', 'Desperdicio (%)', 'adhesive',
-                    'Pegante (kg por m²)'),
+                _pair(
+                  'tileLength',
+                  'Largo de la baldosa (cm)',
+                  'tileWidth',
+                  'Ancho de la baldosa (cm)',
+                ),
+                _pair(
+                  'floorWaste',
+                  'Desperdicio (%)',
+                  'adhesive',
+                  'Pegante (kg por m²)',
+                ),
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: _saving ? null : _save,

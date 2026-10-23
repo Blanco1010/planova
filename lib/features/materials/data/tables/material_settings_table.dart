@@ -9,9 +9,11 @@ class ProjectMaterialSettings extends Table {
   IntColumn get projectId =>
       integer().references(Projects, #id, onDelete: KeyAction.cascade)();
 
-  RealColumn get blockLengthMeters => real().withDefault(const Constant(0.39))();
+  RealColumn get blockLengthMeters =>
+      real().withDefault(const Constant(0.39))();
 
-  RealColumn get blockHeightMeters => real().withDefault(const Constant(0.19))();
+  RealColumn get blockHeightMeters =>
+      real().withDefault(const Constant(0.19))();
 
   RealColumn get jointMeters => real().withDefault(const Constant(0.015))();
 

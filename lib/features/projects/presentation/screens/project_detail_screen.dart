@@ -72,8 +72,17 @@ class ProjectDetailScreen extends ConsumerWidget {
                   'Bloques, mortero, pintura y piso con tus rendimientos',
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () =>
-                    context.push(AppRoutes.materialsPath(projectId)),
+                onTap: () => context.push(AppRoutes.materialsPath(projectId)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.request_quote_outlined),
+                title: const Text('Presupuesto'),
+                subtitle: const Text('Precios, mano de obra y costo por m²'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push(AppRoutes.budgetPath(projectId)),
               ),
             ),
             const SizedBox(height: 20),

@@ -2,6 +2,9 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/budget/data/tables/budget_tables.dart';
+import '../../features/budget/domain/entities/budget_item.dart';
+import '../../features/budget/domain/entities/material_kind.dart';
 import '../../features/materials/data/tables/material_settings_table.dart';
 import '../../features/projects/data/tables/projects_table.dart';
 import '../../features/rooms/data/tables/room_openings_table.dart';
@@ -21,6 +24,8 @@ part 'app_database.g.dart';
     RoomWalls,
     RoomOpenings,
     ProjectMaterialSettings,
+    MaterialPrices,
+    BudgetItems,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -32,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
   static const String _fileName = 'planova';
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -44,6 +49,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await m.createTable(projectMaterialSettings);
+      }
+      if (from < 4) {
+        await m.createTable(materialPrices);
+        await m.createTable(budgetItems);
       }
     },
     beforeOpen: (OpeningDetails details) async {

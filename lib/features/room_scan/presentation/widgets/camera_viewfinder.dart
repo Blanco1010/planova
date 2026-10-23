@@ -29,7 +29,8 @@ class CameraViewfinder extends ConsumerWidget {
                 _Unavailable(message: _messageFor(error)),
             data: (CameraController? controller) => controller == null
                 ? const _Unavailable(
-                    message: 'Este aparato no tiene cámara. Puedes medir igual '
+                    message:
+                        'Este aparato no tiene cámara. Puedes medir igual '
                         'apuntando con el teléfono.',
                   )
                 : FittedBox(
@@ -122,9 +123,8 @@ class _Unavailable extends StatelessWidget {
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.mutedDark),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: AppColors.mutedDark),
         ),
       ),
     );

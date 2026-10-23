@@ -19,10 +19,7 @@ abstract final class MaterialCalculator {
         params: settings.masonry,
       ),
       paint: paint(surfaces: surfaces, params: settings.paint),
-      floor: floor(
-        floorAreaM2: surfaces.floorAreaM2,
-        params: settings.floor,
-      ),
+      floor: floor(floorAreaM2: surfaces.floorAreaM2, params: settings.floor),
     );
   }
 
@@ -97,8 +94,7 @@ abstract final class MaterialCalculator {
     required double floorAreaM2,
     required FloorParams params,
   }) {
-    final double tileArea =
-        params.tileLengthMeters * params.tileWidthMeters;
+    final double tileArea = params.tileLengthMeters * params.tileWidthMeters;
     if (floorAreaM2 <= 0 || tileArea <= 0) {
       return const FloorEstimate(
         areaM2: 0,

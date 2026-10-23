@@ -28,8 +28,7 @@ class DriftMaterialSettingsRepository implements MaterialSettingsRepository {
             jointMeters: settings.masonry.jointMeters,
             wallThicknessMeters: settings.masonry.wallThicknessMeters,
             masonryWastePercent: settings.masonry.wastePercent,
-            cementBagsPerCubicMeter:
-                settings.masonry.cementBagsPerCubicMeter,
+            cementBagsPerCubicMeter: settings.masonry.cementBagsPerCubicMeter,
             sandCubicMetersPerCubicMeter:
                 settings.masonry.sandCubicMetersPerCubicMeter,
             paintCoats: settings.paint.coats,
@@ -68,8 +67,7 @@ class DriftMaterialSettingsRepository implements MaterialSettingsRepository {
         tileLengthMeters: row.tileLengthMeters,
         tileWidthMeters: row.tileWidthMeters,
         wastePercent: row.floorWastePercent,
-        adhesiveKilogramsPerSquareMeter:
-            row.adhesiveKilogramsPerSquareMeter,
+        adhesiveKilogramsPerSquareMeter: row.adhesiveKilogramsPerSquareMeter,
       ),
     );
   }

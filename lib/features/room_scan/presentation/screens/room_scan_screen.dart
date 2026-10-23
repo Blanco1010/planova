@@ -8,6 +8,7 @@ import '../../../../core/geometry/point2d.dart';
 import '../../../../core/measuring/sighting_math.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../../core/widgets/number_prompt_dialog.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
@@ -101,47 +102,16 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
   void _undo() => setState(_sightings.removeLast);
 
   Future<void> _editHeight(double current) async {
-    final TextEditingController controller = TextEditingController(
-      text: Formatters.decimal(current),
+    final double? height = await NumberPromptDialog.show(
+      context,
+      title: 'Altura del teléfono',
+      label: 'Metros desde el suelo',
+      helperText: 'A la altura del pecho suele ser 1,40 o 1,50 m',
+      initialText: Formatters.decimal(current),
+      validator: (String? value) =>
+          MeasureInput.validate(value, min: 0.3, max: 2.5),
+      parse: MeasureInput.parse,
     );
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-    final double? height = await showDialog<double>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Altura del teléfono'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              labelText: 'Metros desde el suelo',
-              helperText: 'A la altura del pecho suele ser 1,40 o 1,50 m',
-            ),
-            validator: (String? value) =>
-                MeasureInput.validate(value, min: 0.3, max: 2.5),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (!(formKey.currentState?.validate() ?? false)) return;
-              Navigator.of(
-                dialogContext,
-              ).pop(MeasureInput.parse(controller.text));
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
-    controller.dispose();
 
     if (height == null || !mounted) return;
     await ref.read(settingsRepositoryProvider).savePhoneHeight(height);
@@ -237,10 +207,14 @@ class _Readout extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Text(
               text,
-              style: (distance == null
-                      ? theme.textTheme.bodyMedium
-                      : theme.textTheme.headlineSmall)
-                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+              style:
+                  (distance == null
+                          ? theme.textTheme.bodyMedium
+                          : theme.textTheme.headlineSmall)
+                      ?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
             ),
           ),
         ),

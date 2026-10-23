@@ -28,6 +28,14 @@ abstract final class Formatters {
   /// Cantidad de piezas: `1.250`.
   static String units(int value) => _whole.format(value);
 
+  /// Cantidad que puede o no llevar decimales: `425`, `2,35`.
+  static String quantity(double value) => value == value.roundToDouble()
+      ? _whole.format(value)
+      : _twoDecimals.format(value);
+
+  /// Dinero en pesos, sin centavos: `$ 1.250.000`.
+  static String money(double value) => r'$ ' + _whole.format(value.round());
+
   /// Volumen: `0,135 m³`.
   static String cubicMeters(double value) =>
       '${_threeDecimals.format(value)} m³';
@@ -36,8 +44,7 @@ abstract final class Formatters {
   static String liters(double value) => '${_twoDecimals.format(value)} L';
 
   /// Peso: `66,00 kg`.
-  static String kilograms(double value) =>
-      '${_twoDecimals.format(value)} kg';
+  static String kilograms(double value) => '${_twoDecimals.format(value)} kg';
 
   /// Ángulo: `90°`, `-45,5°`.
   static String degrees(double value) => '${_upToTwoDecimals.format(value)}°';

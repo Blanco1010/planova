@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/budget/presentation/screens/budget_screen.dart';
 import '../features/materials/presentation/screens/materials_screen.dart';
 import '../features/projects/presentation/screens/project_detail_screen.dart';
 import '../features/projects/presentation/screens/projects_screen.dart';
@@ -27,6 +28,9 @@ abstract final class AppRoutes {
   /// Materiales del proyecto: `/projects/7/materials`.
   static String materialsPath(int projectId) =>
       '${projectPath(projectId)}/materials';
+
+  /// Presupuesto del proyecto: `/projects/7/budget`.
+  static String budgetPath(int projectId) => '${projectPath(projectId)}/budget';
 }
 
 final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
@@ -43,6 +47,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             builder: (BuildContext context, GoRouterState state) =>
                 ProjectDetailScreen(projectId: _idOf(state, 'projectId')),
             routes: <RouteBase>[
+              GoRoute(
+                path: 'budget',
+                builder: (BuildContext context, GoRouterState state) =>
+                    BudgetScreen(projectId: _idOf(state, 'projectId')),
+              ),
               GoRoute(
                 path: 'materials',
                 builder: (BuildContext context, GoRouterState state) =>

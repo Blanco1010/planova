@@ -31,49 +31,47 @@ class SensorsOrientationTracker implements OrientationTracker {
     controller = StreamController<DeviceAim>(
       onListen: () {
         accelerometer =
-            accelerometerEventStream(
-              samplingPeriod: SensorInterval.uiInterval,
-            ).listen((AccelerometerEvent event) {
-              lastAccelerometer = event;
-              final double? pitch = SightingMath.pitchRadians(
-                event.x,
-                event.y,
-                event.z,
-              );
-              if (pitch == null) return;
+            accelerometerEventStream(samplingPeriod: SensorInterval.uiInterval)
+                .listen((AccelerometerEvent event) {
+                  lastAccelerometer = event;
+                  final double? pitch = SightingMath.pitchRadians(
+                    event.x,
+                    event.y,
+                    event.z,
+                  );
+                  if (pitch == null) return;
 
-              smoothedPitch = smoothedPitch == null
-                  ? pitch
-                  : smoothedPitch! * (1 - _smoothing) + pitch * _smoothing;
-              controller.add(
-                DeviceAim(pitchRadians: smoothedPitch!, turnRadians: turn),
-              );
-            });
+                  smoothedPitch = smoothedPitch == null
+                      ? pitch
+                      : smoothedPitch! * (1 - _smoothing) + pitch * _smoothing;
+                  controller.add(
+                    DeviceAim(pitchRadians: smoothedPitch!, turnRadians: turn),
+                  );
+                });
 
         gyroscope =
-            gyroscopeEventStream(
-              samplingPeriod: SensorInterval.gameInterval,
-            ).listen((GyroscopeEvent event) {
-              final AccelerometerEvent? reference = lastAccelerometer;
-              final DateTime? previous = lastGyroscopeAt;
-              lastGyroscopeAt = event.timestamp;
-              if (reference == null || previous == null) return;
+            gyroscopeEventStream(samplingPeriod: SensorInterval.gameInterval)
+                .listen((GyroscopeEvent event) {
+                  final AccelerometerEvent? reference = lastAccelerometer;
+                  final DateTime? previous = lastGyroscopeAt;
+                  lastGyroscopeAt = event.timestamp;
+                  if (reference == null || previous == null) return;
 
-              final double seconds =
-                  event.timestamp.difference(previous).inMicroseconds / 1e6;
-              if (seconds <= 0 || seconds > _maxStepSeconds) return;
+                  final double seconds =
+                      event.timestamp.difference(previous).inMicroseconds / 1e6;
+                  if (seconds <= 0 || seconds > _maxStepSeconds) return;
 
-              turn +=
-                  SightingMath.turnRateToTheRight(
-                    gx: event.x,
-                    gy: event.y,
-                    gz: event.z,
-                    ax: reference.x,
-                    ay: reference.y,
-                    az: reference.z,
-                  ) *
-                  seconds;
-            });
+                  turn +=
+                      SightingMath.turnRateToTheRight(
+                        gx: event.x,
+                        gy: event.y,
+                        gz: event.z,
+                        ax: reference.x,
+                        ay: reference.y,
+                        az: reference.z,
+                      ) *
+                      seconds;
+                });
       },
       onCancel: () async {
         await accelerometer?.cancel();

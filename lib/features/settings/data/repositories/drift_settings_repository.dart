@@ -16,7 +16,8 @@ class DriftSettingsRepository implements SettingsRepository {
       _watch(_themeModeKey).map(AppThemeMode.fromStorage);
 
   @override
-  Future<void> saveThemeMode(AppThemeMode mode) => _save(_themeModeKey, mode.name);
+  Future<void> saveThemeMode(AppThemeMode mode) =>
+      _save(_themeModeKey, mode.name);
 
   @override
   Stream<double> watchPhoneHeight() => _watch(_phoneHeightKey).map(

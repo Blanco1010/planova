@@ -3,10 +3,7 @@ import '../../../rooms/domain/entities/room_plan.dart';
 
 /// Superficies de las que salen los materiales.
 class SurfaceTotals {
-  const SurfaceTotals({
-    required this.netWallAreaM2,
-    required this.floorAreaM2,
-  });
+  const SurfaceTotals({required this.netWallAreaM2, required this.floorAreaM2});
 
   /// Suma lo que miden las habitaciones que se le pasen.
   factory SurfaceTotals.ofRooms(Iterable<Room> rooms) {
@@ -17,10 +14,7 @@ class SurfaceTotals {
       netWallArea += plan.netWallAreaM2;
       floorArea += plan.floorAreaM2;
     }
-    return SurfaceTotals(
-      netWallAreaM2: netWallArea,
-      floorAreaM2: floorArea,
-    );
+    return SurfaceTotals(netWallAreaM2: netWallArea, floorAreaM2: floorArea);
   }
 
   static const SurfaceTotals empty = SurfaceTotals(

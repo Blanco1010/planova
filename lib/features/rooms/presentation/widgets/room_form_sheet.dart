@@ -165,7 +165,9 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(_isEditing ? 'Guardar cambios' : 'Crear habitación'),
+                child: Text(
+                  _isEditing ? 'Guardar cambios' : 'Crear habitación',
+                ),
               ),
             ],
           ),

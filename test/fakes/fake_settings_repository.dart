@@ -19,7 +19,8 @@ class FakeSettingsRepository implements SettingsRepository {
   void dispose() => _heights.close();
 
   @override
-  Stream<AppThemeMode> watchThemeMode() => Stream<AppThemeMode>.value(themeMode);
+  Stream<AppThemeMode> watchThemeMode() =>
+      Stream<AppThemeMode>.value(themeMode);
 
   @override
   Future<void> saveThemeMode(AppThemeMode mode) async {}

@@ -12,10 +12,7 @@ void main() {
     });
 
     test('el teléfono tumbado mira al suelo, 90 grados', () {
-      expect(
-        SightingMath.pitchRadians(0, 0, _g),
-        closeTo(math.pi / 2, 1e-6),
-      );
+      expect(SightingMath.pitchRadians(0, 0, _g), closeTo(math.pi / 2, 1e-6));
     });
 
     test('a media inclinación da 45 grados', () {
@@ -85,19 +82,22 @@ void main() {
   });
 
   group('turnRateToTheRight', () {
-    test('con el teléfono de pie, girar a la derecha da velocidad positiva', () {
-      expect(
-        SightingMath.turnRateToTheRight(
-          gx: 0,
-          gy: -1,
-          gz: 0,
-          ax: 0,
-          ay: _g,
-          az: 0,
-        ),
-        closeTo(1, 1e-9),
-      );
-    });
+    test(
+      'con el teléfono de pie, girar a la derecha da velocidad positiva',
+      () {
+        expect(
+          SightingMath.turnRateToTheRight(
+            gx: 0,
+            gy: -1,
+            gz: 0,
+            ax: 0,
+            ay: _g,
+            az: 0,
+          ),
+          closeTo(1, 1e-9),
+        );
+      },
+    );
 
     test('con el teléfono inclinado se proyecta sobre la vertical', () {
       expect(
@@ -130,10 +130,7 @@ void main() {
 
   group('floorPoint', () {
     test('sin giro, la esquina queda de frente', () {
-      final point = SightingMath.floorPoint(
-        distanceMeters: 2,
-        turnRadians: 0,
-      );
+      final point = SightingMath.floorPoint(distanceMeters: 2, turnRadians: 0);
       expect(point.x, closeTo(2, 1e-9));
       expect(point.y, closeTo(0, 1e-9));
     });

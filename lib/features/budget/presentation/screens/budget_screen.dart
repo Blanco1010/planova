@@ -1,0 +1,404 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/money_input.dart';
+import '../../../../core/widgets/number_prompt_dialog.dart';
+import '../../../materials/domain/entities/material_estimates.dart';
+import '../../../materials/domain/entities/material_settings.dart';
+import '../../../materials/domain/services/material_calculator.dart';
+import '../../../materials/presentation/providers/material_providers.dart';
+import '../../../rooms/domain/entities/room.dart';
+import '../../../rooms/presentation/providers/room_providers.dart';
+import '../../domain/entities/budget_item.dart';
+import '../../domain/entities/budget_summary.dart';
+import '../../domain/entities/material_kind.dart';
+import '../../domain/services/budget_calculator.dart';
+import '../providers/budget_providers.dart';
+import '../widgets/budget_item_sheet.dart';
+
+/// Presupuesto de la obra: precio a lo calculado, más lo que se escribe.
+class BudgetScreen extends ConsumerStatefulWidget {
+  const BudgetScreen({required this.projectId, super.key});
+
+  final int projectId;
+
+  @override
+  ConsumerState<BudgetScreen> createState() => _BudgetScreenState();
+}
+
+class _BudgetScreenState extends ConsumerState<BudgetScreen> {
+  /// `null` es el proyecto entero.
+  int? _roomId;
+
+  @override
+  Widget build(BuildContext context) {
+    final int projectId = widget.projectId;
+    final List<Room> rooms =
+        ref.watch(projectRoomsProvider(projectId)).value ?? const <Room>[];
+    final MaterialSettings settings =
+        ref.watch(materialSettingsProvider(projectId)).value ??
+        MaterialSettings.defaults;
+    final Map<MaterialKind, double> prices =
+        ref.watch(materialPricesProvider(projectId)).value ??
+        const <MaterialKind, double>{};
+    final List<BudgetItem> allItems =
+        ref.watch(budgetItemsProvider(projectId)).value ?? const <BudgetItem>[];
+
+    final Iterable<Room> scopedRooms = _roomId == null
+        ? rooms
+        : rooms.where((Room room) => room.id == _roomId);
+    final List<BudgetItem> items = _roomId == null
+        ? allItems
+        : allItems
+              .where((BudgetItem item) => item.roomId == _roomId)
+              .toList(growable: false);
+
+    final SurfaceTotals surfaces = SurfaceTotals.ofRooms(scopedRooms);
+    final MaterialEstimates estimates = MaterialCalculator.estimate(
+      surfaces: surfaces,
+      settings: settings,
+    );
+    final List<MaterialLine> lines = BudgetCalculator.materialLines(
+      estimates: estimates,
+      prices: prices,
+    );
+    final BudgetSummary summary = BudgetCalculator.summarize(
+      materialLines: lines,
+      items: items,
+      floorAreaM2: surfaces.floorAreaM2,
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Presupuesto')),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+        children: [
+          if (rooms.isNotEmpty) ...[
+            _RoomPicker(
+              rooms: rooms,
+              selectedId: _roomId,
+              onChanged: (int? id) => setState(() => _roomId = id),
+            ),
+            const SizedBox(height: 16),
+          ],
+          _MaterialsCard(
+            lines: lines,
+            onTapLine: (MaterialLine line) => _editPrice(line),
+          ),
+          const SizedBox(height: 12),
+          _ItemsCard(
+            items: items,
+            onAdd: () => BudgetItemSheet.show(
+              context,
+              projectId: projectId,
+              roomId: _roomId,
+            ),
+            onTapItem: (BudgetItem item) => BudgetItemSheet.show(
+              context,
+              projectId: projectId,
+              roomId: _roomId,
+              item: item,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _SummaryCard(summary: summary),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editPrice(MaterialLine line) async {
+    final double? price = await NumberPromptDialog.show(
+      context,
+      title: 'Precio de ${line.kind.label.toLowerCase()}',
+      label: 'Precio por ${line.kind.unit}',
+      prefixText: r'$ ',
+      initialText: line.hasPrice ? line.unitPrice.round().toString() : null,
+      validator: MoneyInput.validate,
+      parse: MoneyInput.parse,
+    );
+
+    if (price == null || !mounted) return;
+    await ref
+        .read(budgetRepositoryProvider)
+        .savePrice(widget.projectId, line.kind, price);
+  }
+}
+
+class _RoomPicker extends StatelessWidget {
+  const _RoomPicker({
+    required this.rooms,
+    required this.selectedId,
+    required this.onChanged,
+  });
+
+  final List<Room> rooms;
+  final int? selectedId;
+  final ValueChanged<int?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          ChoiceChip(
+            label: const Text('Todo el proyecto'),
+            selected: selectedId == null,
+            onSelected: (_) => onChanged(null),
+          ),
+          for (final Room room in rooms) ...[
+            const SizedBox(width: 8),
+            ChoiceChip(
+              label: Text(room.name),
+              selected: selectedId == room.id,
+              onSelected: (_) => onChanged(room.id),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MaterialsCard extends StatelessWidget {
+  const _MaterialsCard({required this.lines, required this.onTapLine});
+
+  final List<MaterialLine> lines;
+  final ValueChanged<MaterialLine> onTapLine;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Materiales calculados', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(
+              'Las cantidades vienen del plano; tú pones el precio.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (lines.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'Todavía no hay habitaciones medidas.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            for (final MaterialLine line in lines)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(line.kind.label),
+                subtitle: Text(
+                  line.hasPrice
+                      ? '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
+                            ' × ${Formatters.money(line.unitPrice)}'
+                      : '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
+                            ' · toca para ponerle precio',
+                ),
+                trailing: Text(
+                  line.hasPrice ? Formatters.money(line.subtotal) : '—',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: line.hasPrice
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                onTap: () => onTapLine(line),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ItemsCard extends StatelessWidget {
+  const _ItemsCard({
+    required this.items,
+    required this.onAdd,
+    required this.onTapItem,
+  });
+
+  final List<BudgetItem> items;
+  final VoidCallback onAdd;
+  final ValueChanged<BudgetItem> onTapItem;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Otras partidas',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Añadir'),
+                ),
+              ],
+            ),
+            if (items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Aquí van el acero, la teja, la mano de obra y todo lo que '
+                  'no sale del plano.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            for (final BudgetItem item in items)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(item.description),
+                subtitle: Text(
+                  '${item.category.label} · '
+                  '${Formatters.quantity(item.quantity)} ${item.unit}'
+                  ' × ${Formatters.money(item.unitPrice)}',
+                ),
+                trailing: Text(
+                  Formatters.money(item.subtotal),
+                  style: theme.textTheme.titleSmall,
+                ),
+                onTap: () => onTapItem(item),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({required this.summary});
+
+  final BudgetSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final double? perSquareMeter = summary.costPerSquareMeter;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Resumen', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 12),
+            _Line(label: 'Materiales', value: summary.materialsTotal),
+            _Line(label: 'Mano de obra', value: summary.laborTotal),
+            _Line(label: 'Otros', value: summary.otherTotal),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Divider(),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text('Total', style: theme.textTheme.titleMedium),
+                ),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      Formatters.money(summary.total),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (perSquareMeter != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                '${Formatters.money(perSquareMeter)} por m² de piso',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+            if (!summary.isComplete) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: theme.colorScheme.error,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Faltan '
+                      '${summary.totalMaterials - summary.pricedMaterials}'
+                      ' precios: el total todavía se queda corto.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Line extends StatelessWidget {
+  const _Line({required this.label, required this.value});
+
+  final String label;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
+          Text(
+            Formatters.money(value),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

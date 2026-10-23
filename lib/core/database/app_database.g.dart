@@ -2870,6 +2870,855 @@ class ProjectMaterialSettingsCompanion
   }
 }
 
+class $MaterialPricesTable extends MaterialPrices
+    with TableInfo<$MaterialPricesTable, MaterialPriceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MaterialPricesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MaterialKind, String> kind =
+      GeneratedColumn<String>(
+        'kind',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<MaterialKind>($MaterialPricesTable.$converterkind);
+  static const VerificationMeta _unitPriceMeta = const VerificationMeta(
+    'unitPrice',
+  );
+  @override
+  late final GeneratedColumn<double> unitPrice = GeneratedColumn<double>(
+    'unit_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [projectId, kind, unitPrice];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'material_prices';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MaterialPriceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('unit_price')) {
+      context.handle(
+        _unitPriceMeta,
+        unitPrice.isAcceptableOrUnknown(data['unit_price']!, _unitPriceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitPriceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {projectId, kind};
+  @override
+  MaterialPriceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MaterialPriceRow(
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}project_id'],
+      )!,
+      kind: $MaterialPricesTable.$converterkind.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}kind'],
+        )!,
+      ),
+      unitPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}unit_price'],
+      )!,
+    );
+  }
+
+  @override
+  $MaterialPricesTable createAlias(String alias) {
+    return $MaterialPricesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<MaterialKind, String, String> $converterkind =
+      const EnumNameConverter<MaterialKind>(MaterialKind.values);
+}
+
+class MaterialPriceRow extends DataClass
+    implements Insertable<MaterialPriceRow> {
+  final int projectId;
+  final MaterialKind kind;
+  final double unitPrice;
+  const MaterialPriceRow({
+    required this.projectId,
+    required this.kind,
+    required this.unitPrice,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['project_id'] = Variable<int>(projectId);
+    {
+      map['kind'] = Variable<String>(
+        $MaterialPricesTable.$converterkind.toSql(kind),
+      );
+    }
+    map['unit_price'] = Variable<double>(unitPrice);
+    return map;
+  }
+
+  MaterialPricesCompanion toCompanion(bool nullToAbsent) {
+    return MaterialPricesCompanion(
+      projectId: Value(projectId),
+      kind: Value(kind),
+      unitPrice: Value(unitPrice),
+    );
+  }
+
+  factory MaterialPriceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MaterialPriceRow(
+      projectId: serializer.fromJson<int>(json['projectId']),
+      kind: $MaterialPricesTable.$converterkind.fromJson(
+        serializer.fromJson<String>(json['kind']),
+      ),
+      unitPrice: serializer.fromJson<double>(json['unitPrice']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'projectId': serializer.toJson<int>(projectId),
+      'kind': serializer.toJson<String>(
+        $MaterialPricesTable.$converterkind.toJson(kind),
+      ),
+      'unitPrice': serializer.toJson<double>(unitPrice),
+    };
+  }
+
+  MaterialPriceRow copyWith({
+    int? projectId,
+    MaterialKind? kind,
+    double? unitPrice,
+  }) => MaterialPriceRow(
+    projectId: projectId ?? this.projectId,
+    kind: kind ?? this.kind,
+    unitPrice: unitPrice ?? this.unitPrice,
+  );
+  MaterialPriceRow copyWithCompanion(MaterialPricesCompanion data) {
+    return MaterialPriceRow(
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      unitPrice: data.unitPrice.present ? data.unitPrice.value : this.unitPrice,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MaterialPriceRow(')
+          ..write('projectId: $projectId, ')
+          ..write('kind: $kind, ')
+          ..write('unitPrice: $unitPrice')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(projectId, kind, unitPrice);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MaterialPriceRow &&
+          other.projectId == this.projectId &&
+          other.kind == this.kind &&
+          other.unitPrice == this.unitPrice);
+}
+
+class MaterialPricesCompanion extends UpdateCompanion<MaterialPriceRow> {
+  final Value<int> projectId;
+  final Value<MaterialKind> kind;
+  final Value<double> unitPrice;
+  final Value<int> rowid;
+  const MaterialPricesCompanion({
+    this.projectId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.unitPrice = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MaterialPricesCompanion.insert({
+    required int projectId,
+    required MaterialKind kind,
+    required double unitPrice,
+    this.rowid = const Value.absent(),
+  }) : projectId = Value(projectId),
+       kind = Value(kind),
+       unitPrice = Value(unitPrice);
+  static Insertable<MaterialPriceRow> custom({
+    Expression<int>? projectId,
+    Expression<String>? kind,
+    Expression<double>? unitPrice,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (projectId != null) 'project_id': projectId,
+      if (kind != null) 'kind': kind,
+      if (unitPrice != null) 'unit_price': unitPrice,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MaterialPricesCompanion copyWith({
+    Value<int>? projectId,
+    Value<MaterialKind>? kind,
+    Value<double>? unitPrice,
+    Value<int>? rowid,
+  }) {
+    return MaterialPricesCompanion(
+      projectId: projectId ?? this.projectId,
+      kind: kind ?? this.kind,
+      unitPrice: unitPrice ?? this.unitPrice,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (projectId.present) {
+      map['project_id'] = Variable<int>(projectId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(
+        $MaterialPricesTable.$converterkind.toSql(kind.value),
+      );
+    }
+    if (unitPrice.present) {
+      map['unit_price'] = Variable<double>(unitPrice.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MaterialPricesCompanion(')
+          ..write('projectId: $projectId, ')
+          ..write('kind: $kind, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BudgetItemsTable extends BudgetItems
+    with TableInfo<$BudgetItemsTable, BudgetItemRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BudgetItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<int> projectId = GeneratedColumn<int>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _roomIdMeta = const VerificationMeta('roomId');
+  @override
+  late final GeneratedColumn<int> roomId = GeneratedColumn<int>(
+    'room_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES rooms (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BudgetCategory, String> category =
+      GeneratedColumn<String>(
+        'category',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<BudgetCategory>($BudgetItemsTable.$convertercategory);
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 160,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 24,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitPriceMeta = const VerificationMeta(
+    'unitPrice',
+  );
+  @override
+  late final GeneratedColumn<double> unitPrice = GeneratedColumn<double>(
+    'unit_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    projectId,
+    roomId,
+    category,
+    description,
+    unit,
+    quantity,
+    unitPrice,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'budget_items';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BudgetItemRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('room_id')) {
+      context.handle(
+        _roomIdMeta,
+        roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    if (data.containsKey('unit_price')) {
+      context.handle(
+        _unitPriceMeta,
+        unitPrice.isAcceptableOrUnknown(data['unit_price']!, _unitPriceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitPriceMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BudgetItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BudgetItemRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      projectId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}project_id'],
+      )!,
+      roomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}room_id'],
+      ),
+      category: $BudgetItemsTable.$convertercategory.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}category'],
+        )!,
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}quantity'],
+      )!,
+      unitPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}unit_price'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BudgetItemsTable createAlias(String alias) {
+    return $BudgetItemsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BudgetCategory, String, String> $convertercategory =
+      const EnumNameConverter<BudgetCategory>(BudgetCategory.values);
+}
+
+class BudgetItemRow extends DataClass implements Insertable<BudgetItemRow> {
+  final int id;
+  final int projectId;
+
+  /// Habitación a la que se carga la partida, si es de una sola.
+  final int? roomId;
+  final BudgetCategory category;
+  final String description;
+  final String unit;
+  final double quantity;
+  final double unitPrice;
+  final DateTime createdAt;
+  const BudgetItemRow({
+    required this.id,
+    required this.projectId,
+    this.roomId,
+    required this.category,
+    required this.description,
+    required this.unit,
+    required this.quantity,
+    required this.unitPrice,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['project_id'] = Variable<int>(projectId);
+    if (!nullToAbsent || roomId != null) {
+      map['room_id'] = Variable<int>(roomId);
+    }
+    {
+      map['category'] = Variable<String>(
+        $BudgetItemsTable.$convertercategory.toSql(category),
+      );
+    }
+    map['description'] = Variable<String>(description);
+    map['unit'] = Variable<String>(unit);
+    map['quantity'] = Variable<double>(quantity);
+    map['unit_price'] = Variable<double>(unitPrice);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BudgetItemsCompanion toCompanion(bool nullToAbsent) {
+    return BudgetItemsCompanion(
+      id: Value(id),
+      projectId: Value(projectId),
+      roomId: roomId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(roomId),
+      category: Value(category),
+      description: Value(description),
+      unit: Value(unit),
+      quantity: Value(quantity),
+      unitPrice: Value(unitPrice),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory BudgetItemRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BudgetItemRow(
+      id: serializer.fromJson<int>(json['id']),
+      projectId: serializer.fromJson<int>(json['projectId']),
+      roomId: serializer.fromJson<int?>(json['roomId']),
+      category: $BudgetItemsTable.$convertercategory.fromJson(
+        serializer.fromJson<String>(json['category']),
+      ),
+      description: serializer.fromJson<String>(json['description']),
+      unit: serializer.fromJson<String>(json['unit']),
+      quantity: serializer.fromJson<double>(json['quantity']),
+      unitPrice: serializer.fromJson<double>(json['unitPrice']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'projectId': serializer.toJson<int>(projectId),
+      'roomId': serializer.toJson<int?>(roomId),
+      'category': serializer.toJson<String>(
+        $BudgetItemsTable.$convertercategory.toJson(category),
+      ),
+      'description': serializer.toJson<String>(description),
+      'unit': serializer.toJson<String>(unit),
+      'quantity': serializer.toJson<double>(quantity),
+      'unitPrice': serializer.toJson<double>(unitPrice),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  BudgetItemRow copyWith({
+    int? id,
+    int? projectId,
+    Value<int?> roomId = const Value.absent(),
+    BudgetCategory? category,
+    String? description,
+    String? unit,
+    double? quantity,
+    double? unitPrice,
+    DateTime? createdAt,
+  }) => BudgetItemRow(
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    roomId: roomId.present ? roomId.value : this.roomId,
+    category: category ?? this.category,
+    description: description ?? this.description,
+    unit: unit ?? this.unit,
+    quantity: quantity ?? this.quantity,
+    unitPrice: unitPrice ?? this.unitPrice,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  BudgetItemRow copyWithCompanion(BudgetItemsCompanion data) {
+    return BudgetItemRow(
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      roomId: data.roomId.present ? data.roomId.value : this.roomId,
+      category: data.category.present ? data.category.value : this.category,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      unitPrice: data.unitPrice.present ? data.unitPrice.value : this.unitPrice,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetItemRow(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('roomId: $roomId, ')
+          ..write('category: $category, ')
+          ..write('description: $description, ')
+          ..write('unit: $unit, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    projectId,
+    roomId,
+    category,
+    description,
+    unit,
+    quantity,
+    unitPrice,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BudgetItemRow &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.roomId == this.roomId &&
+          other.category == this.category &&
+          other.description == this.description &&
+          other.unit == this.unit &&
+          other.quantity == this.quantity &&
+          other.unitPrice == this.unitPrice &&
+          other.createdAt == this.createdAt);
+}
+
+class BudgetItemsCompanion extends UpdateCompanion<BudgetItemRow> {
+  final Value<int> id;
+  final Value<int> projectId;
+  final Value<int?> roomId;
+  final Value<BudgetCategory> category;
+  final Value<String> description;
+  final Value<String> unit;
+  final Value<double> quantity;
+  final Value<double> unitPrice;
+  final Value<DateTime> createdAt;
+  const BudgetItemsCompanion({
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.roomId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.description = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.unitPrice = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  BudgetItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int projectId,
+    this.roomId = const Value.absent(),
+    required BudgetCategory category,
+    required String description,
+    required String unit,
+    required double quantity,
+    required double unitPrice,
+    this.createdAt = const Value.absent(),
+  }) : projectId = Value(projectId),
+       category = Value(category),
+       description = Value(description),
+       unit = Value(unit),
+       quantity = Value(quantity),
+       unitPrice = Value(unitPrice);
+  static Insertable<BudgetItemRow> custom({
+    Expression<int>? id,
+    Expression<int>? projectId,
+    Expression<int>? roomId,
+    Expression<String>? category,
+    Expression<String>? description,
+    Expression<String>? unit,
+    Expression<double>? quantity,
+    Expression<double>? unitPrice,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (roomId != null) 'room_id': roomId,
+      if (category != null) 'category': category,
+      if (description != null) 'description': description,
+      if (unit != null) 'unit': unit,
+      if (quantity != null) 'quantity': quantity,
+      if (unitPrice != null) 'unit_price': unitPrice,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  BudgetItemsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? projectId,
+    Value<int?>? roomId,
+    Value<BudgetCategory>? category,
+    Value<String>? description,
+    Value<String>? unit,
+    Value<double>? quantity,
+    Value<double>? unitPrice,
+    Value<DateTime>? createdAt,
+  }) {
+    return BudgetItemsCompanion(
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      roomId: roomId ?? this.roomId,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      unit: unit ?? this.unit,
+      quantity: quantity ?? this.quantity,
+      unitPrice: unitPrice ?? this.unitPrice,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<int>(projectId.value);
+    }
+    if (roomId.present) {
+      map['room_id'] = Variable<int>(roomId.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(
+        $BudgetItemsTable.$convertercategory.toSql(category.value),
+      );
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<double>(quantity.value);
+    }
+    if (unitPrice.present) {
+      map['unit_price'] = Variable<double>(unitPrice.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('roomId: $roomId, ')
+          ..write('category: $category, ')
+          ..write('description: $description, ')
+          ..write('unit: $unit, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2880,6 +3729,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RoomOpeningsTable roomOpenings = $RoomOpeningsTable(this);
   late final $ProjectMaterialSettingsTable projectMaterialSettings =
       $ProjectMaterialSettingsTable(this);
+  late final $MaterialPricesTable materialPrices = $MaterialPricesTable(this);
+  late final $BudgetItemsTable budgetItems = $BudgetItemsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2891,6 +3742,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     roomWalls,
     roomOpenings,
     projectMaterialSettings,
+    materialPrices,
+    budgetItems,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2923,6 +3776,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       result: [
         TableUpdate('project_material_settings', kind: UpdateKind.delete),
       ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('material_prices', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('budget_items', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'rooms',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('budget_items', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2989,6 +3863,42 @@ final class $$ProjectsTableReferences
     final cache = $_typedResult.readTableOrNull(
       _projectMaterialSettingsRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$MaterialPricesTable, List<MaterialPriceRow>>
+  _materialPricesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.materialPrices,
+    aliasName: 'projects__id__material_prices__project_id',
+  );
+
+  $$MaterialPricesTableProcessedTableManager get materialPricesRefs {
+    final manager = $$MaterialPricesTableTableManager(
+      $_db,
+      $_db.materialPrices,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_materialPricesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$BudgetItemsTable, List<BudgetItemRow>>
+  _budgetItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.budgetItems,
+    aliasName: 'projects__id__budget_items__project_id',
+  );
+
+  $$BudgetItemsTableProcessedTableManager get budgetItemsRefs {
+    final manager = $$BudgetItemsTableTableManager(
+      $_db,
+      $_db.budgetItems,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_budgetItemsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3087,6 +3997,56 @@ class $$ProjectsTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> materialPricesRefs(
+    Expression<bool> Function($$MaterialPricesTableFilterComposer f) f,
+  ) {
+    final $$MaterialPricesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.materialPrices,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MaterialPricesTableFilterComposer(
+            $db: $db,
+            $table: $db.materialPrices,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> budgetItemsRefs(
+    Expression<bool> Function($$BudgetItemsTableFilterComposer f) f,
+  ) {
+    final $$BudgetItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.budgetItems,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BudgetItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.budgetItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -3217,6 +4177,56 @@ class $$ProjectsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> materialPricesRefs<T extends Object>(
+    Expression<T> Function($$MaterialPricesTableAnnotationComposer a) f,
+  ) {
+    final $$MaterialPricesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.materialPrices,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MaterialPricesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.materialPrices,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> budgetItemsRefs<T extends Object>(
+    Expression<T> Function($$BudgetItemsTableAnnotationComposer a) f,
+  ) {
+    final $$BudgetItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.budgetItems,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BudgetItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.budgetItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -3235,6 +4245,8 @@ class $$ProjectsTableTableManager
           PrefetchHooks Function({
             bool roomsRefs,
             bool projectMaterialSettingsRefs,
+            bool materialPricesRefs,
+            bool budgetItemsRefs,
           })
         > {
   $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
@@ -3293,12 +4305,19 @@ class $$ProjectsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({roomsRefs = false, projectMaterialSettingsRefs = false}) {
+              ({
+                roomsRefs = false,
+                projectMaterialSettingsRefs = false,
+                materialPricesRefs = false,
+                budgetItemsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (roomsRefs) db.rooms,
                     if (projectMaterialSettingsRefs) db.projectMaterialSettings,
+                    if (materialPricesRefs) db.materialPrices,
+                    if (budgetItemsRefs) db.budgetItems,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3345,6 +4364,48 @@ class $$ProjectsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (materialPricesRefs)
+                        await $_getPrefetchedData<
+                          ProjectRow,
+                          $ProjectsTable,
+                          MaterialPriceRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._materialPricesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).materialPricesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (budgetItemsRefs)
+                        await $_getPrefetchedData<
+                          ProjectRow,
+                          $ProjectsTable,
+                          BudgetItemRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProjectsTableReferences
+                              ._budgetItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).budgetItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projectId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3365,7 +4426,12 @@ typedef $$ProjectsTableProcessedTableManager =
       $$ProjectsTableUpdateCompanionBuilder,
       (ProjectRow, $$ProjectsTableReferences),
       ProjectRow,
-      PrefetchHooks Function({bool roomsRefs, bool projectMaterialSettingsRefs})
+      PrefetchHooks Function({
+        bool roomsRefs,
+        bool projectMaterialSettingsRefs,
+        bool materialPricesRefs,
+        bool budgetItemsRefs,
+      })
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -3569,6 +4635,24 @@ final class $$RoomsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$BudgetItemsTable, List<BudgetItemRow>>
+  _budgetItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.budgetItems,
+    aliasName: 'rooms__id__budget_items__room_id',
+  );
+
+  $$BudgetItemsTableProcessedTableManager get budgetItemsRefs {
+    final manager = $$BudgetItemsTableTableManager(
+      $_db,
+      $_db.budgetItems,
+    ).filter((f) => f.roomId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_budgetItemsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
@@ -3643,6 +4727,31 @@ class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
           }) => $$RoomWallsTableFilterComposer(
             $db: $db,
             $table: $db.roomWalls,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> budgetItemsRefs(
+    Expression<bool> Function($$BudgetItemsTableFilterComposer f) f,
+  ) {
+    final $$BudgetItemsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.budgetItems,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BudgetItemsTableFilterComposer(
+            $db: $db,
+            $table: $db.budgetItems,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3784,6 +4893,31 @@ class $$RoomsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> budgetItemsRefs<T extends Object>(
+    Expression<T> Function($$BudgetItemsTableAnnotationComposer a) f,
+  ) {
+    final $$BudgetItemsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.budgetItems,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BudgetItemsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.budgetItems,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RoomsTableTableManager
@@ -3799,7 +4933,11 @@ class $$RoomsTableTableManager
           $$RoomsTableUpdateCompanionBuilder,
           (RoomRow, $$RoomsTableReferences),
           RoomRow,
-          PrefetchHooks Function({bool projectId, bool roomWallsRefs})
+          PrefetchHooks Function({
+            bool projectId,
+            bool roomWallsRefs,
+            bool budgetItemsRefs,
+          })
         > {
   $$RoomsTableTableManager(_$AppDatabase db, $RoomsTable table)
     : super(
@@ -3852,62 +4990,96 @@ class $$RoomsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({projectId = false, roomWallsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (roomWallsRefs) db.roomWalls],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (projectId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.projectId,
-                        referencedTable: $$RoomsTableReferences._projectIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$RoomsTableReferences
-                            ._projectIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                projectId = false,
+                roomWallsRefs = false,
+                budgetItemsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (roomWallsRefs) db.roomWalls,
+                    if (budgetItemsRefs) db.budgetItems,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (projectId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$RoomsTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn: $$RoomsTableReferences
+                                ._projectIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (roomWallsRefs)
+                        await $_getPrefetchedData<
+                          RoomRow,
+                          $RoomsTable,
+                          RoomWallRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomsTableReferences
+                              ._roomWallsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).roomWallsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.roomId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (budgetItemsRefs)
+                        await $_getPrefetchedData<
+                          RoomRow,
+                          $RoomsTable,
+                          BudgetItemRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomsTableReferences
+                              ._budgetItemsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).budgetItemsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.roomId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (roomWallsRefs)
-                    await $_getPrefetchedData<
-                      RoomRow,
-                      $RoomsTable,
-                      RoomWallRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$RoomsTableReferences
-                          ._roomWallsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$RoomsTableReferences(db, table, p0).roomWallsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.roomId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3924,7 +5096,11 @@ typedef $$RoomsTableProcessedTableManager =
       $$RoomsTableUpdateCompanionBuilder,
       (RoomRow, $$RoomsTableReferences),
       RoomRow,
-      PrefetchHooks Function({bool projectId, bool roomWallsRefs})
+      PrefetchHooks Function({
+        bool projectId,
+        bool roomWallsRefs,
+        bool budgetItemsRefs,
+      })
     >;
 typedef $$RoomWallsTableCreateCompanionBuilder = RoomWallsCompanion Function({
   Value<int> id,
@@ -5244,6 +6420,763 @@ typedef $$ProjectMaterialSettingsTableProcessedTableManager =
       MaterialSettingsRow,
       PrefetchHooks Function({bool projectId})
     >;
+typedef $$MaterialPricesTableCreateCompanionBuilder =
+    MaterialPricesCompanion Function({
+      required int projectId,
+      required MaterialKind kind,
+      required double unitPrice,
+      Value<int> rowid,
+    });
+typedef $$MaterialPricesTableUpdateCompanionBuilder =
+    MaterialPricesCompanion Function({
+      Value<int> projectId,
+      Value<MaterialKind> kind,
+      Value<double> unitPrice,
+      Value<int> rowid,
+    });
+
+final class $$MaterialPricesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $MaterialPricesTable, MaterialPriceRow> {
+  $$MaterialPricesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('material_prices__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MaterialPricesTableFilterComposer
+    extends Composer<_$AppDatabase, $MaterialPricesTable> {
+  $$MaterialPricesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<MaterialKind, MaterialKind, String> get kind =>
+      $composableBuilder(
+        column: $table.kind,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialPricesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MaterialPricesTable> {
+  $$MaterialPricesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialPricesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MaterialPricesTable> {
+  $$MaterialPricesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<MaterialKind, String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<double> get unitPrice =>
+      $composableBuilder(column: $table.unitPrice, builder: (column) => column);
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MaterialPricesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MaterialPricesTable,
+          MaterialPriceRow,
+          $$MaterialPricesTableFilterComposer,
+          $$MaterialPricesTableOrderingComposer,
+          $$MaterialPricesTableAnnotationComposer,
+          $$MaterialPricesTableCreateCompanionBuilder,
+          $$MaterialPricesTableUpdateCompanionBuilder,
+          (MaterialPriceRow, $$MaterialPricesTableReferences),
+          MaterialPriceRow,
+          PrefetchHooks Function({bool projectId})
+        > {
+  $$MaterialPricesTableTableManager(
+    _$AppDatabase db,
+    $MaterialPricesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MaterialPricesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MaterialPricesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MaterialPricesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> projectId = const Value.absent(),
+                Value<MaterialKind> kind = const Value.absent(),
+                Value<double> unitPrice = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MaterialPricesCompanion(
+                projectId: projectId,
+                kind: kind,
+                unitPrice: unitPrice,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int projectId,
+                required MaterialKind kind,
+                required double unitPrice,
+                Value<int> rowid = const Value.absent(),
+              }) => MaterialPricesCompanion.insert(
+                projectId: projectId,
+                kind: kind,
+                unitPrice: unitPrice,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MaterialPricesTable, MaterialPriceRow>(table),
+                  $$MaterialPricesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({projectId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (projectId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.projectId,
+                        referencedTable: $$MaterialPricesTableReferences
+                            ._projectIdTable(db),
+                        referencedColumn: $$MaterialPricesTableReferences
+                            ._projectIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MaterialPricesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MaterialPricesTable,
+      MaterialPriceRow,
+      $$MaterialPricesTableFilterComposer,
+      $$MaterialPricesTableOrderingComposer,
+      $$MaterialPricesTableAnnotationComposer,
+      $$MaterialPricesTableCreateCompanionBuilder,
+      $$MaterialPricesTableUpdateCompanionBuilder,
+      (MaterialPriceRow, $$MaterialPricesTableReferences),
+      MaterialPriceRow,
+      PrefetchHooks Function({bool projectId})
+    >;
+typedef $$BudgetItemsTableCreateCompanionBuilder =
+    BudgetItemsCompanion Function({
+      Value<int> id,
+      required int projectId,
+      Value<int?> roomId,
+      required BudgetCategory category,
+      required String description,
+      required String unit,
+      required double quantity,
+      required double unitPrice,
+      Value<DateTime> createdAt,
+    });
+typedef $$BudgetItemsTableUpdateCompanionBuilder =
+    BudgetItemsCompanion Function({
+      Value<int> id,
+      Value<int> projectId,
+      Value<int?> roomId,
+      Value<BudgetCategory> category,
+      Value<String> description,
+      Value<String> unit,
+      Value<double> quantity,
+      Value<double> unitPrice,
+      Value<DateTime> createdAt,
+    });
+
+final class $$BudgetItemsTableReferences
+    extends BaseReferences<_$AppDatabase, $BudgetItemsTable, BudgetItemRow> {
+  $$BudgetItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('budget_items__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<int>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $RoomsTable _roomIdTable(_$AppDatabase db) =>
+      db.rooms.createAlias('budget_items__room_id__rooms__id');
+
+  $$RoomsTableProcessedTableManager? get roomId {
+    final $_column = $_itemColumn<int>('room_id');
+    if ($_column == null) return null;
+    final manager = $$RoomsTableTableManager(
+      $_db,
+      $_db.rooms,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_roomIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$BudgetItemsTableFilterComposer
+    extends Composer<_$AppDatabase, $BudgetItemsTable> {
+  $$BudgetItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BudgetCategory, BudgetCategory, String>
+  get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableFilterComposer get roomId {
+    final $$RoomsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableFilterComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BudgetItemsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BudgetItemsTable> {
+  $$BudgetItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableOrderingComposer get roomId {
+    final $$RoomsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableOrderingComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BudgetItemsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BudgetItemsTable> {
+  $$BudgetItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BudgetCategory, String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<double> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<double> get unitPrice =>
+      $composableBuilder(column: $table.unitPrice, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$RoomsTableAnnotationComposer get roomId {
+    final $$RoomsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$BudgetItemsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BudgetItemsTable,
+          BudgetItemRow,
+          $$BudgetItemsTableFilterComposer,
+          $$BudgetItemsTableOrderingComposer,
+          $$BudgetItemsTableAnnotationComposer,
+          $$BudgetItemsTableCreateCompanionBuilder,
+          $$BudgetItemsTableUpdateCompanionBuilder,
+          (BudgetItemRow, $$BudgetItemsTableReferences),
+          BudgetItemRow,
+          PrefetchHooks Function({bool projectId, bool roomId})
+        > {
+  $$BudgetItemsTableTableManager(_$AppDatabase db, $BudgetItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BudgetItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BudgetItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BudgetItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> projectId = const Value.absent(),
+                Value<int?> roomId = const Value.absent(),
+                Value<BudgetCategory> category = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<double> quantity = const Value.absent(),
+                Value<double> unitPrice = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BudgetItemsCompanion(
+                id: id,
+                projectId: projectId,
+                roomId: roomId,
+                category: category,
+                description: description,
+                unit: unit,
+                quantity: quantity,
+                unitPrice: unitPrice,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int projectId,
+                Value<int?> roomId = const Value.absent(),
+                required BudgetCategory category,
+                required String description,
+                required String unit,
+                required double quantity,
+                required double unitPrice,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BudgetItemsCompanion.insert(
+                id: id,
+                projectId: projectId,
+                roomId: roomId,
+                category: category,
+                description: description,
+                unit: unit,
+                quantity: quantity,
+                unitPrice: unitPrice,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BudgetItemsTable, BudgetItemRow>(table),
+                  $$BudgetItemsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({projectId = false, roomId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (projectId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.projectId,
+                        referencedTable: $$BudgetItemsTableReferences
+                            ._projectIdTable(db),
+                        referencedColumn: $$BudgetItemsTableReferences
+                            ._projectIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (roomId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.roomId,
+                        referencedTable: $$BudgetItemsTableReferences
+                            ._roomIdTable(db),
+                        referencedColumn: $$BudgetItemsTableReferences
+                            ._roomIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$BudgetItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BudgetItemsTable,
+      BudgetItemRow,
+      $$BudgetItemsTableFilterComposer,
+      $$BudgetItemsTableOrderingComposer,
+      $$BudgetItemsTableAnnotationComposer,
+      $$BudgetItemsTableCreateCompanionBuilder,
+      $$BudgetItemsTableUpdateCompanionBuilder,
+      (BudgetItemRow, $$BudgetItemsTableReferences),
+      BudgetItemRow,
+      PrefetchHooks Function({bool projectId, bool roomId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5263,4 +7196,8 @@ class $AppDatabaseManager {
         _db,
         _db.projectMaterialSettings,
       );
+  $$MaterialPricesTableTableManager get materialPrices =>
+      $$MaterialPricesTableTableManager(_db, _db.materialPrices);
+  $$BudgetItemsTableTableManager get budgetItems =>
+      $$BudgetItemsTableTableManager(_db, _db.budgetItems);
 }
