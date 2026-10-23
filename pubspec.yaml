@@ -45,7 +45,9 @@ dependencies:
   sensors_plus: ^7.1.1
   pdf: ^3.13.1
   printing: ^5.15.1
-  ar_measure_flutter: ^0.1.1
+  # Copia local con un parche: ver packages/ar_measure_flutter/PLANOVA.md
+  ar_measure_flutter:
+    path: packages/ar_measure_flutter
   vector_math: ^2.4.3
 
 dev_dependencies:

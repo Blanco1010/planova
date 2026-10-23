@@ -73,7 +73,7 @@ va por la **versión 4**; cada tabla nueva se añade con su migración en
 [`app_database.dart`](lib/core/database/app_database.dart).
 
 ```bash
-flutter test            # 99 pruebas
+flutter test            # 105 pruebas
 flutter analyze
 flutter build apk --debug
 ```
@@ -94,6 +94,11 @@ La parte más delicada, y la que más se ha rehecho probándola en obra:
 - Las esquinas se guardan en **coordenadas de la habitación**, no respecto a
   quien mide, así que se puede caminar: con «Me moví» se apunta a una esquina
   ya marcada y la app vuelve a situarse.
+- En los teléfonos con **ARCore** manda el escaneo espacial: la cámara mide la
+  distancia de verdad y el aparato sigue sus propios pasos, así que ahí no hay
+  altura que calibrar ni que avisar de que uno se mueve.
+- El paquete de ARCore vive parcheado en `packages/ar_measure_flutter`
+  (ver su `PLANOVA.md`): sin ese cambio no se puede marcar una pared lisa.
 
 ## Lo que falta
 

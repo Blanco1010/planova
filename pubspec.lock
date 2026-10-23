@@ -20,10 +20,9 @@ packages:
   ar_measure_flutter:
     dependency: "direct main"
     description:
-      name: ar_measure_flutter
-      sha256: a83602e914a50c78fbedf3ad48b8e01394fbbdaac7735fff9d1e50c781055805
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/ar_measure_flutter"
+      relative: true
+    source: path
     version: "0.1.1"
   archive:
     dependency: transitive
