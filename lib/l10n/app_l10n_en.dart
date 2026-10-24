@@ -50,7 +50,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get currencyNote =>
-      'Changes how prices are written. It does not convert them: what you typed is still worth the same.';
+      'Changes how prices are written. It doesn\'t convert them — what you typed is still worth the same.';
 
   @override
   String get currencyCop => 'Colombian peso';
@@ -59,7 +59,7 @@ class AppL10nEn extends AppL10n {
   String get currencyUsd => 'Dollar';
 
   @override
-  String get projectsLoadError => 'Your projects couldn\'t be read';
+  String get projectsLoadError => 'Couldn\'t load your projects';
 
   @override
   String get projectsEmptyTitle => 'No projects yet';
@@ -82,7 +82,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String deleteProjectMessage(String project) {
-    return '«$project» and everything you keep inside it will be deleted. This can\'t be undone.';
+    return '“$project” will be deleted, along with everything in it. This can\'t be undone.';
   }
 
   @override
@@ -94,7 +94,7 @@ class AppL10nEn extends AppL10n {
   String get projectName => 'Project name';
 
   @override
-  String get projectNameHint => 'Two-storey house, kitchen remodel…';
+  String get projectNameHint => 'Two-story house, kitchen remodel…';
 
   @override
   String get projectNameRequired => 'Give the project a name';
@@ -120,11 +120,11 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get projectGone => 'That project is gone';
+  String get projectGone => 'That project no longer exists';
 
   @override
   String roomsLoadError(String error) {
-    return 'The rooms couldn\'t be read: $error';
+    return 'Couldn\'t load the rooms: $error';
   }
 
   @override
@@ -132,13 +132,13 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get materialsCardBody =>
-      'Blocks or bricks, mortar, paint and flooring with your own rates';
+      'Blocks or bricks, mortar, paint and flooring, using your own rates';
 
   @override
   String get budget => 'Budget';
 
   @override
-  String get budgetCardBody => 'Prices, labour and cost per m²';
+  String get budgetCardBody => 'Prices, labor and cost per m²';
 
   @override
   String get rooms => 'Rooms';
@@ -155,21 +155,20 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get measureWithCameraBody =>
-      'Aim at the foot of each corner and the plan comes out';
+      'Aim at the foot of each corner and the plan draws itself';
 
   @override
   String get typeMeasurements => 'Type the measurements';
 
   @override
-  String get typeMeasurementsBody =>
-      'Width and length, then you adjust the plan';
+  String get typeMeasurementsBody => 'Width and length, then adjust the plan';
 
   @override
   String get deleteRoom => 'Delete room';
 
   @override
   String deleteRoomMessage(String room) {
-    return '«$room» will be deleted, with its plan, its walls and its openings.';
+    return '“$room” will be deleted, along with its plan, its walls and its openings.';
   }
 
   @override
@@ -187,7 +186,7 @@ class AppL10nEn extends AppL10n {
   String get builtArea => 'built area';
 
   @override
-  String get netWallArea => 'walls minus openings';
+  String get netWallArea => 'net wall area';
 
   @override
   String roomCardSummary(String area, String walls, String perimeter) {
@@ -196,7 +195,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String planDoesNotClose(String gap) {
-    return 'The plan doesn\'t close: $gap missing';
+    return 'The plan doesn\'t close — $gap missing';
   }
 
   @override
@@ -227,13 +226,13 @@ class AppL10nEn extends AppL10n {
   String get editRoom => 'Edit room';
 
   @override
-  String get saveScanned => 'Save what you scanned';
+  String get saveScanned => 'Save the scan';
 
   @override
   String get measureHeight => 'Measure the height';
 
   @override
-  String get roomGone => 'That room is gone';
+  String get roomGone => 'That room no longer exists';
 
   @override
   String get walls => 'Walls';
@@ -252,14 +251,14 @@ class AppL10nEn extends AppL10n {
   String get perimeter => 'Perimeter';
 
   @override
-  String get netWallAreaTitle => 'Walls minus openings';
+  String get netWallAreaTitle => 'Net wall area';
 
   @override
   String get height => 'Height';
 
   @override
   String planOpenWarning(String gap) {
-    return 'The outline doesn\'t come back to where it started: $gap missing. Check the lengths and the turns; the area is worked out by closing the plan along the last wall.';
+    return 'The outline doesn\'t come back to where it started — $gap missing. Check the lengths and the turns; the area is figured by closing the plan along the last wall.';
   }
 
   @override
@@ -325,7 +324,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get openingsEmptyBody =>
-      'This wall has no openings. Whatever you add is taken off the surface to be painted.';
+      'This wall has no openings. Anything you add is subtracted from the surface to be painted.';
 
   @override
   String openingSummary(String kind, String width, String height) {
@@ -341,7 +340,7 @@ class AppL10nEn extends AppL10n {
   String get deleteThisWall => 'Delete this wall';
 
   @override
-  String get degreesRequired => 'Type the degrees';
+  String get degreesRequired => 'Enter the degrees';
 
   @override
   String get degreesRange => 'Between -359 and 359';
@@ -358,7 +357,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get deleteWallMessage =>
-      'The wall goes with its doors and windows, and the plan is redrawn with the ones left.';
+      'The wall goes, along with its doors and windows, and the plan is redrawn with the ones left.';
 
   @override
   String get newOpening => 'New opening';
@@ -393,10 +392,10 @@ class AppL10nEn extends AppL10n {
   String get deleteOpening => 'Delete opening';
 
   @override
-  String get measureRequired => 'Type a measurement';
+  String get measureRequired => 'Enter a measurement';
 
   @override
-  String get openingOffWall => 'The opening runs off the wall';
+  String get openingOffWall => 'The opening runs past the end of the wall';
 
   @override
   String get door => 'Door';
@@ -418,7 +417,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String pdfFailed(String error) {
-    return 'The PDF could not be made: $error';
+    return 'Couldn\'t create the PDF: $error';
   }
 
   @override
@@ -453,7 +452,7 @@ class AppL10nEn extends AppL10n {
   String get changePrice => 'Change the price';
 
   @override
-  String get removeFromBudget => 'Take out of the budget';
+  String get removeFromBudget => 'Remove from the budget';
 
   @override
   String get materialsEmptyBody =>
@@ -464,7 +463,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get otherItemsEmptyBody =>
-      'Steel, roofing, labour and everything else that does not come from the plan goes here.';
+      'Steel, roofing, labor and anything else that doesn\'t come from the plan goes here.';
 
   @override
   String itemLine(String category, String quantity, String unit, String price) {
@@ -476,7 +475,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get finishesEmptyBody =>
-      'Tick the walls and floors that get paint, render or tiling and give them a price per m². The metres come from the plan.';
+      'Check the walls and floors that get paint, stucco or tile and give them a price per m². The square meters come from the plan.';
 
   @override
   String finishLine(String where, String area, String price) {
@@ -512,7 +511,7 @@ class AppL10nEn extends AppL10n {
   String get summary => 'Summary';
 
   @override
-  String get labour => 'Labour';
+  String get labour => 'Labor';
 
   @override
   String get otherCategory => 'Other';
@@ -538,10 +537,10 @@ class AppL10nEn extends AppL10n {
   String get whatIsDone => 'What gets done';
 
   @override
-  String get whatIsDoneHint => 'Emulsion paint, render, tiling…';
+  String get whatIsDoneHint => 'Latex paint, stucco, tile…';
 
   @override
-  String get whatIsDoneRequired => 'Say what the finish is';
+  String get whatIsDoneRequired => 'Name the finish';
 
   @override
   String get pricePerSquareMetre => 'Price per m²';
@@ -567,16 +566,16 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get markOneSurface => 'Tick at least one wall or floor.';
+  String get markOneSurface => 'Check at least one wall or floor.';
 
   @override
   String deleteFinishMessage(String finish) {
-    return '«$finish» is taken out of the budget. The walls and the plan are left alone.';
+    return '“$finish” is removed from the budget. The walls and the plan aren\'t touched.';
   }
 
   @override
   String markedArea(String area) {
-    return 'Ticked: $area';
+    return 'Selected: $area';
   }
 
   @override
@@ -592,10 +591,10 @@ class AppL10nEn extends AppL10n {
   String get description => 'Description';
 
   @override
-  String get itemHint => 'Rebar, roof sheet, labourer…';
+  String get itemHint => 'Rebar, roof sheet, helper…';
 
   @override
-  String get itemRequired => 'Say what it is';
+  String get itemRequired => 'Name the item';
 
   @override
   String get quantity => 'Quantity';
@@ -650,11 +649,11 @@ class AppL10nEn extends AppL10n {
 
   @override
   String pdfDocumentTitle(String project) {
-    return 'Budget $project';
+    return '$project budget';
   }
 
   @override
-  String get pdfHeading => 'Works budget';
+  String get pdfHeading => 'Construction budget';
 
   @override
   String pdfScope(String scope) {
@@ -740,7 +739,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String surfacesLine(String walls, String floor) {
-    return 'Walls minus openings $walls · Floor $floor';
+    return 'Net walls $walls · Floor $floor';
   }
 
   @override
@@ -757,7 +756,7 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get bedMortar => 'Bedding mortar';
+  String get bedMortar => 'Mortar';
 
   @override
   String cementBags(String count) {
@@ -774,7 +773,7 @@ class AppL10nEn extends AppL10n {
     String joint,
     String thickness,
   ) {
-    return '$area × $perSquareMetre pieces/m² + $waste % waste. Piece $length × $height, joint $joint, wall $thickness.';
+    return '$area × $perSquareMetre pieces/m² + $waste% waste. Piece $length × $height, joint $joint, wall $thickness.';
   }
 
   @override
@@ -795,7 +794,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String paintNote(String coats, String coverage, String ceiling) {
-    return '$coats coats · $coverage m² per litre$ceiling';
+    return '$coats coats · $coverage m² per liter$ceiling';
   }
 
   @override
@@ -819,7 +818,7 @@ class AppL10nEn extends AppL10n {
     String length,
     String width,
   ) {
-    return '$area × $perSquareMetre tiles/m² + $waste % waste. Tile $length × $width.';
+    return '$area × $perSquareMetre tiles/m² + $waste% waste. Tile $length × $width.';
   }
 
   @override
@@ -834,7 +833,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get projectRatesNote =>
-      'These are the figures the calculator uses. Put in the ones from your site and the materials work themselves out again.';
+      'These are the figures the calculator uses. Put in the ones from your own job and the materials are worked out again.';
 
   @override
   String get pieceLengthCm => 'Piece length (cm)';
@@ -889,7 +888,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get spatialHelpBody =>
-      '1. Move the phone slowly, aiming at the floor, until the app picks up the surface.\n2. Put the crosshair at the foot of a corner and mark it.\n3. Walk to the next corner and mark again: the wall is made with its measurement. You can walk about, the plan stays put.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nClosing it asks for a name and the room is created with its walls. The ceiling height is measured afterwards, from the room itself. Here the phone measures the distance, it is not estimated. Even so, check the walls on the plan before buying material.';
+      '1. Move the phone slowly, aiming at the floor, until the app picks up the surface.\n2. Put the crosshair at the foot of a corner and mark it.\n3. Walk to the next corner and mark again: the wall is made with its measurement. You can walk around, the plan stays put.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nClosing it asks for a name and the room is created with its walls. The ceiling height is measured afterwards, from the room itself. Here the phone measures the distance, it is not estimated. Even so, check the walls on the plan before buying material.';
 
   @override
   String get atCornerOneClose => 'You are at corner 1: close the room';
@@ -952,29 +951,29 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get cameraDenied =>
-      'Planova has no camera permission. You can grant it in the phone settings, or measure anyway by aiming without seeing the picture.';
+      'Planova doesn\'t have camera permission. You can grant it in the phone settings, or measure anyway by aiming without seeing the picture.';
 
   @override
   String get cameraFailed =>
-      'The camera would not open. You can still measure by aiming the phone.';
+      'The camera wouldn\'t open. You can still measure by aiming the phone.';
 
   @override
   String get ceilingHeight => 'Ceiling height';
 
   @override
-  String get metresFloorToCeiling => 'Metres from floor to ceiling';
+  String get metresFloorToCeiling => 'Meters from floor to ceiling';
 
   @override
   String get ceilingHeightHelp =>
-      'It is the only thing needed: the rest follows from it';
+      'It\'s the only thing needed — the rest follows from it';
 
   @override
   String get sightingsDoNotMatch =>
-      'That does not add up: aim at the foot of a wall and then at the ceiling of that same wall.';
+      'That doesn\'t add up — aim at the foot of a wall, then at the ceiling of that same wall.';
 
   @override
   String calibrationDone(String height, String distance) {
-    return 'Done: you are holding the phone $height off the floor and that wall is $distance away.';
+    return 'Done — you\'re holding the phone $height off the floor and that wall is $distance away.';
   }
 
   @override
@@ -982,11 +981,11 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get whichCornerBody =>
-      'This phone doesn\'t know you moved: it only knows where you are aiming. Aim at the foot of a corner you already marked and tell me which one; that puts you back in place and the plan stays where it is.';
+      'This phone doesn\'t know you moved: it only knows where you are aiming. Aim at the foot of a corner you already marked and say which one: that puts you back in place and the plan stays where it is.';
 
   @override
   String get legacyHelpBody =>
-      '1. Tap «Not calibrated» and type the ceiling height. Aim at the foot of a wall, lock it, then at the ceiling of that same wall. That tells the app how high you are holding the phone so it measures properly.\n2. Put the crosshair at the foot of a corner, where the wall meets the floor, and mark it.\n3. Turn on the spot: a line runs from the marked corner and follows the crosshair. Mark the next one and the wall is made.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nThis phone measures from where you are standing, so turn on the spot instead of walking. If you have to move somewhere else, tap «I moved», aim at the foot of a corner you already marked and say which one: the app puts you back in place and the plan stays where it is.\n\nAll of this is an estimate: afterwards you can correct each wall with a tape measure in the plan editor.';
+      '1. Tap “Not calibrated” and type the ceiling height. Aim at the foot of a wall, lock it, then at the ceiling of that same wall. That tells the app how high you are holding the phone so it measures properly.\n2. Put the crosshair at the foot of a corner, where the wall meets the floor, and mark it.\n3. Turn in place: a line runs from the marked corner and follows the crosshair. Mark the next one and the wall is made.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nThis phone measures from where you are standing, so turn in place instead of walking. If you have to move somewhere else, tap “I moved”, aim at the foot of a corner you already marked and say which one: the app puts you back in place and the plan stays where it is.\n\nAll of this is an estimate: afterwards you can correct each wall with a tape measure in the plan editor.';
 
   @override
   String get waitingForSensors => 'Waiting for the sensors…';
@@ -1000,7 +999,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String aimAtCornerFixPosition(String corner) {
-    return 'Aim at the foot of corner $corner and tap «I am here»';
+    return 'Aim at the foot of corner $corner and tap “I’m here”';
   }
 
   @override
@@ -1008,7 +1007,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get turnOnTheSpot =>
-      'Turn on the spot, without walking. If you move somewhere else, tap «I moved».';
+      'Turn in place, without walking. If you move somewhere else, tap “I moved”.';
 
   @override
   String calibrated(String height) {
@@ -1028,14 +1027,14 @@ class AppL10nEn extends AppL10n {
   String get lockCeiling => 'Lock the ceiling';
 
   @override
-  String get iAmHere => 'I am here';
+  String get iAmHere => 'I\'m here';
 
   @override
-  String get noGyroscopeTitle => 'This phone cannot measure the turn';
+  String get noGyroscopeTitle => 'This phone can\'t tell which way you turn';
 
   @override
   String get noGyroscopeBody =>
-      'It has no gyroscope, so there is no way to know where you are aiming as you turn on the spot and the plan would be made up.\n\nYou can create the room by typing the width and the length, and adjust each wall on the plan.';
+      'It has no gyroscope, so there\'s no way to know where you are aiming as you turn, and the plan would be made up.\n\nYou can still create the room by typing the width and the length, and adjust each wall on the plan.';
 
   @override
   String get goBack => 'Go back';
