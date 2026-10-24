@@ -17,6 +17,8 @@ cliente en PDF.
   y **acabados** por superficie —marcas qué paredes y qué pisos llevan pintura
   o enchape y a cuánto el m²—, con total y costo por m².
 - **PDF**: el presupuesto con el plano de cada habitación dibujado dentro.
+- **Idioma y moneda**: español o inglés, peso colombiano o dólar. Los precios
+  se escriben con los miles separados y el PDF sale en el idioma elegido.
 
 ## Arquitectura
 
@@ -45,6 +47,7 @@ lib/
 │   ├── measuring/  trigonometría de la medición con la cámara
 │   ├── utils/      formatos (metros, m², dinero) y lectura de medidas
 │   └── widgets/    piezas compartidas
+├── l10n/           los textos en español y en inglés (gen_l10n)
 ├── features/
 │   ├── projects/   ┐
 │   ├── rooms/      │  cada uno con
@@ -60,7 +63,13 @@ test/
 └── fakes/   repositorios y servicios de mentira
 ```
 
-Los nombres del código van en inglés; los textos de la app, en español.
+Los nombres del código van en inglés. Los textos de la app no viven en el
+código: están en [`lib/l10n`](lib/l10n), en español —que es como se escriben
+primero— y en inglés. Al tocarlos hay que volver a generar:
+
+```bash
+flutter gen-l10n
+```
 
 ## Cómo se trabaja
 
@@ -71,11 +80,11 @@ flutter run
 ```
 
 Después de tocar una tabla de Drift hay que volver a generar. La base de datos
-va por la **versión 4**; cada tabla nueva se añade con su migración en
+va por la **versión 5**; cada tabla nueva se añade con su migración en
 [`app_database.dart`](lib/core/database/app_database.dart).
 
 ```bash
-flutter test            # 117 pruebas
+flutter test            # 130 pruebas
 flutter analyze
 flutter build apk --debug
 ```
@@ -89,13 +98,15 @@ La parte más delicada, y la que más se ha rehecho probándola en obra:
   segundos y las esquinas marcadas se van de sitio; hay respaldo al
   giroscopio para aparatos sin ese sensor.
 - El ángulo que abarca la cámara se le pregunta al sistema (Camera2), no se
-  estima, y la imagen se enseña **entera** para que el dibujo encaje con ella.
+  estima. La imagen llena la pantalla sin deformarse: se agranda hasta
+  cubrirla y se recorta lo que sobra, mientras el dibujo sigue usando el
+  encuadre entero, que es lo que hace que cada esquina caiga en su sitio.
 - La distancia sale de la inclinación, y la altura a la que se lleva el
   teléfono **no se pregunta**: se calibra mirando el pie y el techo de una
   pared, que con la altura del techo despeja las dos de una vez.
 - Las esquinas se guardan en **coordenadas de la habitación**, no respecto a
-  quien mide, así que se puede caminar: con «Me moví» se apunta a una esquina
-  ya marcada y la app vuelve a situarse.
+  quien mide, así que se puede caminar: con «Cambié de sitio» se apunta a una
+  esquina ya marcada y la app vuelve a situarse.
 - En los teléfonos con **ARCore** manda el escaneo espacial: la cámara mide la
   distancia de verdad y el aparato sigue sus propios pasos, así que ahí no hay
   altura que calibrar ni que avisar de que uno se mueve.
