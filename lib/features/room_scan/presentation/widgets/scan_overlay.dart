@@ -14,19 +14,19 @@ import '../../../../core/utils/formatters.dart';
 Offset labelCenterInside(
   Offset center,
   Size label,
-  Size viewport, {
+  Rect visible, {
   double margin = 8,
 }) {
   final double halfWidth = label.width / 2;
   final double halfHeight = label.height / 2;
-  final double minX = margin + halfWidth;
-  final double maxX = viewport.width - margin - halfWidth;
-  final double minY = margin + halfHeight;
-  final double maxY = viewport.height - margin - halfHeight;
+  final double minX = visible.left + margin + halfWidth;
+  final double maxX = visible.right - margin - halfWidth;
+  final double minY = visible.top + margin + halfHeight;
+  final double maxY = visible.bottom - margin - halfHeight;
 
   return Offset(
-    minX > maxX ? viewport.width / 2 : center.dx.clamp(minX, maxX),
-    minY > maxY ? viewport.height / 2 : center.dy.clamp(minY, maxY),
+    minX > maxX ? visible.center.dx : center.dx.clamp(minX, maxX),
+    minY > maxY ? visible.center.dy : center.dy.clamp(minY, maxY),
   );
 }
 
@@ -41,6 +41,7 @@ class ScanOverlay extends StatelessWidget {
     required this.project,
     required this.aimPoint,
     required this.snappedCorner,
+    this.visible,
     super.key,
   });
 
@@ -57,6 +58,10 @@ class ScanOverlay extends StatelessWidget {
   /// Esquina resaltada: la enganchada o la que se usa para situarse.
   final int? snappedCorner;
 
+  /// El trozo del encuadre que se ve en la pantalla; si falta, se ve entero.
+  /// Las medidas se escriben siempre dentro de él.
+  final Rect? visible;
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -66,6 +71,7 @@ class ScanOverlay extends StatelessWidget {
         project: project,
         aimPoint: aimPoint,
         snappedCorner: snappedCorner,
+        visible: visible,
       ),
     );
   }
@@ -77,12 +83,14 @@ class _ScanOverlayPainter extends CustomPainter {
     required this.project,
     required this.aimPoint,
     required this.snappedCorner,
+    required this.visible,
   });
 
   final List<Point2D> corners;
   final Offset? Function(Point2D floorPoint, Size viewport) project;
   final Point2D? aimPoint;
   final int? snappedCorner;
+  final Rect? visible;
 
   /// El trazo oscuro de debajo: sin él las líneas se pierden sobre la imagen.
   static const Color _halo = Color(0xCC0F172A);
@@ -91,6 +99,8 @@ class _ScanOverlayPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (corners.isEmpty) return;
 
+    final Rect onScreen = visible ?? (Offset.zero & size);
+
     final List<Offset?> screen = <Offset?>[
       for (final Point2D corner in corners) project(corner, size),
     ];
@@ -98,7 +108,7 @@ class _ScanOverlayPainter extends CustomPainter {
     for (int i = 0; i + 1 < screen.length; i++) {
       _wall(
         canvas,
-        size,
+        onScreen,
         screen[i],
         screen[i + 1],
         meters: corners[i].distanceTo(corners[i + 1]),
@@ -107,7 +117,7 @@ class _ScanOverlayPainter extends CustomPainter {
     }
 
     _paintLiveWall(canvas, size, screen);
-    _paintCorners(canvas, size, screen);
+    _paintCorners(canvas, onScreen, screen);
   }
 
   /// La línea que va desde la última esquina hasta donde apunta la mira.
@@ -124,7 +134,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
     _wall(
       canvas,
-      size,
+      visible ?? (Offset.zero & size),
       from,
       to,
       meters: corners.last.distanceTo(endPoint),
@@ -135,7 +145,7 @@ class _ScanOverlayPainter extends CustomPainter {
     );
   }
 
-  void _paintCorners(Canvas canvas, Size size, List<Offset?> screen) {
+  void _paintCorners(Canvas canvas, Rect onScreen, List<Offset?> screen) {
     for (int i = 0; i < screen.length; i++) {
       final Offset? corner = screen[i];
       if (corner == null) continue;
@@ -157,7 +167,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
       _label(
         canvas,
-        size,
+        onScreen,
         // El aro de enganche es más grande: el número se aparta de él.
         corner.translate(0, highlighted ? -34 : -24),
         '${i + 1}',
@@ -170,7 +180,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
   void _wall(
     Canvas canvas,
-    Size viewport,
+    Rect onScreen,
     Offset? from,
     Offset? to, {
     required double meters,
@@ -198,13 +208,13 @@ class _ScanOverlayPainter extends CustomPainter {
     }
 
     // En un tramo corto la etiqueta tapa más de lo que explica.
-    final double onScreen = (to - from).distance;
-    if (meters > 0.05 && onScreen > 56) {
+    final double drawn = (to - from).distance;
+    if (meters > 0.05 && drawn > 56) {
       final Offset middle = from + (to - from) * labelAt;
-      final Offset unit = (to - from) / onScreen;
+      final Offset unit = (to - from) / drawn;
       // Apartada de la línea, para que el trazo no cruce los números.
       final Offset away = Offset(-unit.dy, unit.dx) * 22;
-      _label(canvas, viewport, middle + away, Formatters.meters(meters));
+      _label(canvas, onScreen, middle + away, Formatters.meters(meters));
     }
   }
 
@@ -225,7 +235,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
   void _label(
     Canvas canvas,
-    Size viewport,
+    Rect onScreen,
     Offset center,
     String text, {
     Color background = _halo,
@@ -248,7 +258,7 @@ class _ScanOverlayPainter extends CustomPainter {
       painter.width + padding * 2,
       painter.height + padding,
     );
-    final Offset inside = labelCenterInside(center, label, viewport);
+    final Offset inside = labelCenterInside(center, label, onScreen);
     final Rect box = Rect.fromCenter(
       center: inside,
       width: label.width,

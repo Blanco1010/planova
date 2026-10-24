@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:planova/features/room_scan/presentation/widgets/scan_overlay.dart';
 
 void main() {
-  const Size viewport = Size(400, 800);
+  const Rect viewport = Rect.fromLTWH(0, 0, 400, 800);
   const Size label = Size(80, 36);
 
   test('en medio de la pantalla la medida se queda donde cae', () {

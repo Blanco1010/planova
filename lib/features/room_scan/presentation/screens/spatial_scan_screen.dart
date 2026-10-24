@@ -57,14 +57,15 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.darkNavy,
+      // La imagen llega hasta arriba; la barra del título se apoya encima
+      // con un velo oscuro para que se lea sobre cualquier pared.
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black26,
         foregroundColor: Colors.white,
         // El título del tema es azul oscuro: sobre la cámara no se lee.
-        titleTextStyle: Theme.of(
-          context,
-        ).appBarTheme.titleTextStyle?.copyWith(color: Colors.white),
+        titleTextStyle: Theme.of(context).appBarTheme.titleTextStyle
+            ?.copyWith(color: Colors.white),
         title: Text(t.newRoom),
         actions: [
           IconButton(
@@ -200,9 +201,7 @@ class _Readout extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        // Despegada de la barra de arriba: la medida se lee sobre la
-        // imagen, no en el filo entre las dos.
-        padding: const EdgeInsets.fromLTRB(24, 104, 24, 0),
+        padding: const EdgeInsets.fromLTRB(24, kToolbarHeight + 20, 24, 0),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: closing

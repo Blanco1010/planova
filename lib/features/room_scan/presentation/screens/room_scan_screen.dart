@@ -20,6 +20,7 @@ import '../../domain/entities/device_aim.dart';
 import '../../domain/entities/scan_session.dart';
 import '../../domain/services/scan_snap.dart';
 import '../providers/scan_providers.dart';
+import '../widgets/camera_stage.dart';
 import '../widgets/camera_viewfinder.dart';
 import '../widgets/scan_overlay.dart';
 
@@ -101,14 +102,15 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.darkNavy,
+      // La imagen llega hasta arriba; la barra del título se apoya encima
+      // con un velo oscuro para que se lea sobre cualquier pared.
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black26,
         foregroundColor: Colors.white,
         // El título del tema es azul oscuro: sobre la cámara no se lee.
-        titleTextStyle: Theme.of(
-          context,
-        ).appBarTheme.titleTextStyle?.copyWith(color: Colors.white),
+        titleTextStyle: Theme.of(context).appBarTheme.titleTextStyle
+            ?.copyWith(color: Colors.white),
         title: Text(t.newRoom),
         actions: [
           IconButton(
@@ -150,52 +152,44 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // El dibujo va dentro del mismo encuadre que la imagen: así el
-        // ángulo de la cámara vale para colocar cada esquina.
-        Center(
-          child: AspectRatio(
-            aspectRatio: previewAspect,
-            // Lo que se dibuje fuera de la imagen no se enseña: ahí ya no
-            // hay nada que mirar.
-            child: ClipRect(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const CameraViewfinder(),
-                  ScanOverlay(
-                    corners: _session.corners,
-                    project: (Point2D floor, Size viewport) {
-                      final ({double distance, double turn}) view = _session
-                          .viewOf(floor);
-                      final Point2D? screen =
-                          ViewProjection(
-                            widthPx: viewport.width,
-                            heightPx: viewport.height,
-                            aimTurnRadians: aim?.turnRadians ?? 0,
-                            aimPitchRadians: aim?.pitchRadians ?? 0,
-                            phoneHeightMeters: _phoneHeight,
-                            horizontalFovRadians: fieldOfView.horizontalFor(
-                              previewAspect,
-                            ),
-                          ).project(
-                            distanceMeters: view.distance,
-                            turnRadians: view.turn,
-                          );
-                      return screen == null ? null : Offset(screen.x, screen.y);
-                    },
-                    // Mientras se calibra o se vuelve a situar, la línea
-                    // viva estorba.
-                    aimPoint: relocating == null && !calibrating
-                        ? aimPoint
-                        : null,
-                    snappedCorner: relocating ?? snapped,
-                  ),
-                  const ScanReticle(),
-                ],
+        CameraStage(
+          aspectRatio: previewAspect,
+          builder: (Size frame, Rect visible) => Stack(
+            fit: StackFit.expand,
+            children: [
+              const CameraViewfinder(),
+              ScanOverlay(
+                visible: visible,
+                corners: _session.corners,
+                project: (Point2D floor, Size viewport) {
+                  final ({double distance, double turn}) view = _session.viewOf(
+                    floor,
+                  );
+                  final Point2D? screen =
+                      ViewProjection(
+                        widthPx: viewport.width,
+                        heightPx: viewport.height,
+                        aimTurnRadians: aim?.turnRadians ?? 0,
+                        aimPitchRadians: aim?.pitchRadians ?? 0,
+                        phoneHeightMeters: _phoneHeight,
+                        horizontalFovRadians: fieldOfView.horizontalFor(
+                          previewAspect,
+                        ),
+                      ).project(
+                        distanceMeters: view.distance,
+                        turnRadians: view.turn,
+                      );
+                  return screen == null ? null : Offset(screen.x, screen.y);
+                },
+                // Mientras se calibra o se vuelve a situar, la línea viva
+                // estorba.
+                aimPoint: relocating == null && !calibrating ? aimPoint : null,
+                snappedCorner: relocating ?? snapped,
               ),
-            ),
+            ],
           ),
         ),
+        const ScanReticle(),
         Align(
           alignment: Alignment.topCenter,
           child: _Readout(
@@ -313,9 +307,8 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
         );
 
     if (result == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_t.sightingsDoNotMatch)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(_t.sightingsDoNotMatch)));
       setState(() => _calibration = _Calibration.floor);
       return;
     }
@@ -446,11 +439,11 @@ class _Readout extends StatelessWidget {
       distance,
     )) {
       (false, _, _, _, _) => t.waitingForSensors,
-      (_, _Calibration.floor, _, _, _) =>
-        t.aimAtWallFootLockFloor,
+      (_, _Calibration.floor, _, _, _) => t.aimAtWallFootLockFloor,
       (_, _Calibration.ceiling, _, _, _) => t.nowAtTheCeiling,
-      (_, _, final int corner?, _, _) =>
-        t.aimAtCornerFixPosition('${corner + 1}'),
+      (_, _, final int corner?, _, _) => t.aimAtCornerFixPosition(
+        '${corner + 1}',
+      ),
       (_, _, _, true, _) => t.atCornerOneClose,
       (_, _, _, _, final double value?) => Formatters.meters(value),
       _ => t.aimLowerAtWallFoot,
@@ -458,9 +451,7 @@ class _Readout extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        // Despegada de la barra de arriba: la medida se lee sobre la
-        // imagen, no en el filo entre las dos.
-        padding: const EdgeInsets.fromLTRB(24, 104, 24, 0),
+        padding: const EdgeInsets.fromLTRB(24, kToolbarHeight + 20, 24, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -505,10 +496,7 @@ class _Readout extends StatelessWidget {
                   child: Text(
                     t.turnOnTheSpot,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ),
               ),
@@ -640,10 +628,7 @@ class _ScanBar extends StatelessWidget {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                         ),
-                        child: Text(
-                          t.cancel,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        child: Text(t.cancel, overflow: TextOverflow.ellipsis),
                       ),
                     )
                   else
@@ -655,10 +640,7 @@ class _ScanBar extends StatelessWidget {
                           disabledForegroundColor: Colors.white38,
                         ),
                         icon: const Icon(Icons.directions_walk, size: 18),
-                        label: Text(
-                          t.iMoved,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        label: Text(t.iMoved, overflow: TextOverflow.ellipsis),
                       ),
                     ),
                   if (onFinish != null)
