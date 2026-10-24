@@ -105,6 +105,10 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
+        // El título del tema es azul oscuro: sobre la cámara no se lee.
+        titleTextStyle: Theme.of(
+          context,
+        ).appBarTheme.titleTextStyle?.copyWith(color: Colors.white),
         title: Text(t.newRoom),
         actions: [
           IconButton(
@@ -354,7 +358,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
           for (int i = 0; i < count; i++)
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(i),
-              child: Text('${i + 1}'),
+              child: Text(_t.cornerNumber(i + 1)),
             ),
         ],
       ),
@@ -454,7 +458,9 @@ class _Readout extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 64, 24, 0),
+        // Despegada de la barra de arriba: la medida se lee sobre la
+        // imagen, no en el filo entre las dos.
+        padding: const EdgeInsets.fromLTRB(24, 104, 24, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -491,13 +497,18 @@ class _Readout extends StatelessWidget {
                   color: Colors.black.withValues(alpha: 0.45),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
                   child: Text(
-                    'Gira sobre ti mismo, sin caminar. Si te mueves, usa '
-                    '«Me moví».',
+                    t.turnOnTheSpot,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),
@@ -571,22 +582,30 @@ class _ScanBar extends StatelessWidget {
               Row(
                 children: [
                   Flexible(
-                    child: ActionChip(
-                      avatar: Icon(
+                    // Un botón y no un Chip: el Chip se pinta con el color
+                    // claro del tema y la letra blanca se perdía encima.
+                    child: TextButton.icon(
+                      onPressed: onStartCalibration,
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.white24,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                      ),
+                      icon: Icon(
                         calibrated ? Icons.check_circle : Icons.straighten,
                         size: 18,
-                        color: calibrated ? AppColors.lightBlue : null,
+                        color: calibrated ? AppColors.lightBlue : Colors.white,
                       ),
-                      backgroundColor: Colors.white24,
-                      labelStyle: const TextStyle(color: Colors.white),
-                      side: BorderSide.none,
                       label: Text(
                         calibrated
                             ? t.calibrated(Formatters.meters(phoneHeight))
                             : t.notCalibrated,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      onPressed: onStartCalibration,
                     ),
                   ),
                   const SizedBox(width: 8),

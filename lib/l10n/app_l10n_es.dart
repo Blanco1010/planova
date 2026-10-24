@@ -979,15 +979,15 @@ class AppL10nEs extends AppL10n {
   }
 
   @override
-  String get whichCorner => '¿A qué esquina apuntas?';
+  String get whichCorner => '¿Desde dónde mides ahora?';
 
   @override
   String get whichCornerBody =>
-      'Desde donde estás ahora, apunta al pie de una esquina que ya hayas marcado. Con eso la app vuelve a saber dónde estás y el plano no se mueve.';
+      'Este teléfono no sabe que te moviste: solo sabe hacia dónde apuntas. Apunta al pie de una esquina que ya marcaste y dime cuál es; con eso vuelve a situarte y el plano se queda donde está.';
 
   @override
   String get legacyHelpBody =>
-      '1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nSi tienes que caminar, toca «Me moví», apunta a una esquina que ya hayas marcado y fija tu posición: el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.';
+      '1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nEste teléfono mide desde donde estás parado, así que gira sobre ti mismo en vez de caminar. Si tienes que cambiarte de sitio, toca «Cambié de sitio», apunta al pie de una esquina que ya marcaste y dile cuál es: la app vuelve a situarte y el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.';
 
   @override
   String get waitingForSensors => 'Esperando a los sensores…';
@@ -1001,7 +1001,7 @@ class AppL10nEs extends AppL10n {
 
   @override
   String aimAtCornerFixPosition(String corner) {
-    return 'Apunta al pie de la esquina $corner y fija tu posición';
+    return 'Apunta al pie de la esquina $corner y toca «Estoy aquí»';
   }
 
   @override
@@ -1009,7 +1009,7 @@ class AppL10nEs extends AppL10n {
 
   @override
   String get turnOnTheSpot =>
-      'Gira sobre ti mismo, sin caminar. Si te mueves, usa «Me moví».';
+      'Gira sobre ti mismo, sin caminar. Si cambias de sitio, toca «Cambié de sitio».';
 
   @override
   String calibrated(String height) {
@@ -1020,7 +1020,7 @@ class AppL10nEs extends AppL10n {
   String get notCalibrated => 'Sin calibrar';
 
   @override
-  String get iMoved => 'Me moví';
+  String get iMoved => 'Cambié de sitio';
 
   @override
   String get lockFloor => 'Fijar el suelo';
@@ -1040,4 +1040,9 @@ class AppL10nEs extends AppL10n {
 
   @override
   String get goBack => 'Volver';
+
+  @override
+  String cornerNumber(int number) {
+    return 'Esquina $number';
+  }
 }

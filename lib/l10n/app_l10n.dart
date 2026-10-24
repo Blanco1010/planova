@@ -1691,19 +1691,19 @@ abstract class AppL10n {
   /// No description provided for @whichCorner.
   ///
   /// In es, this message translates to:
-  /// **'¿A qué esquina apuntas?'**
+  /// **'¿Desde dónde mides ahora?'**
   String get whichCorner;
 
   /// No description provided for @whichCornerBody.
   ///
   /// In es, this message translates to:
-  /// **'Desde donde estás ahora, apunta al pie de una esquina que ya hayas marcado. Con eso la app vuelve a saber dónde estás y el plano no se mueve.'**
+  /// **'Este teléfono no sabe que te moviste: solo sabe hacia dónde apuntas. Apunta al pie de una esquina que ya marcaste y dime cuál es; con eso vuelve a situarte y el plano se queda donde está.'**
   String get whichCornerBody;
 
   /// No description provided for @legacyHelpBody.
   ///
   /// In es, this message translates to:
-  /// **'1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nSi tienes que caminar, toca «Me moví», apunta a una esquina que ya hayas marcado y fija tu posición: el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.'**
+  /// **'1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nEste teléfono mide desde donde estás parado, así que gira sobre ti mismo en vez de caminar. Si tienes que cambiarte de sitio, toca «Cambié de sitio», apunta al pie de una esquina que ya marcaste y dile cuál es: la app vuelve a situarte y el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.'**
   String get legacyHelpBody;
 
   /// No description provided for @waitingForSensors.
@@ -1727,7 +1727,7 @@ abstract class AppL10n {
   /// No description provided for @aimAtCornerFixPosition.
   ///
   /// In es, this message translates to:
-  /// **'Apunta al pie de la esquina {corner} y fija tu posición'**
+  /// **'Apunta al pie de la esquina {corner} y toca «Estoy aquí»'**
   String aimAtCornerFixPosition(String corner);
 
   /// No description provided for @aimLowerAtWallFoot.
@@ -1739,7 +1739,7 @@ abstract class AppL10n {
   /// No description provided for @turnOnTheSpot.
   ///
   /// In es, this message translates to:
-  /// **'Gira sobre ti mismo, sin caminar. Si te mueves, usa «Me moví».'**
+  /// **'Gira sobre ti mismo, sin caminar. Si cambias de sitio, toca «Cambié de sitio».'**
   String get turnOnTheSpot;
 
   /// No description provided for @calibrated.
@@ -1757,7 +1757,7 @@ abstract class AppL10n {
   /// No description provided for @iMoved.
   ///
   /// In es, this message translates to:
-  /// **'Me moví'**
+  /// **'Cambié de sitio'**
   String get iMoved;
 
   /// No description provided for @lockFloor.
@@ -1795,6 +1795,12 @@ abstract class AppL10n {
   /// In es, this message translates to:
   /// **'Volver'**
   String get goBack;
+
+  /// No description provided for @cornerNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Esquina {number}'**
+  String cornerNumber(int number);
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

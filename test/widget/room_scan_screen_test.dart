@@ -258,12 +258,12 @@ void main() {
     }
 
     // Se camina al otro lado y se vuelve a situar apuntando a la esquina 2.
-    await tester.tap(find.text('Me moví'));
+    await tester.tap(find.text('Cambié de sitio'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, '2'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Esquina 2'));
     await tester.pumpAndSettle();
     expect(
-      find.text('Apunta al pie de la esquina 2 y fija tu posición'),
+      find.text('Apunta al pie de la esquina 2 y toca «Estoy aquí»'),
       findsOneWidget,
     );
 

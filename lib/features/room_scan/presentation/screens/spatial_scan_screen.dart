@@ -61,6 +61,10 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
+        // El título del tema es azul oscuro: sobre la cámara no se lee.
+        titleTextStyle: Theme.of(
+          context,
+        ).appBarTheme.titleTextStyle?.copyWith(color: Colors.white),
         title: Text(t.newRoom),
         actions: [
           IconButton(
@@ -196,7 +200,9 @@ class _Readout extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 64, 24, 0),
+        // Despegada de la barra de arriba: la medida se lee sobre la
+        // imagen, no en el filo entre las dos.
+        padding: const EdgeInsets.fromLTRB(24, 104, 24, 0),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: closing
@@ -274,17 +280,28 @@ class _SpatialBar extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     itemCount: walls.length,
                     separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (BuildContext context, int index) => Chip(
-                      backgroundColor: Colors.white24,
-                      side: BorderSide.none,
-                      labelStyle: const TextStyle(color: Colors.white),
-                      label: Text(
-                        t.wallChip(
-                          '${index + 1}',
-                          Formatters.meters(walls[index]),
+                    // A mano y no con Chip: el del tema se pinta claro y la
+                    // letra blanca no se leía.
+                    itemBuilder: (BuildContext context, int index) =>
+                        DecoratedBox(
+                          decoration: const ShapeDecoration(
+                            color: Colors.white24,
+                            shape: StadiumBorder(),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            child: Text(
+                              t.wallChip(
+                                '${index + 1}',
+                                Formatters.meters(walls[index]),
+                              ),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
                 ),
               Row(

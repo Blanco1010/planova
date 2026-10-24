@@ -66,6 +66,10 @@ class _MeasureDistanceScreenState extends ConsumerState<MeasureDistanceScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
+        // El título del tema es azul oscuro: sobre la cámara no se lee.
+        titleTextStyle: Theme.of(
+          context,
+        ).appBarTheme.titleTextStyle?.copyWith(color: Colors.white),
         title: Text(widget.title),
       ),
       body: Stack(

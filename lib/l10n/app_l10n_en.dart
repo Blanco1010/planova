@@ -978,15 +978,15 @@ class AppL10nEn extends AppL10n {
   }
 
   @override
-  String get whichCorner => 'Which corner are you aiming at?';
+  String get whichCorner => 'Where are you measuring from now?';
 
   @override
   String get whichCornerBody =>
-      'From where you are now, aim at the foot of a corner you already marked. That tells the app where you are again and the plan stays put.';
+      'This phone doesn\'t know you moved: it only knows where you are aiming. Aim at the foot of a corner you already marked and tell me which one; that puts you back in place and the plan stays where it is.';
 
   @override
   String get legacyHelpBody =>
-      '1. Tap «Not calibrated» and type the ceiling height. Aim at the foot of a wall, lock it, then at the ceiling of that same wall. That tells the app how high you are holding the phone so it measures properly.\n2. Put the crosshair at the foot of a corner, where the wall meets the floor, and mark it.\n3. Turn on the spot: a line runs from the marked corner and follows the crosshair. Mark the next one and the wall is made.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nIf you have to walk, tap «I moved», aim at a corner you already marked and fix your position: the plan stays where it is.\n\nAll of this is an estimate: afterwards you can correct each wall with a tape measure in the plan editor.';
+      '1. Tap «Not calibrated» and type the ceiling height. Aim at the foot of a wall, lock it, then at the ceiling of that same wall. That tells the app how high you are holding the phone so it measures properly.\n2. Put the crosshair at the foot of a corner, where the wall meets the floor, and mark it.\n3. Turn on the spot: a line runs from the marked corner and follows the crosshair. Mark the next one and the wall is made.\n4. When you come back to the first corner the line snaps to it: that closes the room.\n\nThis phone measures from where you are standing, so turn on the spot instead of walking. If you have to move somewhere else, tap «I moved», aim at the foot of a corner you already marked and say which one: the app puts you back in place and the plan stays where it is.\n\nAll of this is an estimate: afterwards you can correct each wall with a tape measure in the plan editor.';
 
   @override
   String get waitingForSensors => 'Waiting for the sensors…';
@@ -1000,7 +1000,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String aimAtCornerFixPosition(String corner) {
-    return 'Aim at the foot of corner $corner and fix your position';
+    return 'Aim at the foot of corner $corner and tap «I am here»';
   }
 
   @override
@@ -1008,7 +1008,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get turnOnTheSpot =>
-      'Turn on the spot, without walking. If you move, use «I moved».';
+      'Turn on the spot, without walking. If you move somewhere else, tap «I moved».';
 
   @override
   String calibrated(String height) {
@@ -1039,4 +1039,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get goBack => 'Go back';
+
+  @override
+  String cornerNumber(int number) {
+    return 'Corner $number';
+  }
 }

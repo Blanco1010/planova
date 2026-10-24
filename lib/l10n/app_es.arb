@@ -722,13 +722,13 @@
       }
     }
   },
-  "whichCorner": "¿A qué esquina apuntas?",
-  "whichCornerBody": "Desde donde estás ahora, apunta al pie de una esquina que ya hayas marcado. Con eso la app vuelve a saber dónde estás y el plano no se mueve.",
-  "legacyHelpBody": "1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nSi tienes que caminar, toca «Me moví», apunta a una esquina que ya hayas marcado y fija tu posición: el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.",
+  "whichCorner": "¿Desde dónde mides ahora?",
+  "whichCornerBody": "Este teléfono no sabe que te moviste: solo sabe hacia dónde apuntas. Apunta al pie de una esquina que ya marcaste y dime cuál es; con eso vuelve a situarte y el plano se queda donde está.",
+  "legacyHelpBody": "1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nEste teléfono mide desde donde estás parado, así que gira sobre ti mismo en vez de caminar. Si tienes que cambiarte de sitio, toca «Cambié de sitio», apunta al pie de una esquina que ya marcaste y dile cuál es: la app vuelve a situarte y el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.",
   "waitingForSensors": "Esperando a los sensores…",
   "aimAtWallFootLockFloor": "Apunta al pie de una pared y fija el suelo",
   "nowAtTheCeiling": "Ahora al techo de esa misma pared",
-  "aimAtCornerFixPosition": "Apunta al pie de la esquina {corner} y fija tu posición",
+  "aimAtCornerFixPosition": "Apunta al pie de la esquina {corner} y toca «Estoy aquí»",
   "@aimAtCornerFixPosition": {
     "placeholders": {
       "corner": {
@@ -737,7 +737,7 @@
     }
   },
   "aimLowerAtWallFoot": "Apunta más abajo, al pie de la pared",
-  "turnOnTheSpot": "Gira sobre ti mismo, sin caminar. Si te mueves, usa «Me moví».",
+  "turnOnTheSpot": "Gira sobre ti mismo, sin caminar. Si cambias de sitio, toca «Cambié de sitio».",
   "calibrated": "Calibrado · {height}",
   "@calibrated": {
     "placeholders": {
@@ -747,11 +747,19 @@
     }
   },
   "notCalibrated": "Sin calibrar",
-  "iMoved": "Me moví",
+  "iMoved": "Cambié de sitio",
   "lockFloor": "Fijar el suelo",
   "lockCeiling": "Fijar el techo",
   "iAmHere": "Estoy aquí",
   "noGyroscopeTitle": "Este teléfono no puede medir el giro",
   "noGyroscopeBody": "Le falta el giroscopio, así que no hay forma de saber hacia dónde apuntas al girar sobre ti mismo y el plano saldría inventado.\n\nPuedes crear la habitación escribiendo el ancho y el largo, y ajustar cada pared en el plano.",
-  "goBack": "Volver"
+  "goBack": "Volver",
+  "cornerNumber": "Esquina {number}",
+  "@cornerNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  }
 }
