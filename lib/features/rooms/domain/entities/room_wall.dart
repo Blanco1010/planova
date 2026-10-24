@@ -1,3 +1,4 @@
+import '../../../../l10n/app_l10n.dart';
 import 'opening.dart';
 
 /// Una pared de la habitación, con los vanos que tenga.
@@ -27,5 +28,5 @@ class RoomWall {
       openings.fold<double>(0, (double sum, Opening o) => sum + o.areaM2);
 
   /// Cómo se llama la pared en pantalla: «Pared 1», «Pared 2»…
-  String get label => 'Pared ${position + 1}';
+  String name(AppL10n t) => t.wallName(position + 1);
 }

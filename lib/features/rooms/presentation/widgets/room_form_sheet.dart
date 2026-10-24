@@ -6,6 +6,7 @@ import '../../../../core/utils/measure_input.dart';
 import '../../../room_scan/domain/entities/scan_surface.dart';
 import '../../../room_scan/presentation/providers/scan_providers.dart';
 import '../../../room_scan/presentation/screens/measure_distance_screen.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
 import '../providers/room_providers.dart';
@@ -104,6 +105,8 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
@@ -113,19 +116,19 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(_title, style: Theme.of(context).textTheme.titleLarge),
+              Text(_title(t), style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 20),
               TextFormField(
                 controller: _name,
                 autofocus: !_isEditing,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre',
-                  hintText: 'Sala, cocina, alcoba 1…',
+                decoration: InputDecoration(
+                  labelText: t.name,
+                  hintText: t.roomNameHint,
                 ),
                 validator: (String? value) =>
                     (value == null || value.trim().isEmpty)
-                    ? 'Ponle un nombre a la habitación'
+                    ? t.roomNameRequired
                     : null,
               ),
               if (_asksForSize) ...[
@@ -138,9 +141,7 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Ancho (m)',
-                        ),
+                        decoration: InputDecoration(labelText: t.widthMeters),
                         validator: (String? value) =>
                             MeasureInput.validate(value),
                       ),
@@ -152,8 +153,8 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Largo (m)',
+                        decoration: InputDecoration(
+                          labelText: t.lengthMeters,
                         ),
                         validator: (String? value) =>
                             MeasureInput.validate(value),
@@ -168,9 +169,7 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(
-                  labelText: 'Altura de las paredes (m)',
-                ),
+                decoration: InputDecoration(labelText: t.wallHeightMeters),
                 validator: (String? value) => MeasureInput.validate(value),
               ),
               if (ref.watch(arCoreProvider).value ?? false)
@@ -179,15 +178,13 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
                   child: TextButton.icon(
                     onPressed: _saving ? null : _measureHeight,
                     icon: const Icon(Icons.height),
-                    label: const Text('Medir la altura con la cámara'),
+                    label: Text(t.measureHeightWithCamera),
                   ),
                 ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(
-                  _isEditing ? 'Guardar cambios' : 'Crear habitación',
-                ),
+                child: Text(_isEditing ? t.saveChanges : t.createRoom),
               ),
             ],
           ),
@@ -196,17 +193,17 @@ class _RoomFormSheetState extends ConsumerState<RoomFormSheet> {
     );
   }
 
-  String get _title {
-    if (_isEditing) return 'Editar habitación';
-    if (widget.scannedWalls != null) return 'Guardar lo escaneado';
-    return 'Nueva habitación';
+  String _title(AppL10n t) {
+    if (_isEditing) return t.editRoom;
+    if (widget.scannedWalls != null) return t.saveScanned;
+    return t.newRoom;
   }
 
   /// Mide del suelo al techo y lo deja escrito en el campo.
   Future<void> _measureHeight() async {
     final double? meters = await MeasureDistanceScreen.show(
       context,
-      title: 'Medir la altura',
+      title: AppL10n.of(context).measureHeight,
       surface: ScanSurface.wall,
     );
     if (meters == null || !mounted) return;

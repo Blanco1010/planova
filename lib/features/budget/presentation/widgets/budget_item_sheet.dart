@@ -6,6 +6,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
 import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/entities/budget_item.dart';
 import '../providers/budget_providers.dart';
@@ -89,6 +90,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
   @override
   Widget build(BuildContext context) {
     final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
+    final AppL10n t = AppL10n.of(context);
 
     return SafeArea(
       child: Padding(
@@ -100,7 +102,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                _isEditing ? 'Editar partida' : 'Nueva partida',
+                _isEditing ? t.editItem : t.newItem,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
@@ -109,7 +111,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                   for (final BudgetCategory category in BudgetCategory.values)
                     ButtonSegment<BudgetCategory>(
                       value: category,
-                      label: Text(category.label),
+                      label: Text(category.label(t)),
                     ),
                 ],
                 selected: <BudgetCategory>{_category},
@@ -121,13 +123,13 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                 controller: _description,
                 autofocus: !_isEditing,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Descripción',
-                  hintText: 'Varilla de 1/2", teja, ayudante…',
+                decoration: InputDecoration(
+                  labelText: t.description,
+                  hintText: t.itemHint,
                 ),
                 validator: (String? value) =>
                     (value == null || value.trim().isEmpty)
-                    ? 'Escribe qué es'
+                    ? t.itemRequired
                     : null,
               ),
               const SizedBox(height: 12),
@@ -140,7 +142,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(labelText: 'Cantidad'),
+                      decoration: InputDecoration(labelText: t.quantity),
                       validator: (String? value) =>
                           MeasureInput.validate(value),
                     ),
@@ -149,10 +151,10 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                   Expanded(
                     child: TextFormField(
                       controller: _unit,
-                      decoration: const InputDecoration(labelText: 'Unidad'),
+                      decoration: InputDecoration(labelText: t.unit),
                       validator: (String? value) =>
                           (value == null || value.trim().isEmpty)
-                          ? 'Falta'
+                          ? t.missing
                           : null,
                     ),
                   ),
@@ -165,7 +167,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: 'Precio por unidad',
+                  labelText: t.pricePerUnit,
                   prefixText: '${money.symbol} ',
                 ),
                 inputFormatters: <TextInputFormatter>[
@@ -176,7 +178,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(_isEditing ? 'Guardar cambios' : 'Añadir partida'),
+                child: Text(_isEditing ? t.saveChanges : t.addItem),
               ),
               if (_isEditing)
                 TextButton(
@@ -184,7 +186,7 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.error,
                   ),
-                  child: const Text('Eliminar partida'),
+                  child: Text(t.deleteItem),
                 ),
             ],
           ),

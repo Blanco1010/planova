@@ -8,6 +8,7 @@ import '../../../../core/geometry/plan_geometry.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/geometry/point3d.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/presentation/widgets/room_form_sheet.dart';
 import '../../domain/entities/scan_surface.dart';
@@ -43,6 +44,7 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final SpatialScanner scanner = ref.watch(spatialScannerProvider);
     final SpatialFrame? frame = _frame;
     final SpatialHit? hit = frame?.aim;
@@ -59,11 +61,11 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Nueva habitación'),
+        title: Text(t.newRoom),
         actions: [
           IconButton(
             onPressed: _showHelp,
-            tooltip: 'Cómo se mide',
+            tooltip: t.howItMeasures,
             icon: const Icon(Icons.help_outline),
           ),
         ],
@@ -156,32 +158,17 @@ class _SpatialScanScreenState extends ConsumerState<SpatialScanScreen> {
   }
 
   void _showHelp() {
+    final AppL10n t = AppL10n.of(context);
+
     showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Cómo se mide'),
-        content: const SingleChildScrollView(
-          child: Text(
-            '1. Mueve despacio el teléfono apuntando al suelo hasta que la '
-            'app reconozca la superficie.\n'
-            '2. Apunta con la mira al pie de una esquina y marca.\n'
-            '3. Ve a la siguiente esquina y marca otra vez: la pared queda '
-            'hecha con su medida. Puedes caminar, que el plano no se '
-            'mueve.\n'
-            '4. Al volver a la primera esquina, la línea se engancha a '
-            'ella: ahí se cierra la habitación.\n\n'
-            'Al cerrar le pones nombre y la habitación queda creada con '
-            'sus paredes. La altura del techo se mide después, desde la '
-            'habitación. '
-            'Aquí la distancia la mide el aparato, no se estima. Aun así '
-            'conviene revisar las paredes en el plano antes de comprar '
-            'material.',
-          ),
-        ),
+        title: Text(t.howItMeasures),
+        content: SingleChildScrollView(child: Text(t.spatialHelpBody)),
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Entendido'),
+            child: Text(t.gotIt),
           ),
         ],
       ),
@@ -198,12 +185,13 @@ class _Readout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     final SpatialHit? hit = this.hit;
     final String text = switch ((closing, hit)) {
-      (true, _) => 'Estás en la esquina 1: cierra la habitación',
+      (true, _) => t.atCornerOneClose,
       (_, final SpatialHit hit) => Formatters.meters(hit.distanceMeters),
-      _ => 'Mueve el teléfono despacio para reconocer el suelo',
+      _ => t.moveToFindFloor,
     };
 
     return SafeArea(
@@ -262,6 +250,7 @@ class _SpatialBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -290,7 +279,10 @@ class _SpatialBar extends StatelessWidget {
                       side: BorderSide.none,
                       labelStyle: const TextStyle(color: Colors.white),
                       label: Text(
-                        'Pared ${index + 1} · ${Formatters.meters(walls[index])}',
+                        t.wallChip(
+                          '${index + 1}',
+                          Formatters.meters(walls[index]),
+                        ),
                       ),
                     ),
                   ),
@@ -299,14 +291,14 @@ class _SpatialBar extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      corners == 1 ? '1 esquina' : '$corners esquinas',
+                      t.cornerCount(corners),
                       style: const TextStyle(color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(
                     onPressed: onUndo,
-                    tooltip: 'Quitar la última',
+                    tooltip: t.undoLast,
                     color: Colors.white,
                     disabledColor: Colors.white38,
                     icon: const Icon(Icons.undo),
@@ -318,19 +310,19 @@ class _SpatialBar extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: onClose,
                   icon: const Icon(Icons.check_circle_outline),
-                  label: const Text('Cerrar habitación'),
+                  label: Text(t.closeRoom),
                 )
               else
                 FilledButton.icon(
                   onPressed: onMark,
                   icon: const Icon(Icons.add_location_alt_outlined),
-                  label: const Text('Marcar esquina'),
+                  label: Text(t.markCorner),
                 ),
               if (onFinish != null)
                 TextButton(
                   onPressed: onFinish,
                   style: TextButton.styleFrom(foregroundColor: Colors.white),
-                  child: const Text('Terminar sin cerrar'),
+                  child: Text(t.finishWithoutClosing),
                 ),
             ],
           ),

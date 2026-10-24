@@ -12,6 +12,7 @@ import '../../../../core/measuring/view_projection.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
 import '../../../../core/widgets/number_prompt_dialog.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../rooms/domain/entities/room_drafts.dart';
 import '../../../rooms/presentation/widgets/room_form_sheet.dart';
 import '../../domain/entities/camera_field_of_view.dart';
@@ -45,6 +46,8 @@ class RoomScanScreen extends ConsumerStatefulWidget {
 }
 
 class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
+  AppL10n get _t => AppL10n.of(context);
+
   ScanSession _session = ScanSession.empty;
 
   /// Esquina a la que se está apuntando para volver a situarse, si toca.
@@ -59,6 +62,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     // Sin sensor de giro no hay plano que levantar: se dice y punto.
     final bool canTurn = ref.watch(turnSensorProvider).value ?? true;
     final DeviceAim? aim = ref.watch(deviceAimProvider).value;
@@ -101,11 +105,11 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Nueva habitación'),
+        title: Text(t.newRoom),
         actions: [
           IconButton(
             onPressed: _showHelp,
-            tooltip: 'Cómo se mide',
+            tooltip: t.howItMeasures,
             icon: const Icon(Icons.help_outline),
           ),
         ],
@@ -268,9 +272,9 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
   Future<void> _startCalibration() async {
     final double? ceiling = await NumberPromptDialog.show(
       context,
-      title: 'Altura del techo',
-      label: 'Metros del suelo al techo',
-      helperText: 'Es lo único que hay que saber: con eso salen las demás',
+      title: _t.ceilingHeight,
+      label: _t.metresFloorToCeiling,
+      helperText: _t.ceilingHeightHelp,
       initialText: Formatters.decimal(_ceilingHeight),
       validator: (String? value) =>
           MeasureInput.validate(value, min: 1.5, max: 6),
@@ -306,12 +310,7 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
 
     if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'No cuadra: apunta al pie de una pared y luego al techo de esa '
-            'misma pared.',
-          ),
-        ),
+        SnackBar(content: Text(_t.sightingsDoNotMatch)),
       );
       setState(() => _calibration = _Calibration.floor);
       return;
@@ -325,9 +324,10 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Listo: llevas el teléfono a '
-          '${Formatters.meters(result.phoneHeight)} del suelo y esa pared '
-          'está a ${Formatters.meters(result.distance)}.',
+          _t.calibrationDone(
+            Formatters.meters(result.phoneHeight),
+            Formatters.meters(result.distance),
+          ),
         ),
       ),
     );
@@ -344,16 +344,12 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     final int? corner = await showDialog<int>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('¿A qué esquina apuntas?'),
-        content: const Text(
-          'Desde donde estás ahora, apunta al pie de una esquina que ya '
-          'hayas marcado. Con eso la app vuelve a saber dónde estás y el '
-          'plano no se mueve.',
-        ),
+        title: Text(_t.whichCorner),
+        content: Text(_t.whichCornerBody),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
+            child: Text(_t.cancel),
           ),
           for (int i = 0; i < count; i++)
             FilledButton(
@@ -396,31 +392,12 @@ class _RoomScanScreenState extends ConsumerState<RoomScanScreen> {
     showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Cómo se mide'),
-        content: const SingleChildScrollView(
-          child: Text(
-            '1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al '
-            'pie de una pared, fija, y luego al techo de esa misma pared. '
-            'Con eso la app sabe a qué altura llevas el teléfono y mide '
-            'bien.\n'
-            '2. Apunta con la mira al pie de una esquina, donde la pared '
-            'toca el suelo, y marca.\n'
-            '3. Gira sobre ti mismo: desde la esquina marcada sale una '
-            'línea que sigue a la mira. Marca la siguiente y la pared '
-            'queda hecha.\n'
-            '4. Al volver a la primera esquina, la línea se engancha a '
-            'ella: ahí se cierra la habitación.\n\n'
-            'Si tienes que caminar, toca «Me moví», apunta a una esquina '
-            'que ya hayas marcado y fija tu posición: el plano se queda '
-            'donde está.\n\n'
-            'Todo esto es una estimación: después puedes corregir cada '
-            'pared con el flexómetro en el editor del plano.',
-          ),
-        ),
+        title: Text(_t.howItMeasures),
+        content: SingleChildScrollView(child: Text(_t.legacyHelpBody)),
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Entendido'),
+            child: Text(_t.gotIt),
           ),
         ],
       ),
@@ -450,6 +427,7 @@ class _Readout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     final int? relocating = relocatingTo;
     final bool highlighted =
@@ -463,15 +441,15 @@ class _Readout extends StatelessWidget {
       closing,
       distance,
     )) {
-      (false, _, _, _, _) => 'Esperando a los sensores…',
+      (false, _, _, _, _) => t.waitingForSensors,
       (_, _Calibration.floor, _, _, _) =>
-        'Apunta al pie de una pared y fija el suelo',
-      (_, _Calibration.ceiling, _, _, _) => 'Ahora al techo de esa misma pared',
+        t.aimAtWallFootLockFloor,
+      (_, _Calibration.ceiling, _, _, _) => t.nowAtTheCeiling,
       (_, _, final int corner?, _, _) =>
-        'Apunta al pie de la esquina ${corner + 1} y fija tu posición',
-      (_, _, _, true, _) => 'Estás en la esquina 1: cierra la habitación',
+        t.aimAtCornerFixPosition('${corner + 1}'),
+      (_, _, _, true, _) => t.atCornerOneClose,
       (_, _, _, _, final double value?) => Formatters.meters(value),
-      _ => 'Apunta más abajo, al pie de la pared',
+      _ => t.aimLowerAtWallFoot,
     };
 
     return SafeArea(
@@ -573,6 +551,7 @@ class _ScanBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -603,8 +582,8 @@ class _ScanBar extends StatelessWidget {
                       side: BorderSide.none,
                       label: Text(
                         calibrated
-                            ? 'Calibrado · ${Formatters.meters(phoneHeight)}'
-                            : 'Sin calibrar',
+                            ? t.calibrated(Formatters.meters(phoneHeight))
+                            : t.notCalibrated,
                         overflow: TextOverflow.ellipsis,
                       ),
                       onPressed: onStartCalibration,
@@ -613,7 +592,7 @@ class _ScanBar extends StatelessWidget {
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      corners == 1 ? '1 esquina' : '$corners esquinas',
+                      t.cornerCount(corners),
                       style: const TextStyle(color: Colors.white),
                       textAlign: TextAlign.end,
                       overflow: TextOverflow.ellipsis,
@@ -621,7 +600,7 @@ class _ScanBar extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: onUndo,
-                    tooltip: 'Quitar la última',
+                    tooltip: t.undoLast,
                     color: Colors.white,
                     disabledColor: Colors.white38,
                     icon: const Icon(Icons.undo),
@@ -629,7 +608,7 @@ class _ScanBar extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              _primaryButton(),
+              _primaryButton(t),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -642,8 +621,8 @@ class _ScanBar extends StatelessWidget {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text(
-                          'Cancelar',
+                        child: Text(
+                          t.cancel,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -657,8 +636,8 @@ class _ScanBar extends StatelessWidget {
                           disabledForegroundColor: Colors.white38,
                         ),
                         icon: const Icon(Icons.directions_walk, size: 18),
-                        label: const Text(
-                          'Me moví',
+                        label: Text(
+                          t.iMoved,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -670,8 +649,8 @@ class _ScanBar extends StatelessWidget {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text(
-                          'Terminar sin cerrar',
+                        child: Text(
+                          t.finishWithoutClosing,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -685,32 +664,32 @@ class _ScanBar extends StatelessWidget {
     );
   }
 
-  Widget _primaryButton() {
+  Widget _primaryButton(AppL10n t) {
     return switch (calibration) {
       _Calibration.floor => FilledButton.icon(
         onPressed: onCalibrationStep,
         icon: const Icon(Icons.vertical_align_bottom),
-        label: const Text('Fijar el suelo'),
+        label: Text(t.lockFloor),
       ),
       _Calibration.ceiling => FilledButton.icon(
         onPressed: onCalibrationStep,
         icon: const Icon(Icons.vertical_align_top),
-        label: const Text('Fijar el techo'),
+        label: Text(t.lockCeiling),
       ),
       _Calibration.idle when relocatingTo != null => FilledButton.icon(
         onPressed: onRelocate,
         icon: const Icon(Icons.my_location),
-        label: const Text('Estoy aquí'),
+        label: Text(t.iAmHere),
       ),
       _Calibration.idle when closing => FilledButton.icon(
         onPressed: onClose,
         icon: const Icon(Icons.check_circle_outline),
-        label: const Text('Cerrar habitación'),
+        label: Text(t.closeRoom),
       ),
       _Calibration.idle => FilledButton.icon(
         onPressed: onCapture,
         icon: const Icon(Icons.add_location_alt_outlined),
-        label: const Text('Marcar esquina'),
+        label: Text(t.markCorner),
       ),
     };
   }
@@ -722,6 +701,7 @@ class _NoTurnSensor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
 
     return Center(
@@ -737,17 +717,13 @@ class _NoTurnSensor extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Este teléfono no puede medir el giro',
+              t.noGyroscopeTitle,
               style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             Text(
-              'Le falta el giroscopio, así que no hay forma de saber hacia '
-              'dónde apuntas al girar sobre ti mismo y el plano saldría '
-              'inventado.\n\n'
-              'Puedes crear la habitación escribiendo el ancho y el largo, '
-              'y ajustar cada pared en el plano.',
+              t.noGyroscopeBody,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.mutedDark,
               ),
@@ -756,7 +732,7 @@ class _NoTurnSensor extends StatelessWidget {
             const SizedBox(height: 24),
             FilledButton(
               onPressed: () => Navigator.of(context).maybePop(),
-              child: const Text('Volver'),
+              child: Text(t.goBack),
             ),
           ],
         ),

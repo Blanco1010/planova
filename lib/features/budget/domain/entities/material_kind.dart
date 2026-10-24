@@ -1,3 +1,5 @@
+import '../../../../l10n/app_l10n.dart';
+
 /// Los materiales que salen solos del plano y a los que basta ponerles
 /// precio unitario.
 enum MaterialKind { block, cement, sand, paint, adhesive, tile }
@@ -9,9 +11,9 @@ enum MaterialKind { block, cement, sand, paint, adhesive, tile }
 enum MaterialSurface { walls, floor }
 
 extension MaterialSurfaceDisplay on MaterialSurface {
-  String get label => switch (this) {
-    MaterialSurface.walls => 'Paredes',
-    MaterialSurface.floor => 'Piso',
+  String label(AppL10n t) => switch (this) {
+    MaterialSurface.walls => t.surfaceWalls,
+    MaterialSurface.floor => t.surfaceFloor,
   };
 }
 
@@ -25,21 +27,21 @@ extension MaterialKindDisplay on MaterialKind {
     MaterialKind.adhesive || MaterialKind.tile => MaterialSurface.floor,
   };
 
-  String get label => switch (this) {
-    MaterialKind.block => 'Bloques o ladrillos',
-    MaterialKind.cement => 'Cemento',
-    MaterialKind.sand => 'Arena',
-    MaterialKind.paint => 'Pintura',
-    MaterialKind.adhesive => 'Pegante',
-    MaterialKind.tile => 'Baldosas',
+  String label(AppL10n t) => switch (this) {
+    MaterialKind.block => t.materialBlock,
+    MaterialKind.cement => t.materialCement,
+    MaterialKind.sand => t.materialSand,
+    MaterialKind.paint => t.materialPaint,
+    MaterialKind.adhesive => t.materialAdhesive,
+    MaterialKind.tile => t.materialTile,
   };
 
-  String get unit => switch (this) {
-    MaterialKind.block => 'unid',
-    MaterialKind.cement => 'bulto',
+  String unit(AppL10n t) => switch (this) {
+    MaterialKind.block => t.unitShort,
+    MaterialKind.cement => t.unitBag,
     MaterialKind.sand => 'm³',
-    MaterialKind.paint => 'gal',
-    MaterialKind.adhesive => 'kg',
-    MaterialKind.tile => 'unid',
+    MaterialKind.paint => t.unitGallon,
+    MaterialKind.adhesive => t.unitKilogram,
+    MaterialKind.tile => t.unitShort,
   };
 }

@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/geometry/point3d.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/scan_surface.dart';
 import '../../domain/entities/spatial_frame.dart';
 import '../providers/scan_providers.dart';
@@ -209,6 +210,7 @@ class _Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final double? measure = this.measure;
 
     return DecoratedBox(
@@ -231,7 +233,7 @@ class _Bar extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: onStart,
                   icon: const Icon(Icons.adjust),
-                  label: const Text('Marcar el principio'),
+                  label: Text(t.markTheStart),
                 )
               else
                 FilledButton.icon(
@@ -239,15 +241,15 @@ class _Bar extends StatelessWidget {
                   icon: const Icon(Icons.check),
                   label: Text(
                     measure == null
-                        ? 'Apunta al otro extremo'
-                        : 'Usar ${Formatters.meters(measure)}',
+                        ? t.aimAtOtherEnd
+                        : t.useMeasure(Formatters.meters(measure)),
                   ),
                 ),
               if (hasStart)
                 TextButton(
                   onPressed: onRestart,
                   style: TextButton.styleFrom(foregroundColor: Colors.white),
-                  child: const Text('Empezar de nuevo'),
+                  child: Text(t.startAgain),
                 ),
             ],
           ),

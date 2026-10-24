@@ -6,6 +6,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_wall.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
@@ -80,6 +81,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
         ref.watch(projectRoomsProvider(widget.projectId)).value ??
         const <Room>[];
     final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
+    final AppL10n t = AppL10n.of(context);
     final double area = _selectedArea(rooms);
     final double? price = MoneyInput.parse(_price.text, money);
 
@@ -94,7 +96,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  _isEditing ? 'Editar acabado' : 'Nuevo acabado',
+                  _isEditing ? t.editFinish : t.newFinish,
                   style: theme.textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
@@ -102,13 +104,13 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                   controller: _description,
                   autofocus: !_isEditing,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Qué se hace',
-                    hintText: 'Pintura vinilo, estuco, enchape…',
+                  decoration: InputDecoration(
+                    labelText: t.whatIsDone,
+                    hintText: t.whatIsDoneHint,
                   ),
                   validator: (String? value) =>
                       (value == null || value.trim().isEmpty)
-                      ? 'Escribe qué acabado es'
+                      ? t.whatIsDoneRequired
                       : null,
                 ),
                 const SizedBox(height: 12),
@@ -118,7 +120,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                     decimal: true,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Precio por m²',
+                    labelText: t.pricePerSquareMetre,
                     prefixText: '${money.symbol} ',
                   ),
                   inputFormatters: <TextInputFormatter>[
@@ -128,12 +130,12 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                   validator: (String? raw) => MoneyInput.validate(raw, money),
                 ),
                 const SizedBox(height: 20),
-                Text('Dónde se aplica', style: theme.textTheme.titleMedium),
+                Text(t.whereItGoes, style: theme.textTheme.titleMedium),
                 if (rooms.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'Todavía no hay habitaciones medidas.',
+                      t.noRoomsMeasured,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -146,7 +148,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                 FilledButton(
                   onPressed: _saving ? null : () => _save(rooms),
                   child: Text(
-                    _isEditing ? 'Guardar cambios' : 'Añadir acabado',
+                    _isEditing ? t.saveChanges : t.addFinish,
                   ),
                 ),
                 if (_isEditing)
@@ -155,7 +157,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                     style: TextButton.styleFrom(
                       foregroundColor: theme.colorScheme.error,
                     ),
-                    child: const Text('Eliminar acabado'),
+                    child: Text(t.deleteFinish),
                   ),
               ],
             ),
@@ -164,6 +166,8 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
       ),
     );
   }
+
+  AppL10n get _t => AppL10n.of(context);
 
   Widget _roomSection(Room room) {
     final ThemeData theme = Theme.of(context);
@@ -182,12 +186,12 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
         for (final RoomWall wall in room.walls)
           _surfaceTile(
             surface: FinishSurface(roomId: room.id, wallId: wall.id),
-            label: wall.label,
+            label: wall.name(_t),
             area: FinishCalculator.wallArea(room, wall),
           ),
         _surfaceTile(
           surface: FinishSurface(roomId: room.id),
-          label: 'Piso',
+          label: _t.floor,
           area: FinishCalculator.surfaceArea(
             FinishSurface(roomId: room.id),
             <Room>[room],
@@ -214,7 +218,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
       dense: true,
       contentPadding: EdgeInsets.zero,
       controlAffinity: ListTileControlAffinity.leading,
-      title: Text('$label · ${Formatters.squareMeters(area)}'),
+      title: Text(_t.surfaceTile(label, Formatters.squareMeters(area))),
     );
   }
 
@@ -230,7 +234,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_selected.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Marca al menos una pared o un piso.')),
+        SnackBar(content: Text(_t.markOneSurface)),
       );
       return;
     }
@@ -259,10 +263,8 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
     final NavigatorState navigator = Navigator.of(context);
     final bool confirmed = await ConfirmDeleteDialog.show(
       context,
-      title: 'Eliminar acabado',
-      message:
-          'Se quita «${widget.finish!.description}» del presupuesto. Las '
-          'paredes y el plano no se tocan.',
+      title: _t.deleteFinish,
+      message: _t.deleteFinishMessage(widget.finish!.description),
     );
     if (!confirmed) return;
 
@@ -299,7 +301,9 @@ class _Total extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              'Marcado: ${Formatters.squareMeters(area)}',
+              AppL10n.of(
+                context,
+              ).markedArea(Formatters.squareMeters(area)),
               style: theme.textTheme.bodyMedium,
             ),
           ),

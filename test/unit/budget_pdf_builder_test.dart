@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter/widgets.dart';
 import 'package:planova/core/utils/money.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/features/budget/data/services/budget_pdf_builder.dart';
 import 'package:planova/features/budget/domain/entities/budget_item.dart';
 import 'package:planova/features/budget/domain/entities/budget_summary.dart';
@@ -51,6 +53,9 @@ Room _room(String name, double width, double length) {
   );
 }
 
+/// El PDF se arma en español, que es como lo miran las pruebas.
+final AppL10n t = lookupAppL10n(const Locale('es'));
+
 Future<Uint8List> _buildSample() {
   final List<Room> rooms = <Room>[_room('Sala', 4, 3)];
   final MaterialEstimates estimates = MaterialCalculator.estimate(
@@ -78,6 +83,7 @@ Future<Uint8List> _buildSample() {
   ];
 
   return BudgetPdfBuilder.build(
+    t: t,
     money: MoneyFormat.cop,
     project: _project,
     scopeLabel: 'Todo el proyecto',
@@ -140,6 +146,7 @@ void main() {
 
   test('se arma igual sin habitaciones ni partidas', () async {
     final Uint8List bytes = await BudgetPdfBuilder.build(
+      t: t,
       money: MoneyFormat.cop,
       project: _project,
       scopeLabel: 'Todo el proyecto',

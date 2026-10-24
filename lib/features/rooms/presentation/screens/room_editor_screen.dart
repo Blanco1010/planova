@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/opening.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
@@ -36,10 +37,11 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
     if (room == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('La habitación ya no existe')),
+        body: Center(child: Text(AppL10n.of(context).roomGone)),
       );
     }
 
+    final AppL10n t = AppL10n.of(context);
     final RoomPlan plan = RoomPlan.of(room);
 
     return Scaffold(
@@ -52,7 +54,7 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
               projectId: room.projectId,
               room: room,
             ),
-            tooltip: 'Editar habitación',
+            tooltip: t.editRoom,
             icon: const Icon(Icons.edit_outlined),
           ),
         ],
@@ -82,22 +84,21 @@ class _RoomEditorScreenState extends ConsumerState<RoomEditorScreen> {
             children: [
               Expanded(
                 child: Text(
-                  'Paredes',
+                  t.walls,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               TextButton.icon(
                 onPressed: () => _addWall(room),
                 icon: const Icon(Icons.add),
-                label: const Text('Añadir pared'),
+                label: Text(t.addWall),
               ),
             ],
           ),
           const SizedBox(height: 4),
           if (room.walls.isEmpty)
             Text(
-              'Esta habitación no tiene paredes. Añade la primera para '
-              'empezar el recorrido.',
+              t.wallsEmptyBody,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -143,31 +144,33 @@ class _PlanSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
+
     return Row(
       // Sin este aire, «Muros sin vanos» y «Altura» quedan pegados.
       spacing: 12,
       children: [
         Expanded(
           child: _Stat(
-            label: 'Área del piso',
+            label: t.floorArea,
             value: Formatters.squareMeters(plan.floorAreaM2),
           ),
         ),
         Expanded(
           child: _Stat(
-            label: 'Perímetro',
+            label: t.perimeter,
             value: Formatters.meters(plan.perimeterMeters),
           ),
         ),
         Expanded(
           child: _Stat(
-            label: 'Muros sin vanos',
+            label: t.netWallAreaTitle,
             value: Formatters.squareMeters(plan.netWallAreaM2),
           ),
         ),
         Expanded(
           child: _Stat(
-            label: 'Altura',
+            label: t.height,
             value: Formatters.meters(room.wallHeightMeters),
           ),
         ),
@@ -212,6 +215,7 @@ class _ClosureBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
@@ -228,10 +232,7 @@ class _ClosureBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'El recorrido no vuelve al punto de partida: faltan '
-              '${Formatters.centimeters(gapMeters)}. Revisa los largos y los '
-              'giros; el área se calcula cerrando el plano por la última '
-              'pared.',
+              t.planOpenWarning(Formatters.centimeters(gapMeters)),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onErrorContainer,
               ),
@@ -257,37 +258,38 @@ class _WallTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final AppL10n t = AppL10n.of(context);
     final String turn = wall.position == 0
-        ? 'arranque'
-        : 'gira ${Formatters.degrees(wall.turnDegrees)}';
+        ? t.wallStart
+        : t.wallTurn(Formatters.degrees(wall.turnDegrees));
 
     return ListTile(
       selected: selected,
       selectedTileColor: theme.colorScheme.primary.withValues(alpha: 0.08),
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      title: Text('${wall.label} · ${Formatters.meters(wall.lengthMeters)}'),
+      title: Text(
+        '${wall.name(t)} · ${Formatters.meters(wall.lengthMeters)}',
+      ),
       subtitle: Text(
         wall.openings.isEmpty
             ? turn
-            : '$turn · ${_openingsSummary(wall.openings)}',
+            : '$turn · ${_openingsSummary(t, wall.openings)}',
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );
   }
 
-  String _openingsSummary(List<Opening> openings) {
+  String _openingsSummary(AppL10n t, List<Opening> openings) {
     final int doors = openings
         .where((Opening o) => o.kind == OpeningKind.door)
         .length;
     final int windows = openings.length - doors;
     final List<String> parts = <String>[];
-    if (doors > 0) {
-      parts.add(doors == 1 ? '1 puerta' : '$doors puertas');
-    }
-    if (windows > 0) {
-      parts.add(windows == 1 ? '1 ventana' : '$windows ventanas');
-    }
-    return parts.join(' y ');
+    if (doors > 0) parts.add(t.doorCount(doors));
+    if (windows > 0) parts.add(t.windowCount(windows));
+    return parts.length == 2
+        ? t.listAnd(parts.first, parts.last)
+        : parts.join();
   }
 }

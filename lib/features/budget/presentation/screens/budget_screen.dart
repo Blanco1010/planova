@@ -6,6 +6,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
 import '../../../../core/widgets/number_prompt_dialog.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../materials/domain/entities/material_estimates.dart';
 import '../../../materials/domain/entities/material_settings.dart';
 import '../../../materials/domain/services/material_calculator.dart';
@@ -58,6 +59,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     final List<Finish> allFinishes =
         ref.watch(finishesProvider(projectId)).value ?? const <Finish>[];
     final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
+    final AppL10n t = AppL10n.of(context);
 
     final Iterable<Room> scopedRooms = _roomId == null
         ? rooms
@@ -93,7 +95,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Presupuesto'),
+        title: Text(t.budget),
         actions: [
           IconButton(
             onPressed: project == null
@@ -110,7 +112,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                     summary: summary,
                     money: money,
                   ),
-            tooltip: 'Exportar en PDF',
+            tooltip: t.exportPdf,
             icon: const Icon(Icons.ios_share),
           ),
         ],
@@ -171,6 +173,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     );
   }
 
+  AppL10n get _t => AppL10n.of(context);
+
   /// Arma el PDF y lo entrega a la hoja de compartir del teléfono.
   Future<void> _export({
     required Project project,
@@ -183,8 +187,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   }) async {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final String scopeLabel = _roomId == null
-        ? 'Todo el proyecto'
-        : rooms.firstOrNull?.name ?? 'Una habitación';
+        ? _t.wholeProject
+        : rooms.firstOrNull?.name ?? _t.oneRoom;
 
     try {
       final Map<int, Uint8List> plans = <int, Uint8List>{};
@@ -196,6 +200,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
       }
 
       final Uint8List bytes = await BudgetPdfBuilder.build(
+        t: _t,
         project: project,
         scopeLabel: scopeLabel,
         rooms: rooms,
@@ -212,7 +217,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           .share(bytes: bytes, fileName: BudgetPdfBuilder.fileNameFor(project));
     } catch (error) {
       messenger.showSnackBar(
-        SnackBar(content: Text('No se pudo crear el PDF: $error')),
+        SnackBar(content: Text(_t.pdfFailed('$error'))),
       );
     }
   }
@@ -234,17 +239,20 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '¿Qué material entra?',
+                    _t.whichMaterial,
                     style: Theme.of(sheetContext).textTheme.titleLarge,
                   ),
                 ),
               ),
               for (final MaterialLine line in available)
                 ListTile(
-                  title: Text(line.kind.label),
+                  title: Text(line.kind.label(_t)),
                   subtitle: Text(
-                    '${line.kind.surface.label} · harían falta '
-                    '${Formatters.quantity(line.quantity)} ${line.kind.unit}',
+                    _t.materialNeeded(
+                      line.kind.surface.label(_t),
+                      Formatters.quantity(line.quantity),
+                      line.kind.unit(_t),
+                    ),
                   ),
                   onTap: () => Navigator.of(sheetContext).pop(line),
                 ),
@@ -268,8 +276,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     final double? price = await NumberPromptDialog.show(
       context,
-      title: 'Precio de ${line.kind.label.toLowerCase()}',
-      label: 'Precio por ${line.kind.unit}',
+      title: _t.priceOf(line.kind.label(_t).toLowerCase()),
+      label: _t.pricePer(line.kind.unit(_t)),
       prefixText: '${money.symbol} ',
       initialText: line.hasPrice ? money.formatAmount(line.unitPrice) : null,
       inputFormatters: <TextInputFormatter>[MoneyInputFormatter(money)],
@@ -298,7 +306,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           children: <Widget>[
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('Cambiar el precio'),
+              title: Text(_t.changePrice),
               onTap: () => Navigator.of(sheetContext).pop(false),
             ),
             ListTile(
@@ -306,7 +314,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                 Icons.remove_circle_outline,
                 color: Theme.of(sheetContext).colorScheme.error,
               ),
-              title: const Text('Quitar del presupuesto'),
+              title: Text(_t.removeFromBudget),
               onTap: () => Navigator.of(sheetContext).pop(true),
             ),
           ],
@@ -341,7 +349,7 @@ class _RoomPicker extends StatelessWidget {
       child: Row(
         children: [
           ChoiceChip(
-            label: const Text('Todo el proyecto'),
+            label: Text(AppL10n.of(context).wholeProject),
             selected: selectedId == null,
             onSelected: (_) => onChanged(null),
           ),
@@ -374,6 +382,7 @@ class _MaterialsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
 
     return Card(
@@ -385,12 +394,12 @@ class _MaterialsCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text('Materiales', style: theme.textTheme.titleMedium),
+                  child: Text(t.materials, style: theme.textTheme.titleMedium),
                 ),
                 TextButton.icon(
                   onPressed: onAdd,
                   icon: const Icon(Icons.add),
-                  label: const Text('Añadir'),
+                  label: Text(t.add),
                 ),
               ],
             ),
@@ -398,9 +407,7 @@ class _MaterialsCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Añade los materiales que quieras presupuestar. Las '
-                  'cantidades salen del plano; tú pones el precio y decides '
-                  'cuáles entran.',
+                  t.materialsEmptyBody,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -409,11 +416,14 @@ class _MaterialsCard extends StatelessWidget {
             for (final MaterialLine line in lines)
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(line.kind.label),
+                title: Text(line.kind.label(t)),
                 subtitle: Text(
-                  '${line.kind.surface.label} · '
-                  '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
-                  ' × ${money.format(line.unitPrice)}',
+                  t.materialLine(
+                    line.kind.surface.label(t),
+                    Formatters.quantity(line.quantity),
+                    line.kind.unit(t),
+                    money.format(line.unitPrice),
+                  ),
                 ),
                 trailing: Text(
                   money.format(line.subtotal),
@@ -443,6 +453,7 @@ class _ItemsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
 
     return Card(
@@ -455,14 +466,14 @@ class _ItemsCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Otras partidas',
+                    t.otherItems,
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
                 TextButton.icon(
                   onPressed: onAdd,
                   icon: const Icon(Icons.add),
-                  label: const Text('Añadir'),
+                  label: Text(t.add),
                 ),
               ],
             ),
@@ -470,8 +481,7 @@ class _ItemsCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Aquí van el acero, la teja, la mano de obra y todo lo que '
-                  'no sale del plano.',
+                  t.otherItemsEmptyBody,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -482,9 +492,12 @@ class _ItemsCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(item.description),
                 subtitle: Text(
-                  '${item.category.label} · '
-                  '${Formatters.quantity(item.quantity)} ${item.unit}'
-                  ' × ${money.format(item.unitPrice)}',
+                  t.itemLine(
+                    item.category.label(t),
+                    Formatters.quantity(item.quantity),
+                    item.unit,
+                    money.format(item.unitPrice),
+                  ),
                 ),
                 trailing: Text(
                   money.format(item.subtotal),
@@ -517,6 +530,7 @@ class _FinishesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
 
     return Card(
@@ -528,12 +542,12 @@ class _FinishesCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text('Acabados', style: theme.textTheme.titleMedium),
+                  child: Text(t.finishes, style: theme.textTheme.titleMedium),
                 ),
                 TextButton.icon(
                   onPressed: onAdd,
                   icon: const Icon(Icons.add),
-                  label: const Text('Añadir'),
+                  label: Text(t.add),
                 ),
               ],
             ),
@@ -541,9 +555,7 @@ class _FinishesCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Marca las paredes y los pisos que llevan pintura, estuco '
-                  'o enchape y ponles precio por m². Los metros salen del '
-                  'plano.',
+                  t.finishesEmptyBody,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -558,12 +570,17 @@ class _FinishesCard extends StatelessWidget {
   }
 
   Widget _finishTile(BuildContext context, FinishEstimate estimate) {
+    final AppL10n t = AppL10n.of(context);
+
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(estimate.finish.description),
       subtitle: Text(
-        '${_where(estimate)} · ${Formatters.squareMeters(estimate.areaM2)}'
-        ' × ${money.format(estimate.finish.unitPrice)}',
+        t.finishLine(
+          _where(t, estimate),
+          Formatters.squareMeters(estimate.areaM2),
+          money.format(estimate.finish.unitPrice),
+        ),
       ),
       trailing: Text(
         money.format(estimate.total),
@@ -573,15 +590,16 @@ class _FinishesCard extends StatelessWidget {
     );
   }
 
-  String _where(FinishEstimate estimate) {
+  String _where(AppL10n t, FinishEstimate estimate) {
     final List<String> parts = <String>[];
     if (estimate.walls > 0) {
-      parts.add(estimate.walls == 1 ? '1 pared' : '${estimate.walls} paredes');
+      parts.add(t.wallCount(estimate.walls));
     }
     if (estimate.floors > 0) {
-      parts.add(estimate.floors == 1 ? '1 piso' : '${estimate.floors} pisos');
+      parts.add(t.floorCount(estimate.floors));
     }
-    return parts.isEmpty ? 'Sin superficies' : parts.join(' y ');
+    if (parts.isEmpty) return t.noSurfaces;
+    return parts.length == 2 ? t.listAnd(parts.first, parts.last) : parts.first;
   }
 }
 
@@ -593,6 +611,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     final double? perSquareMeter = summary.costPerSquareMeter;
 
@@ -602,12 +621,12 @@ class _SummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Resumen', style: theme.textTheme.titleMedium),
+            Text(t.summary, style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
-            _Line(label: 'Materiales', value: summary.materialsTotal, money: money),
-            _Line(label: 'Acabados', value: summary.finishesTotal, money: money),
-            _Line(label: 'Mano de obra', value: summary.laborTotal, money: money),
-            _Line(label: 'Otros', value: summary.otherTotal, money: money),
+            _Line(label: t.materials, value: summary.materialsTotal, money: money),
+            _Line(label: t.finishes, value: summary.finishesTotal, money: money),
+            _Line(label: t.labour, value: summary.laborTotal, money: money),
+            _Line(label: t.otherCategory, value: summary.otherTotal, money: money),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Divider(),
@@ -615,7 +634,7 @@ class _SummaryCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text('Total', style: theme.textTheme.titleMedium),
+                  child: Text(t.total, style: theme.textTheme.titleMedium),
                 ),
                 Flexible(
                   child: FittedBox(
@@ -634,7 +653,7 @@ class _SummaryCard extends StatelessWidget {
             if (perSquareMeter != null) ...[
               const SizedBox(height: 6),
               Text(
-                '${money.format(perSquareMeter)} por m² de piso',
+                t.perSquareMetre(money.format(perSquareMeter)),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

@@ -7,6 +7,7 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../room_scan/presentation/providers/scan_providers.dart';
 import '../../../room_scan/presentation/screens/measure_distance_screen.dart';
 import '../../domain/entities/opening.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_drafts.dart';
 import '../../domain/entities/room_wall.dart';
@@ -58,6 +59,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final Room? room = ref.watch(roomProvider(widget.roomId)).value;
     final RoomWall? wall = _wallOf(room);
     if (room == null || wall == null) {
@@ -80,7 +82,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(wall.label, style: Theme.of(context).textTheme.titleLarge),
+              Text(wall.name(t), style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               Form(
                 key: _formKey,
@@ -93,9 +95,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(
-                        labelText: 'Largo de la pared (m)',
-                      ),
+                      decoration: InputDecoration(labelText: t.wallLengthMeters),
                       validator: (String? value) =>
                           MeasureInput.validate(value),
                     ),
@@ -107,10 +107,9 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                           decimal: true,
                           signed: true,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Giro respecto a la pared anterior (°)',
-                          helperText:
-                              '90 gira a la derecha, -90 a la izquierda',
+                        decoration: InputDecoration(
+                          labelText: t.wallTurnDegrees,
+                          helperText: t.wallTurnHelp,
                         ),
                         validator: _validateTurn,
                       ),
@@ -123,13 +122,13 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                               ? null
                               : () => _measureWithCamera(wall),
                           icon: const Icon(Icons.straighten),
-                          label: const Text('Volver a medir con la cámara'),
+                          label: Text(t.measureAgainWithCamera),
                         ),
                       ),
                     const SizedBox(height: 20),
                     FilledButton(
                       onPressed: _saving ? null : () => _save(wall),
-                      child: const Text('Guardar pared'),
+                      child: Text(t.saveWall),
                     ),
                   ],
                 ),
@@ -139,7 +138,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Puertas y ventanas',
+                      t.doorsAndWindows,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -151,7 +150,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                       wallHeightMeters: room.wallHeightMeters,
                     ),
                     icon: const Icon(Icons.add),
-                    label: const Text('Añadir'),
+                    label: Text(t.add),
                   ),
                 ],
               ),
@@ -159,8 +158,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(
-                    'Esta pared no tiene vanos. Los que añadas se descuentan '
-                    'de la superficie a pintar.',
+                    t.openingsEmptyBody,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -171,13 +169,16 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                   contentPadding: EdgeInsets.zero,
                   leading: Icon(opening.kind.icon),
                   title: Text(
-                    '${opening.kind.label} '
-                    '${Formatters.decimal(opening.widthMeters)} × '
-                    '${Formatters.meters(opening.heightMeters)}',
+                    t.openingSummary(
+                      opening.kind.label(t),
+                      Formatters.decimal(opening.widthMeters),
+                      Formatters.meters(opening.heightMeters),
+                    ),
                   ),
                   subtitle: Text(
-                    'A ${Formatters.meters(opening.distanceFromStartMeters)} '
-                    'del inicio',
+                    t.openingFromStart(
+                      Formatters.meters(opening.distanceFromStartMeters),
+                    ),
                   ),
                   onTap: () => OpeningFormSheet.show(
                     context,
@@ -193,7 +194,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.error,
                 ),
-                child: const Text('Eliminar esta pared'),
+                child: Text(t.deleteThisWall),
               ),
             ],
           ),
@@ -201,6 +202,8 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
       ),
     );
   }
+  AppL10n get _t => AppL10n.of(context);
+
 
   RoomWall? _wallOf(Room? room) {
     if (room == null) return null;
@@ -212,8 +215,8 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
 
   String? _validateTurn(String? raw) {
     final double? value = MeasureInput.parse(raw);
-    if (value == null || value.isNaN) return 'Escribe los grados';
-    if (value <= -360 || value >= 360) return 'Entre -359 y 359';
+    if (value == null || value.isNaN) return _t.degreesRequired;
+    if (value <= -360 || value >= 360) return _t.degreesRange;
     return null;
   }
 
@@ -221,7 +224,7 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
   Future<void> _measureWithCamera(RoomWall wall) async {
     final double? meters = await MeasureDistanceScreen.show(
       context,
-      title: 'Medir ${wall.label.toLowerCase()}',
+      title: _t.measureThing(wall.name(_t).toLowerCase()),
     );
     if (meters == null || !mounted) return;
 
@@ -251,10 +254,8 @@ class _WallFormSheetState extends ConsumerState<WallFormSheet> {
     final NavigatorState navigator = Navigator.of(context);
     final bool confirmed = await ConfirmDeleteDialog.show(
       context,
-      title: 'Eliminar ${wall.label.toLowerCase()}',
-      message:
-          'Se borra la pared con sus puertas y ventanas, y el plano se '
-          'vuelve a trazar con las que queden.',
+      title: _t.deleteThing(wall.name(_t).toLowerCase()),
+      message: _t.deleteWallMessage,
     );
 
     if (!confirmed) return;

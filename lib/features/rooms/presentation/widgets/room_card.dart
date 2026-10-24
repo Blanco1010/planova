@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/entities/room_plan.dart';
 
@@ -19,6 +20,7 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     final RoomPlan plan = RoomPlan.of(room);
 
@@ -41,9 +43,11 @@ class RoomCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${Formatters.squareMeters(plan.floorAreaM2)} · '
-                      '${room.walls.length} paredes · '
-                      'perímetro ${Formatters.meters(plan.perimeterMeters)}',
+                      t.roomCardSummary(
+                        Formatters.squareMeters(plan.floorAreaM2),
+                        '${room.walls.length}',
+                        Formatters.meters(plan.perimeterMeters),
+                      ),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -57,7 +61,7 @@ class RoomCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onDelete,
-                tooltip: 'Eliminar habitación',
+                tooltip: t.deleteRoom,
                 icon: const Icon(Icons.delete_outline),
               ),
             ],
@@ -87,7 +91,9 @@ class _ClosureWarning extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(
-            'El plano no cierra: faltan ${Formatters.centimeters(gapMeters)}',
+            AppL10n.of(
+              context,
+            ).planDoesNotClose(Formatters.centimeters(gapMeters)),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.error,
             ),

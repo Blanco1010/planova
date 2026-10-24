@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
@@ -22,6 +23,7 @@ class ProjectDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n t = AppL10n.of(context);
     final AsyncValue<Project?> projectValue = ref.watch(
       projectProvider(projectId),
     );
@@ -33,7 +35,7 @@ class ProjectDetailScreen extends ConsumerWidget {
     if (project == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('El proyecto ya no existe')),
+        body: Center(child: Text(t.projectGone)),
       );
     }
 
@@ -47,7 +49,7 @@ class ProjectDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () => ProjectFormSheet.show(context, project: project),
-            tooltip: 'Editar proyecto',
+            tooltip: t.editProject,
             icon: const Icon(Icons.edit_outlined),
           ),
         ],
@@ -57,7 +59,7 @@ class ProjectDetailScreen extends ConsumerWidget {
         error: (Object error, StackTrace _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
-            child: Text('No se pudieron leer las habitaciones: $error'),
+            child: Text(t.roomsLoadError('$error')),
           ),
         ),
         data: (List<Room> rooms) => ListView(
@@ -68,11 +70,8 @@ class ProjectDetailScreen extends ConsumerWidget {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.calculate_outlined),
-                title: const Text('Materiales'),
-                subtitle: const Text(
-                  'Bloques o ladrillos, mortero, pintura y piso con tus '
-                  'rendimientos',
-                ),
+                title: Text(t.materials),
+                subtitle: Text(t.materialsCardBody),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push(AppRoutes.materialsPath(projectId)),
               ),
@@ -81,22 +80,21 @@ class ProjectDetailScreen extends ConsumerWidget {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.request_quote_outlined),
-                title: const Text('Presupuesto'),
-                subtitle: const Text('Precios, mano de obra y costo por m²'),
+                title: Text(t.budget),
+                subtitle: Text(t.budgetCardBody),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push(AppRoutes.budgetPath(projectId)),
               ),
             ),
             const SizedBox(height: 20),
             Text(
-              'Habitaciones',
+              t.rooms,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             if (rooms.isEmpty)
               Text(
-                'Todavía no hay habitaciones. Crea la primera con su ancho y '
-                'su largo, y luego ajusta el plano pared por pared.',
+                t.roomsEmptyBody,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -116,13 +114,15 @@ class ProjectDetailScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showNewRoomOptions(context),
         icon: const Icon(Icons.add),
-        label: const Text('Nueva habitación'),
+        label: Text(t.newRoom),
       ),
     );
   }
 
   /// Las dos maneras de crear una habitación, tras un solo botón.
   Future<void> _showNewRoomOptions(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
+
     return showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext sheetContext) => SafeArea(
@@ -131,10 +131,8 @@ class ProjectDetailScreen extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Medir con la cámara'),
-              subtitle: const Text(
-                'Apunta al pie de cada esquina y sale el plano',
-              ),
+              title: Text(t.measureWithCamera),
+              subtitle: Text(t.measureWithCameraBody),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 context.push(AppRoutes.scanPath(projectId));
@@ -142,8 +140,8 @@ class ProjectDetailScreen extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.straighten),
-              title: const Text('Escribir las medidas'),
-              subtitle: const Text('Ancho y largo, y luego ajustas el plano'),
+              title: Text(t.typeMeasurements),
+              subtitle: Text(t.typeMeasurementsBody),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 RoomFormSheet.show(
@@ -167,11 +165,11 @@ class ProjectDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Room room,
   ) async {
+    final AppL10n t = AppL10n.of(context);
     final bool confirmed = await ConfirmDeleteDialog.show(
       context,
-      title: 'Eliminar habitación',
-      message:
-          'Se borrará «${room.name}» con su plano, sus paredes y sus vanos.',
+      title: t.deleteRoom,
+      message: t.deleteRoomMessage(room.name),
     );
 
     if (!confirmed) return;
@@ -188,6 +186,7 @@ class _ProjectHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     final List<String> details = <String?>[
       project.client,
@@ -228,19 +227,19 @@ class _ProjectHeader extends StatelessWidget {
               children: [
                 Expanded(
                   child: _Total(
-                    label: rooms.length == 1 ? 'habitación' : 'habitaciones',
+                    label: t.roomCount(rooms.length),
                     value: '${rooms.length}',
                   ),
                 ),
                 Expanded(
                   child: _Total(
-                    label: 'área construida',
+                    label: t.builtArea,
                     value: Formatters.squareMeters(floorArea),
                   ),
                 ),
                 Expanded(
                   child: _Total(
-                    label: 'muros sin vanos',
+                    label: t.netWallArea,
                     value: Formatters.squareMeters(netWallArea),
                   ),
                 ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/plan_geometry.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/opening.dart';
@@ -145,7 +146,7 @@ class FloorPlanView extends StatelessWidget {
     if (plan.vertices.length < 2) {
       return Center(
         child: Text(
-          'Añade al menos dos paredes para ver el plano',
+          AppL10n.of(context).planNeedsTwoWalls,
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,

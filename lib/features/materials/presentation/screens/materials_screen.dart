@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/material_estimates.dart';
@@ -26,6 +27,7 @@ class _MaterialsScreenState extends ConsumerState<MaterialsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final List<Room> rooms =
         ref.watch(projectRoomsProvider(widget.projectId)).value ??
         const <Room>[];
@@ -44,7 +46,7 @@ class _MaterialsScreenState extends ConsumerState<MaterialsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Materiales'),
+        title: Text(t.materials),
         actions: [
           IconButton(
             onPressed: () => MaterialSettingsSheet.show(
@@ -52,7 +54,7 @@ class _MaterialsScreenState extends ConsumerState<MaterialsScreen> {
               projectId: widget.projectId,
               settings: settings,
             ),
-            tooltip: 'Ajustar rendimientos',
+            tooltip: t.tuneRates,
             icon: const Icon(Icons.tune),
           ),
         ],
@@ -77,8 +79,7 @@ class _MaterialsScreenState extends ConsumerState<MaterialsScreen> {
                 _FloorCard(estimate: estimates.floor, settings: settings),
                 const SizedBox(height: 16),
                 Text(
-                  'Las cantidades ya traen el desperdicio. Son una '
-                  'estimación: compruébalas antes de comprar.',
+                  t.materialsNote,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -107,7 +108,7 @@ class _RoomPicker extends StatelessWidget {
       child: Row(
         children: [
           ChoiceChip(
-            label: const Text('Todo el proyecto'),
+            label: Text(AppL10n.of(context).wholeProject),
             selected: selectedId == null,
             onSelected: (_) => onChanged(null),
           ),
@@ -134,8 +135,10 @@ class _SurfacesLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Text(
-      'Muros sin vanos ${Formatters.squareMeters(surfaces.netWallAreaM2)}'
-      ' · Piso ${Formatters.squareMeters(surfaces.floorAreaM2)}',
+      AppL10n.of(context).surfacesLine(
+        Formatters.squareMeters(surfaces.netWallAreaM2),
+        Formatters.squareMeters(surfaces.floorAreaM2),
+      ),
       style: theme.textTheme.bodyMedium?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
       ),
@@ -151,27 +154,29 @@ class _MasonryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final MasonryParams params = settings.masonry;
     return _EstimateCard(
       icon: Icons.grid_view,
-      title: 'Mampostería',
-      headline: '${Formatters.units(estimate.blocks)} piezas',
-      source:
-          'De ${Formatters.squareMeters(estimate.wallAreaM2)} de muros '
-          '(no del piso)',
+      title: t.masonry,
+      headline: t.piecesCount(Formatters.units(estimate.blocks)),
+      source: t.fromWallsNotFloor(
+        Formatters.squareMeters(estimate.wallAreaM2),
+      ),
       rows: <(String, String)>[
-        ('Mortero de pega', Formatters.cubicMeters(estimate.mortarCubicMeters)),
-        ('Cemento', '${Formatters.units(estimate.cementBags)} bultos'),
-        ('Arena', Formatters.cubicMeters(estimate.sandCubicMeters)),
+        (t.bedMortar, Formatters.cubicMeters(estimate.mortarCubicMeters)),
+        (t.materialCement, t.cementBags(Formatters.units(estimate.cementBags))),
+        (t.materialSand, Formatters.cubicMeters(estimate.sandCubicMeters)),
       ],
-      footnote:
-          '${Formatters.squareMeters(estimate.wallAreaM2)} × '
-          '${Formatters.decimal(estimate.blocksPerSquareMeter)} piezas/m² + '
-          '${Formatters.quantity(params.wastePercent)} % de desperdicio. '
-          'Pieza de ${Formatters.centimeters(params.blockLengthMeters)} × '
-          '${Formatters.centimeters(params.blockHeightMeters)}, junta de '
-          '${Formatters.centimeters(params.jointMeters)}, muro de '
-          '${Formatters.centimeters(params.wallThicknessMeters)}.',
+      footnote: t.masonryNote(
+        Formatters.squareMeters(estimate.wallAreaM2),
+        Formatters.decimal(estimate.blocksPerSquareMeter),
+        Formatters.quantity(params.wastePercent),
+        Formatters.centimeters(params.blockLengthMeters),
+        Formatters.centimeters(params.blockHeightMeters),
+        Formatters.centimeters(params.jointMeters),
+        Formatters.centimeters(params.wallThicknessMeters),
+      ),
     );
   }
 }
@@ -184,24 +189,24 @@ class _PaintCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final PaintParams params = settings.paint;
     return _EstimateCard(
       icon: Icons.format_paint_outlined,
-      title: 'Pintura',
+      title: t.paint,
       headline: Formatters.liters(estimate.liters),
       source: params.includeCeiling
-          ? 'De ${Formatters.squareMeters(estimate.areaM2)} de muros y cielo '
-                'raso'
-          : 'De ${Formatters.squareMeters(estimate.areaM2)} de muros '
-                '(no del piso)',
+          ? t.fromWallsAndCeiling(Formatters.squareMeters(estimate.areaM2))
+          : t.fromWallsNotFloor(Formatters.squareMeters(estimate.areaM2)),
       rows: <(String, String)>[
-        ('En galones', '${Formatters.decimal(estimate.gallons)} gal'),
-        ('Superficie', Formatters.squareMeters(estimate.areaM2)),
+        (t.inGallons, t.gallonsValue(Formatters.decimal(estimate.gallons))),
+        (t.surface, Formatters.squareMeters(estimate.areaM2)),
       ],
-      footnote:
-          '${params.coats} manos · ${Formatters.decimal(params.squareMetersPerLiter)}'
-          ' m² por litro'
-          '${params.includeCeiling ? ' · incluye el cielo raso' : ''}',
+      footnote: t.paintNote(
+        '${params.coats}',
+        Formatters.decimal(params.squareMetersPerLiter),
+        params.includeCeiling ? t.includesCeiling : '',
+      ),
     );
   }
 }
@@ -214,22 +219,24 @@ class _FloorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final FloorParams params = settings.floor;
     return _EstimateCard(
       icon: Icons.dashboard_outlined,
-      title: 'Piso',
-      headline: '${Formatters.units(estimate.tiles)} baldosas',
-      source: 'De ${Formatters.squareMeters(estimate.areaM2)} de piso',
+      title: t.floor,
+      headline: t.tilesCount(Formatters.units(estimate.tiles)),
+      source: t.fromFloorArea(Formatters.squareMeters(estimate.areaM2)),
       rows: <(String, String)>[
-        ('Pegante', Formatters.kilograms(estimate.adhesiveKilograms)),
-        ('Superficie', Formatters.squareMeters(estimate.areaM2)),
+        (t.materialAdhesive, Formatters.kilograms(estimate.adhesiveKilograms)),
+        (t.surface, Formatters.squareMeters(estimate.areaM2)),
       ],
-      footnote:
-          '${Formatters.squareMeters(estimate.areaM2)} × '
-          '${Formatters.decimal(estimate.tilesPerSquareMeter)} baldosas/m² + '
-          '${Formatters.quantity(params.wastePercent)} % de desperdicio. '
-          'Baldosa de ${Formatters.centimeters(params.tileLengthMeters)} × '
-          '${Formatters.centimeters(params.tileWidthMeters)}.',
+      footnote: t.floorNote(
+        Formatters.squareMeters(estimate.areaM2),
+        Formatters.decimal(estimate.tilesPerSquareMeter),
+        Formatters.quantity(params.wastePercent),
+        Formatters.centimeters(params.tileLengthMeters),
+        Formatters.centimeters(params.tileWidthMeters),
+      ),
     );
   }
 }
@@ -321,6 +328,7 @@ class _NoRooms extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
     return Center(
       child: Padding(
@@ -335,14 +343,13 @@ class _NoRooms extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Aún no hay de dónde calcular',
+              t.nothingToCalculate,
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Los materiales salen de lo que miden las habitaciones. '
-              'Crea la primera y vuelve aquí.',
+              t.nothingToCalculateBody,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

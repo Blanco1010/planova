@@ -1,12 +1,14 @@
+import '../../../../l10n/app_l10n.dart';
+
 /// En qué capítulo del presupuesto entra una partida.
 enum BudgetCategory { material, labor, other }
 
 /// Cómo se nombra cada capítulo.
 extension BudgetCategoryDisplay on BudgetCategory {
-  String get label => switch (this) {
-    BudgetCategory.material => 'Material',
-    BudgetCategory.labor => 'Mano de obra',
-    BudgetCategory.other => 'Otros',
+  String label(AppL10n t) => switch (this) {
+    BudgetCategory.material => t.materialCategory,
+    BudgetCategory.labor => t.labour,
+    BudgetCategory.other => t.otherCategory,
   };
 }
 

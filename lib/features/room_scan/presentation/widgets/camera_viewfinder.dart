@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../providers/scan_providers.dart';
 
 /// La imagen de la cámara, entera y sin recortar.
@@ -15,6 +16,7 @@ class CameraViewfinder extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n t = AppL10n.of(context);
     final AsyncValue<CameraController?> camera = ref.watch(
       cameraControllerProvider,
     );
@@ -24,27 +26,21 @@ class CameraViewfinder extends ConsumerWidget {
       child: camera.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object error, StackTrace _) =>
-            _Unavailable(message: _messageFor(error)),
+            _Unavailable(message: _messageFor(t, error)),
         data: (CameraController? controller) => controller == null
-            ? const _Unavailable(
-                message:
-                    'Este aparato no tiene cámara. Puedes medir igual '
-                    'apuntando con el teléfono.',
-              )
+            ? _Unavailable(message: t.noCamera)
             : CameraPreview(controller),
       ),
     );
   }
 
-  String _messageFor(Object error) {
+  String _messageFor(AppL10n t, Object error) {
     if (error is CameraException &&
         (error.code == 'CameraAccessDenied' ||
             error.code == 'CameraAccessDeniedWithoutPrompt')) {
-      return 'Planova no tiene permiso para la cámara. Puedes dárselo en los '
-          'ajustes del teléfono, o medir igual apuntando sin ver la imagen.';
+      return t.cameraDenied;
     }
-    return 'No se pudo abrir la cámara. Puedes medir igual apuntando con el '
-        'teléfono.';
+    return t.cameraFailed;
   }
 }
 

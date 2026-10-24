@@ -5,6 +5,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/money.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../../projects/domain/entities/project.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
@@ -36,13 +37,14 @@ abstract final class BudgetPdfBuilder {
     required List<FinishEstimate> finishes,
     required BudgetSummary summary,
     required MoneyFormat money,
+    required AppL10n t,
     required DateTime generatedAt,
 
     /// Sin comprimir, el texto del documento se puede leer en las pruebas.
     bool compress = true,
   }) {
     final pw.Document document = pw.Document(
-      title: 'Presupuesto ${project.name}',
+      title: t.pdfDocumentTitle(project.name),
       author: 'Planova',
       compress: compress,
     );
@@ -52,31 +54,31 @@ abstract final class BudgetPdfBuilder {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.fromLTRB(36, 36, 36, 28),
         header: (pw.Context context) =>
-            _header(project, scopeLabel, generatedAt, context),
-        footer: _footer,
+            _header(t, project, scopeLabel, generatedAt, context),
+        footer: (pw.Context context) => _footer(t, context),
         build: (pw.Context context) => <pw.Widget>[
           if (rooms.isNotEmpty) ...<pw.Widget>[
-            _title('Habitaciones'),
-            for (final Room room in rooms) _roomBlock(room, roomPlans[room.id]),
+            _title(t.rooms),
+            for (final Room room in rooms) _roomBlock(t, room, roomPlans[room.id]),
             pw.SizedBox(height: 8),
           ],
-          _title('Materiales calculados'),
+          _title(t.calculatedMaterials),
           if (materialLines.isEmpty)
-            _note('No hay habitaciones medidas todavía.')
+            _note(t.noRoomsMeasuredYet)
           else
-            _materialsTable(materialLines, money),
+            _materialsTable(t, materialLines, money),
           pw.SizedBox(height: 18),
           if (finishes.isNotEmpty) ...<pw.Widget>[
-            _title('Acabados'),
-            _finishesTable(finishes, money),
+            _title(t.finishes),
+            _finishesTable(t, finishes, money),
             pw.SizedBox(height: 18),
           ],
           if (items.isNotEmpty) ...<pw.Widget>[
-            _title('Otras partidas'),
-            _itemsTable(items, money),
+            _title(t.otherItems),
+            _itemsTable(t, items, money),
             pw.SizedBox(height: 18),
           ],
-          _summary(summary, money),
+          _summary(t, summary, money),
         ],
       ),
     );
@@ -94,6 +96,7 @@ abstract final class BudgetPdfBuilder {
   }
 
   static pw.Widget _header(
+    AppL10n t,
     Project project,
     String scopeLabel,
     DateTime generatedAt,
@@ -104,7 +107,7 @@ abstract final class BudgetPdfBuilder {
         alignment: pw.Alignment.centerRight,
         margin: const pw.EdgeInsets.only(bottom: 12),
         child: pw.Text(
-          '${project.name} · Presupuesto',
+          t.pdfRunningTitle(project.name),
           style: const pw.TextStyle(fontSize: 9, color: _muted),
         ),
       );
@@ -129,7 +132,7 @@ abstract final class BudgetPdfBuilder {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: <pw.Widget>[
               pw.Text(
-                'Presupuesto de obra',
+                t.pdfHeading,
                 style: pw.TextStyle(
                   fontSize: 20,
                   fontWeight: pw.FontWeight.bold,
@@ -154,7 +157,7 @@ abstract final class BudgetPdfBuilder {
             ),
           pw.SizedBox(height: 2),
           pw.Text(
-            'Alcance: $scopeLabel',
+            t.pdfScope(scopeLabel),
             style: const pw.TextStyle(fontSize: 10, color: _muted),
           ),
         ],
@@ -162,13 +165,15 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _footer(pw.Context context) {
+  static pw.Widget _footer(AppL10n t, pw.Context context) {
     return pw.Container(
       alignment: pw.Alignment.centerRight,
       margin: const pw.EdgeInsets.only(top: 10),
       child: pw.Text(
-        'Hecho con Planova · página ${context.pageNumber} de '
-        '${context.pagesCount}',
+        t.pdfFooter(
+          '${context.pageNumber}',
+          '${context.pagesCount}',
+        ),
         style: const pw.TextStyle(fontSize: 8, color: _muted),
       ),
     );
@@ -192,7 +197,11 @@ abstract final class BudgetPdfBuilder {
       pw.Text(text, style: const pw.TextStyle(fontSize: 10, color: _muted));
 
   /// Una habitación: su plano a la izquierda y sus medidas a la derecha.
-  static pw.Widget _roomBlock(Room room, Uint8List? planPng) {
+  static pw.Widget _roomBlock(
+    AppL10n t,
+    Room room,
+    Uint8List? planPng,
+  ) {
     final RoomPlan plan = RoomPlan.of(room);
 
     return pw.Container(
@@ -230,21 +239,20 @@ abstract final class BudgetPdfBuilder {
                 ),
                 pw.SizedBox(height: 5),
                 _fact(
-                  'Área de piso',
+                  t.pdfFloorArea,
                   Formatters.squareMeters(plan.floorAreaM2),
                 ),
-                _fact('Perímetro', Formatters.meters(plan.perimeterMeters)),
-                _fact('Altura', Formatters.meters(room.wallHeightMeters)),
+                _fact(t.perimeter, Formatters.meters(plan.perimeterMeters)),
+                _fact(t.height, Formatters.meters(room.wallHeightMeters)),
                 _fact(
-                  'Muros sin vanos',
+                  t.netWallAreaTitle,
                   Formatters.squareMeters(plan.netWallAreaM2),
                 ),
-                _fact('Paredes', '${room.walls.length}'),
+                _fact(t.wallsCountLabel, '${room.walls.length}'),
                 if (!plan.isClosed) ...<pw.Widget>[
                   pw.SizedBox(height: 4),
                   pw.Text(
-                    'El plano no cierra por '
-                    '${Formatters.centimeters(plan.closureGapMeters)}.',
+                    t.pdfPlanOpenBy(Formatters.centimeters(plan.closureGapMeters)),
                     style: const pw.TextStyle(fontSize: 8, color: _muted),
                   ),
                 ],
@@ -271,24 +279,28 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _materialsTable(List<MaterialLine> lines, MoneyFormat money) {
+  static pw.Widget _materialsTable(
+    AppL10n t,
+    List<MaterialLine> lines,
+    MoneyFormat money,
+  ) {
     return _table(
       headers: <String>[
-        'Material',
-        'De',
-        'Cantidad',
-        'Unidad',
-        'Precio unitario',
-        'Subtotal',
+        t.columnMaterial,
+        t.columnFrom,
+        t.columnQuantity,
+        t.columnUnit,
+        t.columnUnitPrice,
+        t.columnSubtotal,
       ],
       rows: <List<String>>[
         for (final MaterialLine line in lines)
           <String>[
-            line.kind.label,
-            line.kind.surface.label,
+            line.kind.label(t),
+            line.kind.surface.label(t),
             Formatters.quantity(line.quantity),
-            line.kind.unit,
-            line.hasPrice ? money.format(line.unitPrice) : 'sin precio',
+            line.kind.unit(t),
+            line.hasPrice ? money.format(line.unitPrice) : t.noPrice,
             // La fuente base del PDF no tiene guion largo: aquí va corto.
             line.hasPrice ? money.format(line.subtotal) : '-',
           ],
@@ -299,22 +311,23 @@ abstract final class BudgetPdfBuilder {
 
   /// Qué se le hace a cada grupo de superficies, y lo que cuesta.
   static pw.Widget _finishesTable(
+    AppL10n t,
     List<FinishEstimate> finishes,
     MoneyFormat money,
   ) {
     return _table(
       headers: <String>[
-        'Acabado',
-        'Dónde',
-        'Superficie',
-        'Precio por m²',
-        'Subtotal',
+        t.columnFinish,
+        t.columnWhere,
+        t.columnSurface,
+        t.columnPricePerSquareMetre,
+        t.columnSubtotal,
       ],
       rows: <List<String>>[
         for (final FinishEstimate estimate in finishes)
           <String>[
             estimate.finish.description,
-            _whereOf(estimate),
+            _whereOf(t, estimate),
             Formatters.squareMeters(estimate.areaM2),
             money.format(estimate.finish.unitPrice),
             money.format(estimate.total),
@@ -324,32 +337,37 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static String _whereOf(FinishEstimate estimate) {
+  static String _whereOf(AppL10n t, FinishEstimate estimate) {
     final List<String> parts = <String>[];
     if (estimate.walls > 0) {
-      parts.add(estimate.walls == 1 ? '1 pared' : '${estimate.walls} paredes');
+      parts.add(t.wallCount(estimate.walls));
     }
     if (estimate.floors > 0) {
-      parts.add(estimate.floors == 1 ? '1 piso' : '${estimate.floors} pisos');
+      parts.add(t.floorCount(estimate.floors));
     }
-    return parts.isEmpty ? '-' : parts.join(' y ');
+    if (parts.isEmpty) return '-';
+    return parts.length == 2 ? t.listAnd(parts.first, parts.last) : parts.first;
   }
 
-  static pw.Widget _itemsTable(List<BudgetItem> items, MoneyFormat money) {
+  static pw.Widget _itemsTable(
+    AppL10n t,
+    List<BudgetItem> items,
+    MoneyFormat money,
+  ) {
     return _table(
       headers: <String>[
-        'Descripción',
-        'Capítulo',
-        'Cantidad',
-        'Unidad',
-        'Precio unitario',
-        'Subtotal',
+        t.columnDescription,
+        t.columnCategory,
+        t.columnQuantity,
+        t.columnUnit,
+        t.columnUnitPrice,
+        t.columnSubtotal,
       ],
       rows: <List<String>>[
         for (final BudgetItem item in items)
           <String>[
             item.description,
-            item.category.label,
+            item.category.label(t),
             Formatters.quantity(item.quantity),
             item.unit,
             money.format(item.unitPrice),
@@ -391,7 +409,11 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _summary(BudgetSummary summary, MoneyFormat money) {
+  static pw.Widget _summary(
+    AppL10n t,
+    BudgetSummary summary,
+    MoneyFormat money,
+  ) {
     final double? perSquareMeter = summary.costPerSquareMeter;
 
     return pw.Column(
@@ -406,16 +428,16 @@ abstract final class BudgetPdfBuilder {
           ),
           child: pw.Column(
             children: <pw.Widget>[
-              _summaryLine('Materiales', summary.materialsTotal, money),
-              _summaryLine('Acabados', summary.finishesTotal, money),
-              _summaryLine('Mano de obra', summary.laborTotal, money),
-              _summaryLine('Otros', summary.otherTotal, money),
+              _summaryLine(t.materials, summary.materialsTotal, money),
+              _summaryLine(t.finishes, summary.finishesTotal, money),
+              _summaryLine(t.labour, summary.laborTotal, money),
+              _summaryLine(t.otherCategory, summary.otherTotal, money),
               pw.Divider(color: _muted, height: 14),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: <pw.Widget>[
                   pw.Text(
-                    'Total',
+                    t.total,
                     style: pw.TextStyle(
                       fontSize: 12,
                       fontWeight: pw.FontWeight.bold,
@@ -436,7 +458,7 @@ abstract final class BudgetPdfBuilder {
                 pw.Align(
                   alignment: pw.Alignment.centerRight,
                   child: pw.Text(
-                    '${money.format(perSquareMeter)} por m² de piso',
+                    t.perSquareMetre(money.format(perSquareMeter)),
                     style: const pw.TextStyle(fontSize: 9, color: _muted),
                   ),
                 ),
@@ -446,8 +468,7 @@ abstract final class BudgetPdfBuilder {
         ),
         pw.SizedBox(height: 14),
         pw.Text(
-          'Las cantidades de material se calculan a partir de las medidas del '
-          'plano e incluyen desperdicio. Son una estimación.',
+          t.pdfEstimateNote,
           style: const pw.TextStyle(fontSize: 8, color: _muted),
           textAlign: pw.TextAlign.right,
         ),

@@ -1,11 +1,9 @@
 {
   "@@locale": "es",
-
   "cancel": "Cancelar",
   "save": "Guardar",
   "saveChanges": "Guardar cambios",
   "delete": "Eliminar",
-
   "settingsTitle": "Ajustes",
   "settingsAppearance": "Apariencia",
   "optionSystem": "Igual que el sistema",
@@ -23,13 +21,20 @@
   "demoBody": "Crea una casa con tres habitaciones, precios y acabados para ver el presupuesto y el PDF sin medir nada.",
   "demoDone": "Listo: «{project}» está en tus proyectos.",
   "@demoDone": {
-    "placeholders": { "project": { "type": "String" } }
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
   },
   "demoFailed": "No se pudo crear el ejemplo: {error}",
   "@demoFailed": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
-
   "projectsLoadError": "No se pudieron leer los proyectos",
   "projectsEmptyTitle": "Todavía no hay proyectos",
   "projectsEmptyBody": "Crea el primero para empezar a guardar habitaciones, planos y presupuestos.",
@@ -39,11 +44,19 @@
   "deleteProject": "Eliminar proyecto",
   "deleteProjectMessage": "Se borrará «{project}» y todo lo que guardes dentro. Esto no se puede deshacer.",
   "@deleteProjectMessage": {
-    "placeholders": { "project": { "type": "String" } }
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
   },
   "updatedOn": "Actualizado el {date}",
   "@updatedOn": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "projectName": "Nombre del proyecto",
   "projectNameHint": "Casa de dos pisos, remodelación cocina…",
@@ -55,6 +68,709 @@
   "projectUpdated": "Proyecto actualizado",
   "saveFailed": "No se pudo guardar: {error}",
   "@saveFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "projectGone": "El proyecto ya no existe",
+  "roomsLoadError": "No se pudieron leer las habitaciones: {error}",
+  "@roomsLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "materials": "Materiales",
+  "materialsCardBody": "Bloques o ladrillos, mortero, pintura y piso con tus rendimientos",
+  "budget": "Presupuesto",
+  "budgetCardBody": "Precios, mano de obra y costo por m²",
+  "rooms": "Habitaciones",
+  "roomsEmptyBody": "Todavía no hay habitaciones. Crea la primera con su ancho y su largo, y luego ajusta el plano pared por pared.",
+  "newRoom": "Nueva habitación",
+  "measureWithCamera": "Medir con la cámara",
+  "measureWithCameraBody": "Apunta al pie de cada esquina y sale el plano",
+  "typeMeasurements": "Escribir las medidas",
+  "typeMeasurementsBody": "Ancho y largo, y luego ajustas el plano",
+  "deleteRoom": "Eliminar habitación",
+  "deleteRoomMessage": "Se borrará «{room}» con su plano, sus paredes y sus vanos.",
+  "@deleteRoomMessage": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "roomCount": "{count,plural, =1{habitación} other{habitaciones}}",
+  "@roomCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "builtArea": "área construida",
+  "netWallArea": "muros sin vanos",
+  "roomCardSummary": "{area} · {walls} paredes · perímetro {perimeter}",
+  "@roomCardSummary": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      },
+      "walls": {
+        "type": "String"
+      },
+      "perimeter": {
+        "type": "String"
+      }
+    }
+  },
+  "planDoesNotClose": "El plano no cierra: faltan {gap}",
+  "@planDoesNotClose": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "name": "Nombre",
+  "roomNameHint": "Sala, cocina, alcoba 1…",
+  "roomNameRequired": "Ponle un nombre a la habitación",
+  "widthMeters": "Ancho (m)",
+  "lengthMeters": "Largo (m)",
+  "wallHeightMeters": "Altura de las paredes (m)",
+  "measureHeightWithCamera": "Medir la altura con la cámara",
+  "createRoom": "Crear habitación",
+  "editRoom": "Editar habitación",
+  "saveScanned": "Guardar lo escaneado",
+  "measureHeight": "Medir la altura",
+  "roomGone": "La habitación ya no existe",
+  "walls": "Paredes",
+  "addWall": "Añadir pared",
+  "wallsEmptyBody": "Esta habitación no tiene paredes. Añade la primera para empezar el recorrido.",
+  "floorArea": "Área del piso",
+  "perimeter": "Perímetro",
+  "netWallAreaTitle": "Muros sin vanos",
+  "height": "Altura",
+  "planOpenWarning": "El recorrido no vuelve al punto de partida: faltan {gap}. Revisa los largos y los giros; el área se calcula cerrando el plano por la última pared.",
+  "@planOpenWarning": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "wallStart": "arranque",
+  "wallTurn": "gira {degrees}",
+  "@wallTurn": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "wallName": "Pared {number}",
+  "@wallName": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "doorCount": "{count,plural, =1{1 puerta} other{{count} puertas}}",
+  "@doorCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "windowCount": "{count,plural, =1{1 ventana} other{{count} ventanas}}",
+  "@windowCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listAnd": "{first} y {second}",
+  "@listAnd": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "wallLengthMeters": "Largo de la pared (m)",
+  "wallTurnDegrees": "Giro respecto a la pared anterior (°)",
+  "wallTurnHelp": "90 gira a la derecha, -90 a la izquierda",
+  "measureAgainWithCamera": "Volver a medir con la cámara",
+  "saveWall": "Guardar pared",
+  "doorsAndWindows": "Puertas y ventanas",
+  "add": "Añadir",
+  "openingsEmptyBody": "Esta pared no tiene vanos. Los que añadas se descuentan de la superficie a pintar.",
+  "openingSummary": "{kind} {width} × {height}",
+  "@openingSummary": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      },
+      "width": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "openingFromStart": "A {distance} del inicio",
+  "@openingFromStart": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteThisWall": "Eliminar esta pared",
+  "degreesRequired": "Escribe los grados",
+  "degreesRange": "Entre -359 y 359",
+  "measureThing": "Medir {thing}",
+  "@measureThing": {
+    "placeholders": {
+      "thing": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteThing": "Eliminar {thing}",
+  "@deleteThing": {
+    "placeholders": {
+      "thing": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWallMessage": "Se borra la pared con sus puertas y ventanas, y el plano se vuelve a trazar con las que queden.",
+  "newOpening": "Nuevo vano",
+  "editOpening": "Editar vano",
+  "widthMetersShort": "Ancho (m)",
+  "heightMetersShort": "Alto (m)",
+  "openingTooWide": "No cabe en la pared",
+  "openingTooTall": "Pasa de la altura del muro",
+  "openingDistance": "Desde el inicio de la pared (m)",
+  "wallMeasures": "La pared mide {length}",
+  "@wallMeasures": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "addOpening": "Añadir vano",
+  "deleteOpening": "Eliminar vano",
+  "measureRequired": "Escribe una medida",
+  "openingOffWall": "El vano se sale de la pared",
+  "door": "Puerta",
+  "window": "Ventana",
+  "planNeedsTwoWalls": "Añade al menos dos paredes para ver el plano",
+  "exportPdf": "Exportar en PDF",
+  "wholeProject": "Todo el proyecto",
+  "oneRoom": "Una habitación",
+  "pdfFailed": "No se pudo crear el PDF: {error}",
+  "@pdfFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "whichMaterial": "¿Qué material entra?",
+  "materialNeeded": "{surface} · harían falta {quantity} {unit}",
+  "@materialNeeded": {
+    "placeholders": {
+      "surface": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "materialLine": "{surface} · {quantity} {unit} × {price}",
+  "@materialLine": {
+    "placeholders": {
+      "surface": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "priceOf": "Precio de {material}",
+  "@priceOf": {
+    "placeholders": {
+      "material": {
+        "type": "String"
+      }
+    }
+  },
+  "pricePer": "Precio por {unit}",
+  "@pricePer": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "changePrice": "Cambiar el precio",
+  "removeFromBudget": "Quitar del presupuesto",
+  "materialsEmptyBody": "Añade los materiales que quieras presupuestar. Las cantidades salen del plano; tú pones el precio y decides cuáles entran.",
+  "otherItems": "Otras partidas",
+  "otherItemsEmptyBody": "Aquí van el acero, la teja, la mano de obra y todo lo que no sale del plano.",
+  "itemLine": "{category} · {quantity} {unit} × {price}",
+  "@itemLine": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "finishes": "Acabados",
+  "finishesEmptyBody": "Marca las paredes y los pisos que llevan pintura, estuco o enchape y ponles precio por m². Los metros salen del plano.",
+  "finishLine": "{where} · {area} × {price}",
+  "@finishLine": {
+    "placeholders": {
+      "where": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "wallCount": "{count,plural, =1{1 pared} other{{count} paredes}}",
+  "@wallCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "floorCount": "{count,plural, =1{1 piso} other{{count} pisos}}",
+  "@floorCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSurfaces": "Sin superficies",
+  "summary": "Resumen",
+  "labour": "Mano de obra",
+  "otherCategory": "Otros",
+  "materialCategory": "Material",
+  "total": "Total",
+  "perSquareMetre": "{price} por m² de piso",
+  "@perSquareMetre": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "newFinish": "Nuevo acabado",
+  "editFinish": "Editar acabado",
+  "whatIsDone": "Qué se hace",
+  "whatIsDoneHint": "Pintura vinilo, estuco, enchape…",
+  "whatIsDoneRequired": "Escribe qué acabado es",
+  "pricePerSquareMetre": "Precio por m²",
+  "whereItGoes": "Dónde se aplica",
+  "noRoomsMeasured": "Todavía no hay habitaciones medidas.",
+  "addFinish": "Añadir acabado",
+  "deleteFinish": "Eliminar acabado",
+  "floor": "Piso",
+  "surfaceTile": "{surface} · {area}",
+  "@surfaceTile": {
+    "placeholders": {
+      "surface": {
+        "type": "String"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "markOneSurface": "Marca al menos una pared o un piso.",
+  "deleteFinishMessage": "Se quita «{finish}» del presupuesto. Las paredes y el plano no se tocan.",
+  "@deleteFinishMessage": {
+    "placeholders": {
+      "finish": {
+        "type": "String"
+      }
+    }
+  },
+  "markedArea": "Marcado: {area}",
+  "@markedArea": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "unitShort": "unid",
+  "newItem": "Nueva partida",
+  "editItem": "Editar partida",
+  "description": "Descripción",
+  "itemHint": "Varilla de 1/2, teja, ayudante…",
+  "itemRequired": "Escribe qué es",
+  "quantity": "Cantidad",
+  "unit": "Unidad",
+  "missing": "Falta",
+  "pricePerUnit": "Precio por unidad",
+  "addItem": "Añadir partida",
+  "deleteItem": "Eliminar partida",
+  "materialBlock": "Bloques o ladrillos",
+  "materialCement": "Cemento",
+  "materialSand": "Arena",
+  "materialPaint": "Pintura",
+  "materialAdhesive": "Pegante",
+  "materialTile": "Baldosas",
+  "unitBag": "bulto",
+  "unitGallon": "gal",
+  "unitKilogram": "kg",
+  "surfaceWalls": "Paredes",
+  "surfaceFloor": "Piso",
+  "pdfDocumentTitle": "Presupuesto {project}",
+  "@pdfDocumentTitle": {
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfHeading": "Presupuesto de obra",
+  "pdfScope": "Alcance: {scope}",
+  "@pdfScope": {
+    "placeholders": {
+      "scope": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfFooter": "Hecho con Planova · página {page} de {pages}",
+  "@pdfFooter": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "pages": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfRunningTitle": "{project} · Presupuesto",
+  "@pdfRunningTitle": {
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
+  },
+  "calculatedMaterials": "Materiales calculados",
+  "noRoomsMeasuredYet": "No hay habitaciones medidas todavía.",
+  "pdfFloorArea": "Área de piso",
+  "wallsCountLabel": "Paredes",
+  "pdfPlanOpenBy": "El plano no cierra por {gap}.",
+  "@pdfPlanOpenBy": {
+    "placeholders": {
+      "gap": {
+        "type": "String"
+      }
+    }
+  },
+  "columnMaterial": "Material",
+  "columnFrom": "De",
+  "columnQuantity": "Cantidad",
+  "columnUnit": "Unidad",
+  "columnUnitPrice": "Precio unitario",
+  "columnSubtotal": "Subtotal",
+  "noPrice": "sin precio",
+  "columnFinish": "Acabado",
+  "columnWhere": "Dónde",
+  "columnSurface": "Superficie",
+  "columnPricePerSquareMetre": "Precio por m²",
+  "columnDescription": "Descripción",
+  "columnCategory": "Capítulo",
+  "pdfEstimateNote": "Las cantidades de material se calculan a partir de las medidas del plano e incluyen desperdicio. Son una estimación.",
+  "tuneRates": "Ajustar rendimientos",
+  "materialsNote": "Las cantidades ya traen el desperdicio. Son una estimación: compruébalas antes de comprar.",
+  "surfacesLine": "Muros sin vanos {walls} · Piso {floor}",
+  "@surfacesLine": {
+    "placeholders": {
+      "walls": {
+        "type": "String"
+      },
+      "floor": {
+        "type": "String"
+      }
+    }
+  },
+  "masonry": "Mampostería",
+  "piecesCount": "{count} piezas",
+  "@piecesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "fromWallsNotFloor": "De {area} de muros (no del piso)",
+  "@fromWallsNotFloor": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "bedMortar": "Mortero de pega",
+  "cementBags": "{count} bultos",
+  "@cementBags": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "masonryNote": "{area} × {perSquareMetre} piezas/m² + {waste} % de desperdicio. Pieza de {length} × {height}, junta de {joint}, muro de {thickness}.",
+  "@masonryNote": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      },
+      "perSquareMetre": {
+        "type": "String"
+      },
+      "waste": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      },
+      "joint": {
+        "type": "String"
+      },
+      "thickness": {
+        "type": "String"
+      }
+    }
+  },
+  "fromWallsAndCeiling": "De {area} de muros y cielo raso",
+  "@fromWallsAndCeiling": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "inGallons": "En galones",
+  "gallonsValue": "{count} gal",
+  "@gallonsValue": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "surface": "Superficie",
+  "paintNote": "{coats} manos · {coverage} m² por litro{ceiling}",
+  "@paintNote": {
+    "placeholders": {
+      "coats": {
+        "type": "String"
+      },
+      "coverage": {
+        "type": "String"
+      },
+      "ceiling": {
+        "type": "String"
+      }
+    }
+  },
+  "includesCeiling": " · incluye el cielo raso",
+  "tilesCount": "{count} baldosas",
+  "@tilesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "fromFloorArea": "De {area} de piso",
+  "@fromFloorArea": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "floorNote": "{area} × {perSquareMetre} baldosas/m² + {waste} % de desperdicio. Baldosa de {length} × {width}.",
+  "@floorNote": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      },
+      "perSquareMetre": {
+        "type": "String"
+      },
+      "waste": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      },
+      "width": {
+        "type": "String"
+      }
+    }
+  },
+  "nothingToCalculate": "Aún no hay de dónde calcular",
+  "nothingToCalculateBody": "Los materiales salen de lo que miden las habitaciones. Crea la primera y vuelve aquí.",
+  "projectRates": "Rendimientos del proyecto",
+  "projectRatesNote": "Estas cifras son las que usa la calculadora. Cámbialas por las de tu obra y los materiales se recalculan solos.",
+  "pieceLengthCm": "Largo de la pieza (cm)",
+  "pieceHeightCm": "Alto de la pieza (cm)",
+  "jointCm": "Junta de pega (cm)",
+  "wallThicknessCm": "Espesor del muro (cm)",
+  "wastePercent": "Desperdicio (%)",
+  "cementPerCubicMetre": "Cemento (bultos/m³)",
+  "sandPerCubicMetre": "Arena por m³ de mortero (m³)",
+  "paint": "Pintura",
+  "coats": "Manos",
+  "coverage": "Rendimiento (m² por L)",
+  "paintCeilingToo": "Pintar también el cielo raso",
+  "tileLengthCm": "Largo baldosa (cm)",
+  "tileWidthCm": "Ancho baldosa (cm)",
+  "adhesivePerSquareMetre": "Pegante (kg por m²)",
+  "saveRates": "Guardar rendimientos",
+  "howItMeasures": "Cómo se mide",
+  "gotIt": "Entendido",
+  "spatialHelpBody": "1. Mueve despacio el teléfono apuntando al suelo hasta que la app reconozca la superficie.\n2. Apunta con la mira al pie de una esquina y marca.\n3. Ve a la siguiente esquina y marca otra vez: la pared queda hecha con su medida. Puedes caminar, que el plano no se mueve.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nAl cerrar le pones nombre y la habitación queda creada con sus paredes. La altura del techo se mide después, desde la habitación. Aquí la distancia la mide el aparato, no se estima. Aun así conviene revisar las paredes en el plano antes de comprar material.",
+  "atCornerOneClose": "Estás en la esquina 1: cierra la habitación",
+  "moveToFindFloor": "Mueve el teléfono despacio para reconocer el suelo",
+  "wallChip": "Pared {number} · {length}",
+  "@wallChip": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "cornerCount": "{count,plural, =1{1 esquina} other{{count} esquinas}}",
+  "@cornerCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "undoLast": "Quitar la última",
+  "closeRoom": "Cerrar habitación",
+  "markCorner": "Marcar esquina",
+  "finishWithoutClosing": "Terminar sin cerrar",
+  "moveToFindSurface": "Mueve el teléfono despacio para reconocer la superficie",
+  "aimAtOneEnd": "Apunta a un extremo y márcalo",
+  "markTheStart": "Marcar el principio",
+  "aimAtOtherEnd": "Apunta al otro extremo",
+  "useMeasure": "Usar {measure}",
+  "@useMeasure": {
+    "placeholders": {
+      "measure": {
+        "type": "String"
+      }
+    }
+  },
+  "startAgain": "Empezar de nuevo",
+  "noCamera": "Este aparato no tiene cámara. Puedes medir igual apuntando con el teléfono.",
+  "cameraDenied": "Planova no tiene permiso para la cámara. Puedes dárselo en los ajustes del teléfono, o medir igual apuntando sin ver la imagen.",
+  "cameraFailed": "No se pudo abrir la cámara. Puedes medir igual apuntando con el teléfono.",
+  "ceilingHeight": "Altura del techo",
+  "metresFloorToCeiling": "Metros del suelo al techo",
+  "ceilingHeightHelp": "Es lo único que hay que saber: con eso salen las demás",
+  "sightingsDoNotMatch": "No cuadra: apunta al pie de una pared y luego al techo de esa misma pared.",
+  "calibrationDone": "Listo: llevas el teléfono a {height} del suelo y esa pared está a {distance}.",
+  "@calibrationDone": {
+    "placeholders": {
+      "height": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "whichCorner": "¿A qué esquina apuntas?",
+  "whichCornerBody": "Desde donde estás ahora, apunta al pie de una esquina que ya hayas marcado. Con eso la app vuelve a saber dónde estás y el plano no se mueve.",
+  "legacyHelpBody": "1. Toca «Sin calibrar» y escribe la altura del techo. Apunta al pie de una pared, fija, y luego al techo de esa misma pared. Con eso la app sabe a qué altura llevas el teléfono y mide bien.\n2. Apunta con la mira al pie de una esquina, donde la pared toca el suelo, y marca.\n3. Gira sobre ti mismo: desde la esquina marcada sale una línea que sigue a la mira. Marca la siguiente y la pared queda hecha.\n4. Al volver a la primera esquina, la línea se engancha a ella: ahí se cierra la habitación.\n\nSi tienes que caminar, toca «Me moví», apunta a una esquina que ya hayas marcado y fija tu posición: el plano se queda donde está.\n\nTodo esto es una estimación: después puedes corregir cada pared con el flexómetro en el editor del plano.",
+  "waitingForSensors": "Esperando a los sensores…",
+  "aimAtWallFootLockFloor": "Apunta al pie de una pared y fija el suelo",
+  "nowAtTheCeiling": "Ahora al techo de esa misma pared",
+  "aimAtCornerFixPosition": "Apunta al pie de la esquina {corner} y fija tu posición",
+  "@aimAtCornerFixPosition": {
+    "placeholders": {
+      "corner": {
+        "type": "String"
+      }
+    }
+  },
+  "aimLowerAtWallFoot": "Apunta más abajo, al pie de la pared",
+  "turnOnTheSpot": "Gira sobre ti mismo, sin caminar. Si te mueves, usa «Me moví».",
+  "calibrated": "Calibrado · {height}",
+  "@calibrated": {
+    "placeholders": {
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "notCalibrated": "Sin calibrar",
+  "iMoved": "Me moví",
+  "lockFloor": "Fijar el suelo",
+  "lockCeiling": "Fijar el techo",
+  "iAmHere": "Estoy aquí",
+  "noGyroscopeTitle": "Este teléfono no puede medir el giro",
+  "noGyroscopeBody": "Le falta el giroscopio, así que no hay forma de saber hacia dónde apuntas al girar sobre ti mismo y el plano saldría inventado.\n\nPuedes crear la habitación escribiendo el ancho y el largo, y ajustar cada pared en el plano.",
+  "goBack": "Volver"
 }

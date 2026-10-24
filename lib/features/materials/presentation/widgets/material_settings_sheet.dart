@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/material_settings.dart';
 import '../providers/material_providers.dart';
 
@@ -89,6 +90,7 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     final ThemeData theme = Theme.of(context);
 
     return SafeArea(
@@ -102,68 +104,67 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Rendimientos del proyecto',
+                  t.projectRates,
                   style: theme.textTheme.titleLarge,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Estas cifras son las que usa la calculadora. Cámbialas por '
-                  'las de tu obra y los materiales se recalculan solos.',
+                  t.projectRatesNote,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 20),
-                _Section(title: 'Mampostería'),
+                _Section(title: t.masonry),
                 _pair(
                   'blockLength',
-                  'Largo de la pieza (cm)',
+                  t.pieceLengthCm,
                   'blockHeight',
-                  'Alto de la pieza (cm)',
+                  t.pieceHeightCm,
                 ),
                 _pair(
                   'joint',
-                  'Junta de pega (cm)',
+                  t.jointCm,
                   'wallThickness',
-                  'Espesor del muro (cm)',
+                  t.wallThicknessCm,
                 ),
                 _pair(
                   'masonryWaste',
-                  'Desperdicio (%)',
+                  t.wastePercent,
                   'cementBags',
-                  'Cemento (bultos/m³)',
+                  t.cementPerCubicMetre,
                 ),
-                _spaced(_field('sand', 'Arena por m³ de mortero (m³)')),
+                _spaced(_field('sand', t.sandPerCubicMetre)),
                 const SizedBox(height: 20),
-                _Section(title: 'Pintura'),
-                _pair('coats', 'Manos', 'coverage', 'Rendimiento (m² por L)'),
-                _spaced(_field('paintWaste', 'Desperdicio (%)')),
+                _Section(title: t.paint),
+                _pair('coats', t.coats, 'coverage', t.coverage),
+                _spaced(_field('paintWaste', t.wastePercent)),
                 const SizedBox(height: 4),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: _includeCeiling,
                   onChanged: (bool value) =>
                       setState(() => _includeCeiling = value),
-                  title: const Text('Pintar también el cielo raso'),
+                  title: Text(t.paintCeilingToo),
                 ),
                 const SizedBox(height: 12),
-                _Section(title: 'Piso'),
+                _Section(title: t.floor),
                 _pair(
                   'tileLength',
-                  'Largo baldosa (cm)',
+                  t.tileLengthCm,
                   'tileWidth',
-                  'Ancho baldosa (cm)',
+                  t.tileWidthCm,
                 ),
                 _pair(
                   'floorWaste',
-                  'Desperdicio (%)',
+                  t.wastePercent,
                   'adhesive',
-                  'Pegante (kg por m²)',
+                  t.adhesivePerSquareMetre,
                 ),
                 const SizedBox(height: 24),
                 FilledButton(
                   onPressed: _saving ? null : _save,
-                  child: const Text('Guardar rendimientos'),
+                  child: Text(t.saveRates),
                 ),
               ],
             ),

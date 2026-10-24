@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/opening.dart';
 import '../../domain/entities/room_drafts.dart';
 import '../../domain/repositories/room_repository.dart';
@@ -88,6 +89,7 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
@@ -98,7 +100,7 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                _isEditing ? 'Editar vano' : 'Nuevo vano',
+                _isEditing ? t.editOpening : t.newOpening,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
@@ -107,7 +109,7 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
                   for (final OpeningKind kind in OpeningKind.values)
                     ButtonSegment<OpeningKind>(
                       value: kind,
-                      label: Text(kind.label),
+                      label: Text(kind.label(t)),
                       icon: Icon(kind.icon),
                     ),
                 ],
@@ -126,11 +128,11 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(labelText: 'Ancho (m)'),
+                      decoration: InputDecoration(labelText: t.widthMetersShort),
                       validator: (String? value) => MeasureInput.validate(
                         value,
                         max: widget.wallLengthMeters,
-                        maxMessage: 'No cabe en la pared',
+                        maxMessage: t.openingTooWide,
                       ),
                     ),
                   ),
@@ -141,11 +143,11 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      decoration: const InputDecoration(labelText: 'Alto (m)'),
+                      decoration: InputDecoration(labelText: t.heightMetersShort),
                       validator: (String? value) => MeasureInput.validate(
                         value,
                         max: widget.wallHeightMeters,
-                        maxMessage: 'Pasa de la altura del muro',
+                        maxMessage: t.openingTooTall,
                       ),
                     ),
                   ),
@@ -158,16 +160,17 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: 'Desde el inicio de la pared (m)',
-                  helperText:
-                      'La pared mide ${Formatters.meters(widget.wallLengthMeters)}',
+                  labelText: t.openingDistance,
+                  helperText: t.wallMeasures(
+                    Formatters.meters(widget.wallLengthMeters),
+                  ),
                 ),
                 validator: _validateDistance,
               ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(_isEditing ? 'Guardar cambios' : 'Añadir vano'),
+                child: Text(_isEditing ? t.saveChanges : t.addOpening),
               ),
               if (_isEditing)
                 TextButton(
@@ -175,7 +178,7 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.error,
                   ),
-                  child: const Text('Eliminar vano'),
+                  child: Text(t.deleteOpening),
                 ),
             ],
           ),
@@ -183,6 +186,7 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
       ),
     );
   }
+  AppL10n get _t => AppL10n.of(context);
 
   /// Medidas típicas al cambiar de tipo, para no escribirlas siempre.
   void _applyDefaultsFor(OpeningKind kind) {
@@ -194,11 +198,11 @@ class _OpeningFormSheetState extends ConsumerState<OpeningFormSheet> {
   String? _validateDistance(String? raw) {
     final double? value = MeasureInput.parse(raw);
     if (value == null || value.isNaN || value < 0) {
-      return 'Escribe una medida';
+      return _t.measureRequired;
     }
     final double width = MeasureInput.parse(_width.text) ?? 0;
     if (value + width > widget.wallLengthMeters + 0.001) {
-      return 'El vano se sale de la pared';
+      return _t.openingOffWall;
     }
     return null;
   }
