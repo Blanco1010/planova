@@ -6,6 +6,30 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/geometry/point2d.dart';
 import '../../../../core/utils/formatters.dart';
 
+/// Mete el cuadro de una medida dentro de la pantalla.
+///
+/// Pegado al borde se leía a medias: se empuja hacia dentro lo justo para
+/// que quepa entero. Si no cabe de ninguna manera, se centra.
+@visibleForTesting
+Offset labelCenterInside(
+  Offset center,
+  Size label,
+  Size viewport, {
+  double margin = 8,
+}) {
+  final double halfWidth = label.width / 2;
+  final double halfHeight = label.height / 2;
+  final double minX = margin + halfWidth;
+  final double maxX = viewport.width - margin - halfWidth;
+  final double minY = margin + halfHeight;
+  final double maxY = viewport.height - margin - halfHeight;
+
+  return Offset(
+    minX > maxX ? viewport.width / 2 : center.dx.clamp(minX, maxX),
+    minY > maxY ? viewport.height / 2 : center.dy.clamp(minY, maxY),
+  );
+}
+
 /// Dibuja el plano encima de la imagen de la cámara.
 ///
 /// No sabe de dónde salen las medidas: recibe las esquinas en planta y una
@@ -74,6 +98,7 @@ class _ScanOverlayPainter extends CustomPainter {
     for (int i = 0; i + 1 < screen.length; i++) {
       _wall(
         canvas,
+        size,
         screen[i],
         screen[i + 1],
         meters: corners[i].distanceTo(corners[i + 1]),
@@ -82,7 +107,7 @@ class _ScanOverlayPainter extends CustomPainter {
     }
 
     _paintLiveWall(canvas, size, screen);
-    _paintCorners(canvas, screen);
+    _paintCorners(canvas, size, screen);
   }
 
   /// La línea que va desde la última esquina hasta donde apunta la mira.
@@ -99,6 +124,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
     _wall(
       canvas,
+      size,
       from,
       to,
       meters: corners.last.distanceTo(endPoint),
@@ -109,7 +135,7 @@ class _ScanOverlayPainter extends CustomPainter {
     );
   }
 
-  void _paintCorners(Canvas canvas, List<Offset?> screen) {
+  void _paintCorners(Canvas canvas, Size size, List<Offset?> screen) {
     for (int i = 0; i < screen.length; i++) {
       final Offset? corner = screen[i];
       if (corner == null) continue;
@@ -131,6 +157,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
       _label(
         canvas,
+        size,
         // El aro de enganche es más grande: el número se aparta de él.
         corner.translate(0, highlighted ? -34 : -24),
         '${i + 1}',
@@ -143,6 +170,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
   void _wall(
     Canvas canvas,
+    Size viewport,
     Offset? from,
     Offset? to, {
     required double meters,
@@ -176,7 +204,7 @@ class _ScanOverlayPainter extends CustomPainter {
       final Offset unit = (to - from) / onScreen;
       // Apartada de la línea, para que el trazo no cruce los números.
       final Offset away = Offset(-unit.dy, unit.dx) * 22;
-      _label(canvas, middle + away, Formatters.meters(meters));
+      _label(canvas, viewport, middle + away, Formatters.meters(meters));
     }
   }
 
@@ -197,6 +225,7 @@ class _ScanOverlayPainter extends CustomPainter {
 
   void _label(
     Canvas canvas,
+    Size viewport,
     Offset center,
     String text, {
     Color background = _halo,
@@ -215,10 +244,15 @@ class _ScanOverlayPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     )..layout();
 
+    final Size label = Size(
+      painter.width + padding * 2,
+      painter.height + padding,
+    );
+    final Offset inside = labelCenterInside(center, label, viewport);
     final Rect box = Rect.fromCenter(
-      center: center,
-      width: painter.width + padding * 2,
-      height: painter.height + padding,
+      center: inside,
+      width: label.width,
+      height: label.height,
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(box, const Radius.circular(12)),
@@ -226,7 +260,7 @@ class _ScanOverlayPainter extends CustomPainter {
     );
     painter.paint(
       canvas,
-      Offset(center.dx - painter.width / 2, center.dy - painter.height / 2),
+      Offset(inside.dx - painter.width / 2, inside.dy - painter.height / 2),
     );
   }
 
