@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/core/geometry/point2d.dart';
 import 'package:planova/core/measuring/sighting_math.dart';
 import 'package:planova/features/room_scan/domain/entities/device_aim.dart';
@@ -82,7 +83,13 @@ void main() {
           cameraControllerProvider.overrideWith((ref) async => null),
           turnSensorProvider.overrideWith((ref) async => canTurn),
         ],
-        child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
+        child: MaterialApp.router(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
+          theme: AppTheme.light,
+          routerConfig: router,
+        ),
       ),
     );
     await tester.pumpAndSettle();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../../l10n/app_l10n.dart';
 
 /// Pregunta antes de borrar algo que no se puede recuperar.
 ///
@@ -11,8 +12,9 @@ abstract final class ConfirmDeleteDialog {
     BuildContext context, {
     required String title,
     required String message,
-    String confirmLabel = 'Eliminar',
+    String? confirmLabel,
   }) async {
+    final AppL10n t = AppL10n.of(context);
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext dialogContext) => AlertDialog(
@@ -21,7 +23,7 @@ abstract final class ConfirmDeleteDialog {
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(t.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -29,7 +31,7 @@ abstract final class ConfirmDeleteDialog {
               backgroundColor: AppColors.dangerRed,
               foregroundColor: Colors.white,
             ),
-            child: Text(confirmLabel),
+            child: Text(confirmLabel ?? t.delete),
           ),
         ],
       ),

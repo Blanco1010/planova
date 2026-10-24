@@ -1,0 +1,60 @@
+{
+  "@@locale": "es",
+
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saveChanges": "Guardar cambios",
+  "delete": "Eliminar",
+
+  "settingsTitle": "Ajustes",
+  "settingsAppearance": "Apariencia",
+  "optionSystem": "Igual que el sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "settingsLanguage": "Idioma",
+  "languageSpanish": "Español",
+  "languageEnglish": "Inglés",
+  "settingsCurrency": "Moneda",
+  "currencyNote": "Cambia cómo se escriben los precios. No los convierte: lo que está escrito sigue valiendo lo mismo.",
+  "currencyCop": "Peso colombiano",
+  "currencyUsd": "Dólar",
+  "settingsTesting": "Pruebas",
+  "demoTitle": "Cargar un proyecto de ejemplo",
+  "demoBody": "Crea una casa con tres habitaciones, precios y acabados para ver el presupuesto y el PDF sin medir nada.",
+  "demoDone": "Listo: «{project}» está en tus proyectos.",
+  "@demoDone": {
+    "placeholders": { "project": { "type": "String" } }
+  },
+  "demoFailed": "No se pudo crear el ejemplo: {error}",
+  "@demoFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+
+  "projectsLoadError": "No se pudieron leer los proyectos",
+  "projectsEmptyTitle": "Todavía no hay proyectos",
+  "projectsEmptyBody": "Crea el primero para empezar a guardar habitaciones, planos y presupuestos.",
+  "newProject": "Nuevo proyecto",
+  "editProject": "Editar proyecto",
+  "createProject": "Crear proyecto",
+  "deleteProject": "Eliminar proyecto",
+  "deleteProjectMessage": "Se borrará «{project}» y todo lo que guardes dentro. Esto no se puede deshacer.",
+  "@deleteProjectMessage": {
+    "placeholders": { "project": { "type": "String" } }
+  },
+  "updatedOn": "Actualizado el {date}",
+  "@updatedOn": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "projectName": "Nombre del proyecto",
+  "projectNameHint": "Casa de dos pisos, remodelación cocina…",
+  "projectNameRequired": "Ponle un nombre al proyecto",
+  "client": "Cliente",
+  "address": "Dirección",
+  "notes": "Notas",
+  "projectCreated": "Proyecto creado",
+  "projectUpdated": "Proyecto actualizado",
+  "saveFailed": "No se pudo guardar: {error}",
+  "@saveFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  }
+}

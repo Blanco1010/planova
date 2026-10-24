@@ -15,6 +15,9 @@ import '../../../rooms/domain/repositories/room_repository.dart';
 /// Sirve para probar el presupuesto y el PDF en un emulador, donde no hay
 /// cámara ni sensores con los que medir nada.
 class DemoDataService {
+  /// Como se llama el proyecto que se siembra.
+  static const String projectName = 'Casa de ejemplo';
+
   const DemoDataService({
     required this.projects,
     required this.rooms,
@@ -29,7 +32,7 @@ class DemoDataService {
   Future<int> seed() async {
     final int projectId = await projects.create(
       const ProjectDraft(
-        name: 'Casa de ejemplo',
+        name: projectName,
         client: 'Ana López',
         address: 'Vereda El Carmen',
         notes: 'Proyecto de prueba para ver el presupuesto y el PDF.',

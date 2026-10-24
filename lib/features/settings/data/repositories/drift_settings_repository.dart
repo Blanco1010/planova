@@ -1,5 +1,6 @@
 import '../../../../core/database/app_database.dart';
 import '../../../../core/utils/money.dart';
+import '../../domain/entities/app_language.dart';
 import '../../domain/entities/app_theme_mode.dart';
 import '../../domain/repositories/settings_repository.dart';
 
@@ -9,6 +10,7 @@ class DriftSettingsRepository implements SettingsRepository {
 
   static const String _themeModeKey = 'theme_mode';
   static const String _moneyKey = 'money_format';
+  static const String _languageKey = 'language';
 
   final AppDatabase _db;
 
@@ -26,6 +28,14 @@ class DriftSettingsRepository implements SettingsRepository {
 
   @override
   Future<void> saveMoney(MoneyFormat money) => _save(_moneyKey, money.name);
+
+  @override
+  Stream<AppLanguage> watchLanguage() =>
+      _watch(_languageKey).map(AppLanguage.fromStorage);
+
+  @override
+  Future<void> saveLanguage(AppLanguage language) =>
+      _save(_languageKey, language.name);
 
   Stream<String?> _watch(String key) {
     return (_db.select(_db.appSettings)..where((t) => t.key.equals(key)))

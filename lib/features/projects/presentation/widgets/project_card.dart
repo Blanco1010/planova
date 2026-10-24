@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/project.dart';
 
 /// Tarjeta de un proyecto en la lista. Al tocarla se edita.
@@ -64,7 +65,9 @@ class ProjectCard extends StatelessWidget {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      'Actualizado el ${Formatters.shortDate(project.updatedAt)}',
+                      AppL10n.of(
+                        context,
+                      ).updatedOn(Formatters.shortDate(project.updatedAt)),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -74,7 +77,7 @@ class ProjectCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onDelete,
-                tooltip: 'Eliminar proyecto',
+                tooltip: AppL10n.of(context).deleteProject,
                 icon: const Icon(Icons.delete_outline),
               ),
             ],

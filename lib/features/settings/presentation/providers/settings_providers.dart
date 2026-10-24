@@ -8,6 +8,8 @@ import '../../../projects/presentation/providers/project_providers.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../data/repositories/drift_settings_repository.dart';
 import '../../data/services/demo_data_service.dart';
+import '../../../../l10n/app_l10n.dart';
+import '../../domain/entities/app_language.dart';
 import '../../domain/entities/app_theme_mode.dart';
 import '../../domain/repositories/settings_repository.dart';
 
@@ -22,6 +24,21 @@ final StreamProvider<AppThemeMode> themeModeProvider =
       (ref) => ref.watch(settingsRepositoryProvider).watchThemeMode(),
     );
 
+/// Cómo se llama cada idioma en la interfaz.
+extension AppLanguageView on AppLanguage {
+  String label(AppL10n t) => switch (this) {
+    AppLanguage.system => t.optionSystem,
+    AppLanguage.spanish => t.languageSpanish,
+    AppLanguage.english => t.languageEnglish,
+  };
+}
+
+/// Idioma elegido, en vivo. Mientras carga, el del sistema.
+final StreamProvider<AppLanguage> languageProvider =
+    StreamProvider<AppLanguage>(
+      (ref) => ref.watch(settingsRepositoryProvider).watchLanguage(),
+    );
+
 /// Moneda elegida, en vivo. Mientras carga, pesos.
 final StreamProvider<MoneyFormat> moneyProvider = StreamProvider<MoneyFormat>(
   (ref) => ref.watch(settingsRepositoryProvider).watchMoney(),
@@ -29,9 +46,9 @@ final StreamProvider<MoneyFormat> moneyProvider = StreamProvider<MoneyFormat>(
 
 /// Cómo se llama cada moneda en la interfaz.
 extension MoneyFormatView on MoneyFormat {
-  String get label => switch (this) {
-    MoneyFormat.cop => 'Peso colombiano',
-    MoneyFormat.usd => 'Dólar',
+  String label(AppL10n t) => switch (this) {
+    MoneyFormat.cop => t.currencyCop,
+    MoneyFormat.usd => t.currencyUsd,
   };
 
   /// `$ · peso colombiano` para la lista de ajustes.
@@ -43,10 +60,10 @@ extension MoneyFormatView on MoneyFormat {
 
 /// Nombre y equivalente de Flutter de cada modo, para la interfaz.
 extension AppThemeModeView on AppThemeMode {
-  String get label => switch (this) {
-    AppThemeMode.system => 'Igual que el sistema',
-    AppThemeMode.light => 'Claro',
-    AppThemeMode.dark => 'Oscuro',
+  String label(AppL10n t) => switch (this) {
+    AppThemeMode.system => t.optionSystem,
+    AppThemeMode.light => t.themeLight,
+    AppThemeMode.dark => t.themeDark,
   };
 
   ThemeMode get themeMode => switch (this) {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/features/rooms/domain/entities/room_drafts.dart';
 import 'package:planova/features/rooms/presentation/providers/room_providers.dart';
 import 'package:planova/features/rooms/presentation/screens/room_editor_screen.dart';
@@ -36,6 +37,9 @@ void main() {
       ProviderScope(
         overrides: [roomRepositoryProvider.overrideWithValue(repository)],
         child: MaterialApp(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
           theme: AppTheme.light,
           home: RoomEditorScreen(roomId: roomId),
         ),

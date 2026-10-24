@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/features/budget/domain/entities/budget_item.dart';
 import 'package:planova/features/budget/domain/entities/material_kind.dart';
 import 'package:planova/features/budget/presentation/providers/budget_providers.dart';
@@ -69,6 +70,9 @@ void main() {
           floorPlanRendererProvider.overrideWithValue(planRenderer),
         ],
         child: MaterialApp(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
           theme: AppTheme.light,
           home: const BudgetScreen(projectId: 1),
         ),

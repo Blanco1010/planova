@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/project.dart';
 import '../../domain/entities/project_draft.dart';
 import '../providers/project_providers.dart';
@@ -60,6 +61,8 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
@@ -70,7 +73,7 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                _isEditing ? 'Editar proyecto' : 'Nuevo proyecto',
+                _isEditing ? t.editProject : t.newProject,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 20),
@@ -78,26 +81,26 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
                 controller: _name,
                 autofocus: !_isEditing,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre del proyecto',
-                  hintText: 'Casa de dos pisos, remodelación cocina…',
+                decoration: InputDecoration(
+                  labelText: t.projectName,
+                  hintText: t.projectNameHint,
                 ),
                 validator: (String? value) =>
                     (value == null || value.trim().isEmpty)
-                    ? 'Ponle un nombre al proyecto'
+                    ? t.projectNameRequired
                     : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _client,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Cliente'),
+                decoration: InputDecoration(labelText: t.client),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _address,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Dirección'),
+                decoration: InputDecoration(labelText: t.address),
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -105,12 +108,12 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
                 textCapitalization: TextCapitalization.sentences,
                 minLines: 2,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Notas'),
+                decoration: InputDecoration(labelText: t.notes),
               ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _saving ? null : _save,
-                child: Text(_isEditing ? 'Guardar cambios' : 'Crear proyecto'),
+                child: Text(_isEditing ? t.saveChanges : t.createProject),
               ),
             ],
           ),
@@ -122,6 +125,7 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    final AppL10n t = AppL10n.of(context);
     final NavigatorState navigator = Navigator.of(context);
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final ProjectDraft draft = ProjectDraft(
@@ -143,16 +147,14 @@ class _ProjectFormSheetState extends ConsumerState<ProjectFormSheet> {
       navigator.pop();
       messenger.showSnackBar(
         SnackBar(
-          content: Text(
-            _isEditing ? 'Proyecto actualizado' : 'Proyecto creado',
-          ),
+          content: Text(_isEditing ? t.projectUpdated : t.projectCreated),
         ),
       );
     } catch (error) {
       if (!mounted) return;
       setState(() => _saving = false);
       messenger.showSnackBar(
-        SnackBar(content: Text('No se pudo guardar: $error')),
+        SnackBar(content: Text(t.saveFailed('$error'))),
       );
     }
   }

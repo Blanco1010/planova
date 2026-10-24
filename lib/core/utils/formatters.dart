@@ -2,11 +2,26 @@ import 'package:intl/intl.dart';
 
 /// Formatos de texto compartidos por toda la app.
 abstract final class Formatters {
-  static final DateFormat _shortDate = DateFormat('d MMM y', 'es');
-  static final NumberFormat _twoDecimals = NumberFormat('0.00', 'es');
-  static final NumberFormat _upToTwoDecimals = NumberFormat('0.##', 'es');
-  static final NumberFormat _threeDecimals = NumberFormat('0.000', 'es');
-  static final NumberFormat _whole = NumberFormat('#,##0', 'es');
+  /// Un formato por patrón y por idioma: al cambiar de idioma cambian la
+  /// coma decimal y los nombres de los meses, sin reiniciar la app.
+  static final Map<String, NumberFormat> _numbers = <String, NumberFormat>{};
+  static final Map<String, DateFormat> _dates = <String, DateFormat>{};
+
+  static NumberFormat _number(String pattern) => _numbers.putIfAbsent(
+    '$pattern|${Intl.defaultLocale}',
+    () => NumberFormat(pattern, Intl.defaultLocale),
+  );
+
+  static DateFormat _date(String pattern) => _dates.putIfAbsent(
+    '$pattern|${Intl.defaultLocale}',
+    () => DateFormat(pattern, Intl.defaultLocale),
+  );
+
+  static DateFormat get _shortDate => _date('d MMM y');
+  static NumberFormat get _twoDecimals => _number('0.00');
+  static NumberFormat get _upToTwoDecimals => _number('0.##');
+  static NumberFormat get _threeDecimals => _number('0.000');
+  static NumberFormat get _whole => _number('#,##0');
 
   /// Fecha corta en español: `22 oct 2026`.
   static String shortDate(DateTime date) => _shortDate.format(date);

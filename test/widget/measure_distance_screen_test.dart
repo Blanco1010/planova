@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/core/geometry/point3d.dart';
 import 'package:planova/features/room_scan/domain/entities/scan_surface.dart';
 import 'package:planova/features/room_scan/presentation/providers/scan_providers.dart';
@@ -26,6 +27,9 @@ void main() {
       ProviderScope(
         overrides: [spatialScannerProvider.overrideWithValue(scanner)],
         child: MaterialApp(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
           theme: AppTheme.dark,
           home: const MeasureDistanceScreen(
             title: 'Medir la altura',

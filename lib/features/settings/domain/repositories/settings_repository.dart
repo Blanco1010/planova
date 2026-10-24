@@ -1,4 +1,5 @@
 import '../../../../core/utils/money.dart';
+import '../entities/app_language.dart';
 import '../entities/app_theme_mode.dart';
 
 /// Ajustes de la app que sobreviven al cierre.
@@ -10,4 +11,8 @@ abstract interface class SettingsRepository {
   Stream<MoneyFormat> watchMoney();
 
   Future<void> saveMoney(MoneyFormat money);
+
+  Stream<AppLanguage> watchLanguage();
+
+  Future<void> saveLanguage(AppLanguage language);
 }

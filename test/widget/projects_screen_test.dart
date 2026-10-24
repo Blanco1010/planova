@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/features/projects/domain/entities/project_draft.dart';
 import 'package:planova/features/projects/presentation/providers/project_providers.dart';
 import 'package:planova/features/projects/presentation/screens/projects_screen.dart';
@@ -21,7 +22,13 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [projectRepositoryProvider.overrideWithValue(repository)],
-        child: MaterialApp(theme: AppTheme.light, home: const ProjectsScreen()),
+        child: MaterialApp(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
+          theme: AppTheme.light,
+          home: const ProjectsScreen(),
+        ),
       ),
     );
     await tester.pumpAndSettle();

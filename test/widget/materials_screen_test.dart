@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:planova/app/theme/app_theme.dart';
+import 'package:planova/l10n/app_l10n.dart';
 import 'package:planova/features/materials/presentation/providers/material_providers.dart';
 import 'package:planova/features/materials/presentation/screens/materials_screen.dart';
 import 'package:planova/features/rooms/domain/entities/room_drafts.dart';
@@ -39,6 +40,9 @@ void main() {
           materialSettingsRepositoryProvider.overrideWithValue(settings),
         ],
         child: MaterialApp(
+          locale: const Locale('es'),
+          localizationsDelegates: AppL10n.localizationsDelegates,
+          supportedLocales: AppL10n.supportedLocales,
           theme: AppTheme.light,
           home: const MaterialsScreen(projectId: 1),
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_l10n.dart';
+
 /// Diálogo que pide un solo número y lo devuelve, o `null` si se cancela.
 ///
 /// Tiene su propio estado a propósito: si el controlador del campo lo creara
@@ -73,6 +75,8 @@ class _NumberPromptDialogState extends State<NumberPromptDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final AppL10n t = AppL10n.of(context);
+
     return AlertDialog(
       title: Text(widget.title),
       content: Form(
@@ -93,14 +97,14 @@ class _NumberPromptDialogState extends State<NumberPromptDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text(t.cancel),
         ),
         FilledButton(
           onPressed: () {
             if (!(_formKey.currentState?.validate() ?? false)) return;
             Navigator.of(context).pop(widget.parse(_controller.text));
           },
-          child: const Text('Guardar'),
+          child: Text(t.save),
         ),
       ],
     );

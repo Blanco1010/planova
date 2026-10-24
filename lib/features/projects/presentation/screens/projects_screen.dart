@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/project.dart';
 import '../providers/project_providers.dart';
 import '../widgets/project_card.dart';
@@ -15,6 +16,7 @@ class ProjectsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n t = AppL10n.of(context);
     final AsyncValue<List<Project>> projects = ref.watch(projectsProvider);
 
     return Scaffold(
@@ -23,7 +25,7 @@ class ProjectsScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () => context.push(AppRoutes.settings),
-            tooltip: 'Ajustes',
+            tooltip: t.settingsTitle,
             icon: const Icon(Icons.settings_outlined),
           ),
         ],
@@ -32,23 +34,21 @@ class ProjectsScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (Object error, StackTrace _) => _MessageView(
           icon: Icons.error_outline,
-          title: 'No se pudieron leer los proyectos',
+          title: t.projectsLoadError,
           message: '$error',
         ),
         data: (List<Project> items) => items.isEmpty
-            ? const _MessageView(
+            ? _MessageView(
                 icon: Icons.home_work_outlined,
-                title: 'Todavía no hay proyectos',
-                message:
-                    'Crea el primero para empezar a guardar habitaciones, '
-                    'planos y presupuestos.',
+                title: t.projectsEmptyTitle,
+                message: t.projectsEmptyBody,
               )
             : _ProjectList(projects: items),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => ProjectFormSheet.show(context),
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo proyecto'),
+        label: Text(t.newProject),
       ),
     );
   }
@@ -81,12 +81,11 @@ class _ProjectList extends ConsumerWidget {
     WidgetRef ref,
     Project project,
   ) async {
+    final AppL10n t = AppL10n.of(context);
     final bool confirmed = await ConfirmDeleteDialog.show(
       context,
-      title: 'Eliminar proyecto',
-      message:
-          'Se borrará «${project.name}» y todo lo que guardes dentro. '
-          'Esto no se puede deshacer.',
+      title: t.deleteProject,
+      message: t.deleteProjectMessage(project.name),
     );
 
     if (!confirmed) return;
