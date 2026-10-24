@@ -1,11 +1,16 @@
+import 'package:planova/core/utils/money.dart';
 import 'package:planova/features/settings/domain/entities/app_theme_mode.dart';
 import 'package:planova/features/settings/domain/repositories/settings_repository.dart';
 
 /// Ajustes en memoria para las pruebas de interfaz.
 class FakeSettingsRepository implements SettingsRepository {
-  FakeSettingsRepository({this.themeMode = AppThemeMode.system});
+  FakeSettingsRepository({
+    this.themeMode = AppThemeMode.system,
+    this.money = MoneyFormat.cop,
+  });
 
   final AppThemeMode themeMode;
+  final MoneyFormat money;
 
   @override
   Stream<AppThemeMode> watchThemeMode() =>
@@ -13,4 +18,10 @@ class FakeSettingsRepository implements SettingsRepository {
 
   @override
   Future<void> saveThemeMode(AppThemeMode mode) async {}
+
+  @override
+  Stream<MoneyFormat> watchMoney() => Stream<MoneyFormat>.value(money);
+
+  @override
+  Future<void> saveMoney(MoneyFormat money) async {}
 }

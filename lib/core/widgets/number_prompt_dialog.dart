@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Diálogo que pide un solo número y lo devuelve, o `null` si se cancela.
 ///
@@ -13,6 +14,7 @@ class NumberPromptDialog extends StatefulWidget {
     this.helperText,
     this.prefixText,
     this.initialText,
+    this.inputFormatters,
     super.key,
   });
 
@@ -25,6 +27,7 @@ class NumberPromptDialog extends StatefulWidget {
     String? helperText,
     String? prefixText,
     String? initialText,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return showDialog<double>(
       context: context,
@@ -36,6 +39,7 @@ class NumberPromptDialog extends StatefulWidget {
         helperText: helperText,
         prefixText: prefixText,
         initialText: initialText,
+        inputFormatters: inputFormatters,
       ),
     );
   }
@@ -47,6 +51,9 @@ class NumberPromptDialog extends StatefulWidget {
   final String? helperText;
   final String? prefixText;
   final String? initialText;
+
+  /// Lo que arregla el texto mientras se escribe, como separar los miles.
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<NumberPromptDialog> createState() => _NumberPromptDialogState();
@@ -74,6 +81,7 @@ class _NumberPromptDialogState extends State<NumberPromptDialog> {
           controller: _controller,
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: widget.inputFormatters,
           decoration: InputDecoration(
             labelText: widget.label,
             helperText: widget.helperText,

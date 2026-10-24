@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_wall.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/entities/finish.dart';
 import '../../domain/services/finish_calculator.dart';
 import '../providers/budget_providers.dart';
@@ -55,9 +58,10 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
   void initState() {
     super.initState();
     final Finish? finish = widget.finish;
+    final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     _description = TextEditingController(text: finish?.description ?? '');
     _price = TextEditingController(
-      text: finish == null ? '' : finish.unitPrice.round().toString(),
+      text: finish == null ? '' : money.formatAmount(finish.unitPrice),
     );
     _selected = <FinishSurface>{...?finish?.surfaces};
   }
@@ -75,8 +79,9 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
     final List<Room> rooms =
         ref.watch(projectRoomsProvider(widget.projectId)).value ??
         const <Room>[];
+    final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
     final double area = _selectedArea(rooms);
-    final double? price = MoneyInput.parse(_price.text);
+    final double? price = MoneyInput.parse(_price.text, money);
 
     return SafeArea(
       child: Padding(
@@ -112,12 +117,15 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Precio por m²',
-                    prefixText: r'$ ',
+                    prefixText: '${money.symbol} ',
                   ),
+                  inputFormatters: <TextInputFormatter>[
+                    MoneyInputFormatter(money),
+                  ],
                   onChanged: (_) => setState(() {}),
-                  validator: MoneyInput.validate,
+                  validator: (String? raw) => MoneyInput.validate(raw, money),
                 ),
                 const SizedBox(height: 20),
                 Text('Dónde se aplica', style: theme.textTheme.titleMedium),
@@ -133,7 +141,7 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
                   ),
                 for (final Room room in rooms) _roomSection(room),
                 const SizedBox(height: 12),
-                _Total(area: area, price: price),
+                _Total(area: area, price: price, money: money),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: _saving ? null : () => _save(rooms),
@@ -227,10 +235,11 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
       return;
     }
 
+    final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     final NavigatorState navigator = Navigator.of(context);
     final FinishDraft draft = FinishDraft(
       description: _description.text.trim(),
-      unitPrice: MoneyInput.parse(_price.text)!,
+      unitPrice: MoneyInput.parse(_price.text, money)!,
       surfaces: _selected.toList(growable: false),
     );
 
@@ -265,10 +274,15 @@ class _FinishSheetState extends ConsumerState<FinishSheet> {
 
 /// Lo que suma lo marcado, mientras se marca.
 class _Total extends StatelessWidget {
-  const _Total({required this.area, required this.price});
+  const _Total({
+    required this.area,
+    required this.price,
+    required this.money,
+  });
 
   final double area;
   final double? price;
+  final MoneyFormat money;
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +304,7 @@ class _Total extends StatelessWidget {
             ),
           ),
           Text(
-            price == null || price <= 0 ? '—' : Formatters.money(area * price),
+            price == null || price <= 0 ? '—' : money.format(area * price),
             style: theme.textTheme.titleMedium,
           ),
         ],

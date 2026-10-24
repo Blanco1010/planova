@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/money.dart';
 import '../../../projects/domain/entities/project.dart';
 import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
@@ -34,6 +35,7 @@ abstract final class BudgetPdfBuilder {
     required List<BudgetItem> items,
     required List<FinishEstimate> finishes,
     required BudgetSummary summary,
+    required MoneyFormat money,
     required DateTime generatedAt,
 
     /// Sin comprimir, el texto del documento se puede leer en las pruebas.
@@ -62,19 +64,19 @@ abstract final class BudgetPdfBuilder {
           if (materialLines.isEmpty)
             _note('No hay habitaciones medidas todavía.')
           else
-            _materialsTable(materialLines),
+            _materialsTable(materialLines, money),
           pw.SizedBox(height: 18),
           if (finishes.isNotEmpty) ...<pw.Widget>[
             _title('Acabados'),
-            _finishesTable(finishes),
+            _finishesTable(finishes, money),
             pw.SizedBox(height: 18),
           ],
           if (items.isNotEmpty) ...<pw.Widget>[
             _title('Otras partidas'),
-            _itemsTable(items),
+            _itemsTable(items, money),
             pw.SizedBox(height: 18),
           ],
-          _summary(summary),
+          _summary(summary, money),
         ],
       ),
     );
@@ -269,7 +271,7 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _materialsTable(List<MaterialLine> lines) {
+  static pw.Widget _materialsTable(List<MaterialLine> lines, MoneyFormat money) {
     return _table(
       headers: <String>[
         'Material',
@@ -286,9 +288,9 @@ abstract final class BudgetPdfBuilder {
             line.kind.surface.label,
             Formatters.quantity(line.quantity),
             line.kind.unit,
-            line.hasPrice ? Formatters.money(line.unitPrice) : 'sin precio',
+            line.hasPrice ? money.format(line.unitPrice) : 'sin precio',
             // La fuente base del PDF no tiene guion largo: aquí va corto.
-            line.hasPrice ? Formatters.money(line.subtotal) : '-',
+            line.hasPrice ? money.format(line.subtotal) : '-',
           ],
       ],
       numericFrom: 2,
@@ -296,7 +298,10 @@ abstract final class BudgetPdfBuilder {
   }
 
   /// Qué se le hace a cada grupo de superficies, y lo que cuesta.
-  static pw.Widget _finishesTable(List<FinishEstimate> finishes) {
+  static pw.Widget _finishesTable(
+    List<FinishEstimate> finishes,
+    MoneyFormat money,
+  ) {
     return _table(
       headers: <String>[
         'Acabado',
@@ -311,8 +316,8 @@ abstract final class BudgetPdfBuilder {
             estimate.finish.description,
             _whereOf(estimate),
             Formatters.squareMeters(estimate.areaM2),
-            Formatters.money(estimate.finish.unitPrice),
-            Formatters.money(estimate.total),
+            money.format(estimate.finish.unitPrice),
+            money.format(estimate.total),
           ],
       ],
       numericFrom: 2,
@@ -330,7 +335,7 @@ abstract final class BudgetPdfBuilder {
     return parts.isEmpty ? '-' : parts.join(' y ');
   }
 
-  static pw.Widget _itemsTable(List<BudgetItem> items) {
+  static pw.Widget _itemsTable(List<BudgetItem> items, MoneyFormat money) {
     return _table(
       headers: <String>[
         'Descripción',
@@ -347,8 +352,8 @@ abstract final class BudgetPdfBuilder {
             item.category.label,
             Formatters.quantity(item.quantity),
             item.unit,
-            Formatters.money(item.unitPrice),
-            Formatters.money(item.subtotal),
+            money.format(item.unitPrice),
+            money.format(item.subtotal),
           ],
       ],
       numericFrom: 2,
@@ -386,7 +391,7 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _summary(BudgetSummary summary) {
+  static pw.Widget _summary(BudgetSummary summary, MoneyFormat money) {
     final double? perSquareMeter = summary.costPerSquareMeter;
 
     return pw.Column(
@@ -401,10 +406,10 @@ abstract final class BudgetPdfBuilder {
           ),
           child: pw.Column(
             children: <pw.Widget>[
-              _summaryLine('Materiales', summary.materialsTotal),
-              _summaryLine('Acabados', summary.finishesTotal),
-              _summaryLine('Mano de obra', summary.laborTotal),
-              _summaryLine('Otros', summary.otherTotal),
+              _summaryLine('Materiales', summary.materialsTotal, money),
+              _summaryLine('Acabados', summary.finishesTotal, money),
+              _summaryLine('Mano de obra', summary.laborTotal, money),
+              _summaryLine('Otros', summary.otherTotal, money),
               pw.Divider(color: _muted, height: 14),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -417,7 +422,7 @@ abstract final class BudgetPdfBuilder {
                     ),
                   ),
                   pw.Text(
-                    Formatters.money(summary.total),
+                    money.format(summary.total),
                     style: pw.TextStyle(
                       fontSize: 14,
                       fontWeight: pw.FontWeight.bold,
@@ -431,7 +436,7 @@ abstract final class BudgetPdfBuilder {
                 pw.Align(
                   alignment: pw.Alignment.centerRight,
                   child: pw.Text(
-                    '${Formatters.money(perSquareMeter)} por m² de piso',
+                    '${money.format(perSquareMeter)} por m² de piso',
                     style: const pw.TextStyle(fontSize: 9, color: _muted),
                   ),
                 ),
@@ -450,7 +455,7 @@ abstract final class BudgetPdfBuilder {
     );
   }
 
-  static pw.Widget _summaryLine(String label, double value) {
+  static pw.Widget _summaryLine(String label, double value, MoneyFormat money) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 3),
       child: pw.Row(
@@ -458,7 +463,7 @@ abstract final class BudgetPdfBuilder {
         children: <pw.Widget>[
           pw.Text(label, style: const pw.TextStyle(fontSize: 10)),
           pw.Text(
-            Formatters.money(value),
+            money.format(value),
             style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
           ),
         ],

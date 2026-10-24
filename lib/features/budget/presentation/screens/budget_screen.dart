@@ -1,9 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
 import '../../../../core/widgets/number_prompt_dialog.dart';
 import '../../../materials/domain/entities/material_estimates.dart';
@@ -16,6 +16,7 @@ import '../../../rooms/domain/entities/room.dart';
 import '../../../rooms/domain/entities/room_plan.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../domain/entities/budget_item.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/entities/finish.dart';
 import '../../domain/entities/budget_summary.dart';
 import '../../domain/entities/material_kind.dart';
@@ -56,6 +57,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         ref.watch(budgetItemsProvider(projectId)).value ?? const <BudgetItem>[];
     final List<Finish> allFinishes =
         ref.watch(finishesProvider(projectId)).value ?? const <Finish>[];
+    final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
 
     final Iterable<Room> scopedRooms = _roomId == null
         ? rooms
@@ -106,6 +108,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                         FinishCalculator.estimate(finish, scopedRooms),
                     ],
                     summary: summary,
+                    money: money,
                   ),
             tooltip: 'Exportar en PDF',
             icon: const Icon(Icons.ios_share),
@@ -124,12 +127,14 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
             const SizedBox(height: 16),
           ],
           _MaterialsCard(
+            money: money,
             lines: lines,
             onTapLine: _materialOptions,
             onAdd: available.isEmpty ? null : () => _addMaterial(available),
           ),
           const SizedBox(height: 12),
           _ItemsCard(
+            money: money,
             items: items,
             onAdd: () => BudgetItemSheet.show(
               context,
@@ -145,6 +150,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ),
           const SizedBox(height: 12),
           _FinishesCard(
+            money: money,
             finishes: finishes,
             rooms: scopedRooms.toList(growable: false),
             onAdd: () => FinishSheet.show(context, projectId: projectId),
@@ -159,7 +165,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _SummaryCard(summary: summary),
+          _SummaryCard(summary: summary, money: money),
         ],
       ),
     );
@@ -173,6 +179,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     required List<BudgetItem> items,
     required List<FinishEstimate> finishes,
     required BudgetSummary summary,
+    required MoneyFormat money,
   }) async {
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final String scopeLabel = _roomId == null
@@ -197,6 +204,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         items: items,
         finishes: finishes,
         summary: summary,
+        money: money,
         generatedAt: DateTime.now(),
       );
       await ref
@@ -257,14 +265,16 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   }
 
   Future<void> _editPrice(MaterialLine line) async {
+    final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     final double? price = await NumberPromptDialog.show(
       context,
       title: 'Precio de ${line.kind.label.toLowerCase()}',
       label: 'Precio por ${line.kind.unit}',
-      prefixText: r'$ ',
-      initialText: line.hasPrice ? line.unitPrice.round().toString() : null,
-      validator: MoneyInput.validate,
-      parse: MoneyInput.parse,
+      prefixText: '${money.symbol} ',
+      initialText: line.hasPrice ? money.formatAmount(line.unitPrice) : null,
+      inputFormatters: <TextInputFormatter>[MoneyInputFormatter(money)],
+      validator: (String? raw) => MoneyInput.validate(raw, money),
+      parse: (String? raw) => MoneyInput.parse(raw, money),
     );
 
     if (price == null || !mounted) return;
@@ -351,11 +361,13 @@ class _RoomPicker extends StatelessWidget {
 
 class _MaterialsCard extends StatelessWidget {
   const _MaterialsCard({
+    required this.money,
     required this.lines,
     required this.onTapLine,
     required this.onAdd,
   });
 
+  final MoneyFormat money;
   final List<MaterialLine> lines;
   final ValueChanged<MaterialLine> onTapLine;
   final VoidCallback? onAdd;
@@ -401,10 +413,10 @@ class _MaterialsCard extends StatelessWidget {
                 subtitle: Text(
                   '${line.kind.surface.label} · '
                   '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
-                  ' × ${Formatters.money(line.unitPrice)}',
+                  ' × ${money.format(line.unitPrice)}',
                 ),
                 trailing: Text(
-                  Formatters.money(line.subtotal),
+                  money.format(line.subtotal),
                   style: theme.textTheme.titleSmall,
                 ),
                 onTap: () => onTapLine(line),
@@ -418,11 +430,13 @@ class _MaterialsCard extends StatelessWidget {
 
 class _ItemsCard extends StatelessWidget {
   const _ItemsCard({
+    required this.money,
     required this.items,
     required this.onAdd,
     required this.onTapItem,
   });
 
+  final MoneyFormat money;
   final List<BudgetItem> items;
   final VoidCallback onAdd;
   final ValueChanged<BudgetItem> onTapItem;
@@ -470,10 +484,10 @@ class _ItemsCard extends StatelessWidget {
                 subtitle: Text(
                   '${item.category.label} · '
                   '${Formatters.quantity(item.quantity)} ${item.unit}'
-                  ' × ${Formatters.money(item.unitPrice)}',
+                  ' × ${money.format(item.unitPrice)}',
                 ),
                 trailing: Text(
-                  Formatters.money(item.subtotal),
+                  money.format(item.subtotal),
                   style: theme.textTheme.titleSmall,
                 ),
                 onTap: () => onTapItem(item),
@@ -488,12 +502,14 @@ class _ItemsCard extends StatelessWidget {
 /// Los acabados: qué se le hace a qué paredes y pisos.
 class _FinishesCard extends StatelessWidget {
   const _FinishesCard({
+    required this.money,
     required this.finishes,
     required this.rooms,
     required this.onAdd,
     required this.onTapFinish,
   });
 
+  final MoneyFormat money;
   final List<Finish> finishes;
   final List<Room> rooms;
   final VoidCallback onAdd;
@@ -547,10 +563,10 @@ class _FinishesCard extends StatelessWidget {
       title: Text(estimate.finish.description),
       subtitle: Text(
         '${_where(estimate)} · ${Formatters.squareMeters(estimate.areaM2)}'
-        ' × ${Formatters.money(estimate.finish.unitPrice)}',
+        ' × ${money.format(estimate.finish.unitPrice)}',
       ),
       trailing: Text(
-        Formatters.money(estimate.total),
+        money.format(estimate.total),
         style: Theme.of(context).textTheme.titleSmall,
       ),
       onTap: () => onTapFinish(estimate.finish),
@@ -570,9 +586,10 @@ class _FinishesCard extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.summary});
+  const _SummaryCard({required this.summary, required this.money});
 
   final BudgetSummary summary;
+  final MoneyFormat money;
 
   @override
   Widget build(BuildContext context) {
@@ -587,10 +604,10 @@ class _SummaryCard extends StatelessWidget {
           children: [
             Text('Resumen', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
-            _Line(label: 'Materiales', value: summary.materialsTotal),
-            _Line(label: 'Acabados', value: summary.finishesTotal),
-            _Line(label: 'Mano de obra', value: summary.laborTotal),
-            _Line(label: 'Otros', value: summary.otherTotal),
+            _Line(label: 'Materiales', value: summary.materialsTotal, money: money),
+            _Line(label: 'Acabados', value: summary.finishesTotal, money: money),
+            _Line(label: 'Mano de obra', value: summary.laborTotal, money: money),
+            _Line(label: 'Otros', value: summary.otherTotal, money: money),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Divider(),
@@ -605,7 +622,7 @@ class _SummaryCard extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerRight,
                     child: Text(
-                      Formatters.money(summary.total),
+                      money.format(summary.total),
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -617,7 +634,7 @@ class _SummaryCard extends StatelessWidget {
             if (perSquareMeter != null) ...[
               const SizedBox(height: 6),
               Text(
-                '${Formatters.money(perSquareMeter)} por m² de piso',
+                '${money.format(perSquareMeter)} por m² de piso',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -631,10 +648,15 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _Line extends StatelessWidget {
-  const _Line({required this.label, required this.value});
+  const _Line({
+    required this.label,
+    required this.value,
+    required this.money,
+  });
 
   final String label;
   final double value;
+  final MoneyFormat money;
 
   @override
   Widget build(BuildContext context) {
@@ -645,7 +667,7 @@ class _Line extends StatelessWidget {
         children: [
           Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           Text(
-            Formatters.money(value),
+            money.format(value),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),

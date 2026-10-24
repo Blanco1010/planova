@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/money.dart';
 import '../../domain/entities/app_theme_mode.dart';
 import '../providers/settings_providers.dart';
 
@@ -12,6 +13,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeMode selected =
         ref.watch(themeModeProvider).value ?? AppThemeMode.system;
+    final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ajustes')),
@@ -33,6 +35,36 @@ class SettingsScreen extends ConsumerWidget {
                     RadioListTile<AppThemeMode>(
                       value: mode,
                       title: Text(mode.label),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text('Moneda', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            'Cambia cómo se escriben los precios. No los convierte: lo que '
+            'está escrito sigue valiendo lo mismo.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: RadioGroup<MoneyFormat>(
+              groupValue: money,
+              onChanged: (MoneyFormat? chosen) {
+                if (chosen == null) return;
+                ref.read(settingsRepositoryProvider).saveMoney(chosen);
+              },
+              child: Column(
+                children: [
+                  for (final MoneyFormat option in MoneyFormat.values)
+                    RadioListTile<MoneyFormat>(
+                      value: option,
+                      title: Text(option.label),
+                      subtitle: Text(option.example),
                     ),
                 ],
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/app_database.dart';
+import '../../../../core/utils/money.dart';
 import '../../../budget/presentation/providers/budget_providers.dart';
 import '../../../projects/presentation/providers/project_providers.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
@@ -20,6 +21,25 @@ final StreamProvider<AppThemeMode> themeModeProvider =
     StreamProvider<AppThemeMode>(
       (ref) => ref.watch(settingsRepositoryProvider).watchThemeMode(),
     );
+
+/// Moneda elegida, en vivo. Mientras carga, pesos.
+final StreamProvider<MoneyFormat> moneyProvider = StreamProvider<MoneyFormat>(
+  (ref) => ref.watch(settingsRepositoryProvider).watchMoney(),
+);
+
+/// Cómo se llama cada moneda en la interfaz.
+extension MoneyFormatView on MoneyFormat {
+  String get label => switch (this) {
+    MoneyFormat.cop => 'Peso colombiano',
+    MoneyFormat.usd => 'Dólar',
+  };
+
+  /// `$ · peso colombiano` para la lista de ajustes.
+  String get example => switch (this) {
+    MoneyFormat.cop => r'$ 1.250.000',
+    MoneyFormat.usd => r'US$ 1,250.00',
+  };
+}
 
 /// Nombre y equivalente de Flutter de cada modo, para la interfaz.
 extension AppThemeModeView on AppThemeMode {

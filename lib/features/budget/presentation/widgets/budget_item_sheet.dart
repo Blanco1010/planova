@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/measure_input.dart';
+import '../../../../core/utils/money.dart';
 import '../../../../core/utils/money_input.dart';
+import '../../../settings/presentation/providers/settings_providers.dart';
 import '../../domain/entities/budget_item.dart';
 import '../providers/budget_providers.dart';
 
@@ -68,8 +71,9 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
     _quantity = TextEditingController(
       text: item == null ? '1' : Formatters.quantity(item.quantity),
     );
+    final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     _price = TextEditingController(
-      text: item == null ? '' : item.unitPrice.round().toString(),
+      text: item == null ? '' : money.formatAmount(item.unitPrice),
     );
   }
 
@@ -84,6 +88,8 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final MoneyFormat money = ref.watch(moneyProvider).value ?? MoneyFormat.cop;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
@@ -158,11 +164,14 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Precio por unidad',
-                  prefixText: r'$ ',
+                  prefixText: '${money.symbol} ',
                 ),
-                validator: MoneyInput.validate,
+                inputFormatters: <TextInputFormatter>[
+                  MoneyInputFormatter(money),
+                ],
+                validator: (String? raw) => MoneyInput.validate(raw, money),
               ),
               const SizedBox(height: 24),
               FilledButton(
@@ -187,13 +196,14 @@ class _BudgetItemSheetState extends ConsumerState<BudgetItemSheet> {
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    final MoneyFormat money = ref.read(moneyProvider).value ?? MoneyFormat.cop;
     final NavigatorState navigator = Navigator.of(context);
     final BudgetItemDraft draft = BudgetItemDraft(
       category: _category,
       description: _description.text.trim(),
       unit: _unit.text.trim(),
       quantity: MeasureInput.parse(_quantity.text)!,
-      unitPrice: MoneyInput.parse(_price.text)!,
+      unitPrice: MoneyInput.parse(_price.text, money)!,
       roomId: widget.item?.roomId ?? widget.roomId,
     );
 

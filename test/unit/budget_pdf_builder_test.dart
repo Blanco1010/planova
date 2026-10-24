@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:planova/core/utils/money.dart';
 import 'package:planova/features/budget/data/services/budget_pdf_builder.dart';
 import 'package:planova/features/budget/domain/entities/budget_item.dart';
 import 'package:planova/features/budget/domain/entities/budget_summary.dart';
@@ -77,6 +78,7 @@ Future<Uint8List> _buildSample() {
   ];
 
   return BudgetPdfBuilder.build(
+    money: MoneyFormat.cop,
     project: _project,
     scopeLabel: 'Todo el proyecto',
     rooms: rooms,
@@ -138,6 +140,7 @@ void main() {
 
   test('se arma igual sin habitaciones ni partidas', () async {
     final Uint8List bytes = await BudgetPdfBuilder.build(
+      money: MoneyFormat.cop,
       project: _project,
       scopeLabel: 'Todo el proyecto',
       rooms: const <Room>[],

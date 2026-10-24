@@ -36,9 +36,6 @@ abstract final class Formatters {
       ? _whole.format(value)
       : _twoDecimals.format(value);
 
-  /// Dinero en pesos, sin centavos: `$ 1.250.000`.
-  static String money(double value) => r'$ ' + _whole.format(value.round());
-
   /// Volumen: `0,135 m³`.
   static String cubicMeters(double value) =>
       '${_threeDecimals.format(value)} m³';
