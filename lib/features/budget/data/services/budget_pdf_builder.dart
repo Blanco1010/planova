@@ -273,6 +273,7 @@ abstract final class BudgetPdfBuilder {
     return _table(
       headers: <String>[
         'Material',
+        'De',
         'Cantidad',
         'Unidad',
         'Precio unitario',
@@ -282,6 +283,7 @@ abstract final class BudgetPdfBuilder {
         for (final MaterialLine line in lines)
           <String>[
             line.kind.label,
+            line.kind.surface.label,
             Formatters.quantity(line.quantity),
             line.kind.unit,
             line.hasPrice ? Formatters.money(line.unitPrice) : 'sin precio',
@@ -289,7 +291,7 @@ abstract final class BudgetPdfBuilder {
             line.hasPrice ? Formatters.money(line.subtotal) : '-',
           ],
       ],
-      numericFrom: 1,
+      numericFrom: 2,
     );
   }
 

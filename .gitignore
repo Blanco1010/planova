@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Lo que Gradle deja dentro del paquete vendorizado.
+packages/*/android/.gradle/
+packages/*/android/build/

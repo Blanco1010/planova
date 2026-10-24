@@ -213,30 +213,35 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   Future<void> _addMaterial(List<MaterialLine> available) async {
     final MaterialLine? chosen = await showModalBottomSheet<MaterialLine>(
       context: context,
+      // Con los seis materiales sin precio la lista no cabe de una vez.
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (BuildContext sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '¿Qué material entra?',
-                  style: Theme.of(sheetContext).textTheme.titleLarge,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '¿Qué material entra?',
+                    style: Theme.of(sheetContext).textTheme.titleLarge,
+                  ),
                 ),
               ),
-            ),
-            for (final MaterialLine line in available)
-              ListTile(
-                title: Text(line.kind.label),
-                subtitle: Text(
-                  'Harían falta '
-                  '${Formatters.quantity(line.quantity)} ${line.kind.unit}',
+              for (final MaterialLine line in available)
+                ListTile(
+                  title: Text(line.kind.label),
+                  subtitle: Text(
+                    '${line.kind.surface.label} · harían falta '
+                    '${Formatters.quantity(line.quantity)} ${line.kind.unit}',
+                  ),
+                  onTap: () => Navigator.of(sheetContext).pop(line),
                 ),
-                onTap: () => Navigator.of(sheetContext).pop(line),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -394,6 +399,7 @@ class _MaterialsCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(line.kind.label),
                 subtitle: Text(
+                  '${line.kind.surface.label} · '
                   '${Formatters.quantity(line.quantity)} ${line.kind.unit}'
                   ' × ${Formatters.money(line.unitPrice)}',
                 ),

@@ -47,9 +47,15 @@ void main() {
     projects.dispose();
   });
 
-  Future<void> pumpBudget(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1000, 3000);
-    tester.view.devicePixelRatio = 2;
+  /// Por defecto un lienzo largo, para que quepan todas las tarjetas sin
+  /// desplazar; las pruebas de tamaño pasan el de un teléfono normal.
+  Future<void> pumpBudget(
+    WidgetTester tester, {
+    Size size = const Size(1000, 3000),
+    double pixelRatio = 2,
+  }) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = pixelRatio;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
@@ -114,7 +120,8 @@ void main() {
     // El primer «Añadir» es el de materiales.
     await tester.tap(find.widgetWithText(TextButton, 'Añadir').first);
     await tester.pumpAndSettle();
-    expect(find.text('Harían falta 425 unid'), findsOneWidget);
+    // Dice de dónde sale la cantidad: los bloques son de los muros.
+    expect(find.text('Paredes · harían falta 425 unid'), findsOneWidget);
 
     await tester.tap(find.text('Bloques'));
     await tester.pumpAndSettle();
@@ -124,7 +131,7 @@ void main() {
 
     // 425 × 1.800.
     expect(find.text(r'$ 765.000'), findsWidgets);
-    expect(find.text('425 unid × \$ 1.800'), findsOneWidget);
+    expect(find.text('Paredes · 425 unid × \$ 1.800'), findsOneWidget);
   });
 
   testWidgets('un material metido se puede quitar', (
@@ -240,5 +247,28 @@ void main() {
     expect(find.text('1 pared · 7,20 m² × \$ 12.000'), findsOneWidget);
     // 7,20 × 12.000 = 86.400, y entra en el total.
     expect(find.text(r'$ 86.400'), findsWidgets);
+  });
+
+  testWidgets('los seis materiales caben en la pantalla de un teléfono', (
+    WidgetTester tester,
+  ) async {
+    await addRoom();
+    // Un teléfono de verdad, no el lienzo largo de las demás pruebas: con
+    // los seis materiales sin precio la hoja se salía por abajo.
+    await pumpBudget(
+      tester,
+      size: const Size(1080, 2400),
+      pixelRatio: 3,
+    );
+
+    await tester.tap(find.widgetWithText(TextButton, 'Añadir').first);
+    await tester.pumpAndSettle();
+
+    // Si la hoja se desbordara, el propio marco de pruebas lo gritaría al
+    // pintarla. Y se puede bajar hasta el último material.
+    expect(find.text('Bloques'), findsOneWidget);
+    await tester.drag(find.text('Bloques'), const Offset(0, -200));
+    await tester.pumpAndSettle();
+    expect(find.text('Baldosas'), findsOneWidget);
   });
 }
