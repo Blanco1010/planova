@@ -193,36 +193,6 @@ abstract class AppL10n {
   /// **'Dólar'**
   String get currencyUsd;
 
-  /// No description provided for @settingsTesting.
-  ///
-  /// In es, this message translates to:
-  /// **'Pruebas'**
-  String get settingsTesting;
-
-  /// No description provided for @demoTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Cargar un proyecto de ejemplo'**
-  String get demoTitle;
-
-  /// No description provided for @demoBody.
-  ///
-  /// In es, this message translates to:
-  /// **'Crea una casa con tres habitaciones, precios y acabados para ver el presupuesto y el PDF sin medir nada.'**
-  String get demoBody;
-
-  /// No description provided for @demoDone.
-  ///
-  /// In es, this message translates to:
-  /// **'Listo: «{project}» está en tus proyectos.'**
-  String demoDone(String project);
-
-  /// No description provided for @demoFailed.
-  ///
-  /// In es, this message translates to:
-  /// **'No se pudo crear el ejemplo: {error}'**
-  String demoFailed(String error);
-
   /// No description provided for @projectsLoadError.
   ///
   /// In es, this message translates to:

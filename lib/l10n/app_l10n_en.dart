@@ -59,26 +59,6 @@ class AppL10nEn extends AppL10n {
   String get currencyUsd => 'Dollar';
 
   @override
-  String get settingsTesting => 'Testing';
-
-  @override
-  String get demoTitle => 'Load a sample project';
-
-  @override
-  String get demoBody =>
-      'Creates a house with three rooms, prices and finishes so you can see the budget and the PDF without measuring anything.';
-
-  @override
-  String demoDone(String project) {
-    return 'Done: «$project» is in your projects.';
-  }
-
-  @override
-  String demoFailed(String error) {
-    return 'Couldn\'t create the sample: $error';
-  }
-
-  @override
   String get projectsLoadError => 'Your projects couldn\'t be read';
 
   @override

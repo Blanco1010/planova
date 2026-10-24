@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/money.dart';
 import '../../../../l10n/app_l10n.dart';
-import '../../data/services/demo_data_service.dart';
 import '../../domain/entities/app_language.dart';
 import '../../domain/entities/app_theme_mode.dart';
 import '../providers/settings_providers.dart';
@@ -97,40 +95,8 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          if (kDebugMode) ...[
-            const SizedBox(height: 24),
-            Text(t.settingsTesting, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.science_outlined),
-                title: Text(t.demoTitle),
-                subtitle: Text(t.demoBody),
-                onTap: () => _seedDemo(context, ref, t),
-              ),
-            ),
-          ],
         ],
       ),
     );
-  }
-
-  /// Siembra el proyecto de ejemplo y lo dice.
-  Future<void> _seedDemo(
-    BuildContext context,
-    WidgetRef ref,
-    AppL10n t,
-  ) async {
-    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    try {
-      await ref.read(demoDataProvider).seed();
-      messenger.showSnackBar(
-        SnackBar(content: Text(t.demoDone(DemoDataService.projectName))),
-      );
-    } catch (error) {
-      messenger.showSnackBar(
-        SnackBar(content: Text(t.demoFailed('$error'))),
-      );
-    }
   }
 }
