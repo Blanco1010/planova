@@ -155,7 +155,7 @@ class _MasonryCard extends StatelessWidget {
     return _EstimateCard(
       icon: Icons.grid_view,
       title: 'Mampostería',
-      headline: '${Formatters.units(estimate.blocks)} bloques',
+      headline: '${Formatters.units(estimate.blocks)} piezas',
       source:
           'De ${Formatters.squareMeters(estimate.wallAreaM2)} de muros '
           '(no del piso)',
@@ -166,9 +166,9 @@ class _MasonryCard extends StatelessWidget {
       ],
       footnote:
           '${Formatters.squareMeters(estimate.wallAreaM2)} × '
-          '${Formatters.decimal(estimate.blocksPerSquareMeter)} bloques/m² + '
+          '${Formatters.decimal(estimate.blocksPerSquareMeter)} piezas/m² + '
           '${Formatters.quantity(params.wastePercent)} % de desperdicio. '
-          'Bloque de ${Formatters.centimeters(params.blockLengthMeters)} × '
+          'Pieza de ${Formatters.centimeters(params.blockLengthMeters)} × '
           '${Formatters.centimeters(params.blockHeightMeters)}, junta de '
           '${Formatters.centimeters(params.jointMeters)}, muro de '
           '${Formatters.centimeters(params.wallThicknessMeters)}.',

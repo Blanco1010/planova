@@ -70,7 +70,8 @@ class ProjectDetailScreen extends ConsumerWidget {
                 leading: const Icon(Icons.calculate_outlined),
                 title: const Text('Materiales'),
                 subtitle: const Text(
-                  'Bloques, mortero, pintura y piso con tus rendimientos',
+                  'Bloques o ladrillos, mortero, pintura y piso con tus '
+                  'rendimientos',
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.push(AppRoutes.materialsPath(projectId)),

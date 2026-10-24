@@ -117,9 +117,9 @@ class _MaterialSettingsSheetState extends ConsumerState<MaterialSettingsSheet> {
                 _Section(title: 'Mampostería'),
                 _pair(
                   'blockLength',
-                  'Largo del bloque (cm)',
+                  'Largo de la pieza (cm)',
                   'blockHeight',
-                  'Alto del bloque (cm)',
+                  'Alto de la pieza (cm)',
                 ),
                 _pair(
                   'joint',

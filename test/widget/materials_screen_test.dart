@@ -75,7 +75,7 @@ void main() {
       findsOneWidget,
     );
     // 33,60 m² × 12,04 bloques/m² × 1,05 de desperdicio.
-    expect(find.text('425 bloques'), findsOneWidget);
+    expect(find.text('425 piezas'), findsOneWidget);
     expect(find.text('4 bultos'), findsOneWidget);
     // 33,60 × 2 manos / 10 m² por litro × 1,05.
     expect(find.text('7,06 L'), findsOneWidget);
@@ -86,7 +86,7 @@ void main() {
     expect(find.text('De 33,60 m² de muros (no del piso)'), findsNWidgets(2));
     expect(find.text('De 12,00 m² de piso'), findsOneWidget);
     expect(
-      find.textContaining('33,60 m² × 12,04 bloques/m² + 5 % de desperdicio'),
+      find.textContaining('33,60 m² × 12,04 piezas/m² + 5 % de desperdicio'),
       findsOneWidget,
     );
   });

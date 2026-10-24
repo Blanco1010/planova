@@ -26,7 +26,7 @@ extension MaterialKindDisplay on MaterialKind {
   };
 
   String get label => switch (this) {
-    MaterialKind.block => 'Bloques',
+    MaterialKind.block => 'Bloques o ladrillos',
     MaterialKind.cement => 'Cemento',
     MaterialKind.sand => 'Arena',
     MaterialKind.paint => 'Pintura',

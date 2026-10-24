@@ -104,7 +104,7 @@ void main() {
     await addRoom();
     await pumpBudget(tester);
 
-    expect(find.text('Bloques'), findsNothing);
+    expect(find.text('Bloques o ladrillos'), findsNothing);
     expect(
       find.textContaining('Añade los materiales que quieras presupuestar'),
       findsOneWidget,
@@ -123,7 +123,7 @@ void main() {
     // Dice de dónde sale la cantidad: los bloques son de los muros.
     expect(find.text('Paredes · harían falta 425 unid'), findsOneWidget);
 
-    await tester.tap(find.text('Bloques'));
+    await tester.tap(find.text('Bloques o ladrillos'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), '1800');
     await tester.tap(find.text('Guardar'));
@@ -140,14 +140,14 @@ void main() {
     await addRoom();
     await budget.savePrice(1, MaterialKind.block, 1800);
     await pumpBudget(tester);
-    expect(find.text('Bloques'), findsOneWidget);
+    expect(find.text('Bloques o ladrillos'), findsOneWidget);
 
-    await tester.tap(find.text('Bloques'));
+    await tester.tap(find.text('Bloques o ladrillos'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Quitar del presupuesto'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Bloques'), findsNothing);
+    expect(find.text('Bloques o ladrillos'), findsNothing);
   });
 
   testWidgets('una partida de mano de obra entra en su capítulo', (
@@ -266,8 +266,11 @@ void main() {
 
     // Si la hoja se desbordara, el propio marco de pruebas lo gritaría al
     // pintarla. Y se puede bajar hasta el último material.
-    expect(find.text('Bloques'), findsOneWidget);
-    await tester.drag(find.text('Bloques'), const Offset(0, -200));
+    expect(find.text('Bloques o ladrillos'), findsOneWidget);
+    await tester.drag(
+      find.text('Bloques o ladrillos'),
+      const Offset(0, -200),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Baldosas'), findsOneWidget);
   });
