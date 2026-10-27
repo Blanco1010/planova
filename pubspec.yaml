@@ -54,6 +54,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # Genera los iconos de Android desde assets/icon.
+  flutter_launcher_icons: ^0.14.4
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -107,3 +110,13 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# El icono de la app: el dibujo del plano sobre blanco. La capa de delante
+# del icono adaptable va más pequeña para que ninguna máscara se la coma.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon/planova_icon.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icon/planova_icon_foreground.png
+  min_sdk_android: 28
