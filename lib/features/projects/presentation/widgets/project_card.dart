@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/formatters.dart';
 import '../../../../l10n/app_l10n.dart';
 import '../../domain/entities/project.dart';
 
@@ -63,15 +62,8 @@ class ProjectCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    const SizedBox(height: 4),
-                    Text(
-                      AppL10n.of(
-                        context,
-                      ).updatedOn(Formatters.shortDate(project.updatedAt)),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+                    // La fecha de la última edición no se enseña: en la
+                    // lista no dice gran cosa y hace ver vieja la obra.
                   ],
                 ),
               ),
