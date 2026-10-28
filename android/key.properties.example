@@ -1,0 +1,7 @@
+# Copia este archivo como android/key.properties y pon lo tuyo.
+# Ese archivo no se sube al repositorio: lleva las contraseñas.
+storePassword=la-contraseña-del-keystore
+keyPassword=la-contraseña-de-la-clave
+keyAlias=planova
+# Relativo a la carpeta android/; el keystore está en la raíz del proyecto.
+storeFile=../planova-release.jks

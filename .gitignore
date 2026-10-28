@@ -50,3 +50,8 @@ app.*.map.json
 # Lo que Gradle deja dentro del paquete vendorizado.
 packages/*/android/.gradle/
 packages/*/android/build/
+
+# La firma de la app: el keystore y sus contraseñas no se suben nunca.
+*.jks
+*.keystore
+android/key.properties
